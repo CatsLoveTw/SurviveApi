@@ -1,0 +1,46 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "§e§l生存伺服器包",
+		"description": "By cat",
+		"min_engine_version": [
+			1,
+			19,
+			50
+		],
+		"uuid": "706b23a8-7f8c-4be4-b973-4c73a5968894",
+		"version": [
+			1,
+			0,
+			0
+		]
+	},
+	"modules": [
+		{
+			"description": "Script resources",
+			"type": "script",
+			"language": "javascript",
+			"uuid": "33097b67-5b94-4c30-a183-1ece39122c70",
+			"entry": "scripts/main.js",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "1.1.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-gametest",
+			"version": "1.0.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "1.0.0-beta"
+		}
+	]
+}
