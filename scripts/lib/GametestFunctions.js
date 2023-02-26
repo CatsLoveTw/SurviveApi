@@ -1,7 +1,7 @@
 import * as mc from "@minecraft/server";
 
 const cmd = function(command) {
-    return mc.world.getDimension("overworld").runCommandAsync(command).statusMessage
+    return mc.world.getDimension("overworld").runCommandAsync(command)
 };
   
 const logfor = function(playername,message) {
@@ -25,7 +25,7 @@ const titlelog = function(message) {
 
 const log = function(message) {
     let okay_message = message.toString().replaceAll('\"',"''").replaceAll('\\',"/")
-    mc.world.getDimension("overworld").runCommandAsync(`tellraw @a {"rawtext":[{"text":"${okay_message}"}]}`).statusMessage
+    mc.world.getDimension("overworld").runCommandAsync(`tellraw @a {"rawtext":[{"text":"${okay_message}"}]}`)
 }
 
 
