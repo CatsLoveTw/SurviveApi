@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
-import { worldlog } from '../../lib/function.js'
+import { getRandomIntInclusive, worldlog } from '../../lib/function.js'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 
 // 在這個檔案內 unix為1970/1/1至今的毫秒數
@@ -22,21 +22,22 @@ function getLandData(land) {
     let z2 = postion[1].split("|")[1]
 
     let permissions = args[4].split("|")
-
     /**
-     * @type {[{username: string,permission: {build: string, container: string, action: string}}]}
-     */
+    * @type {[{username: string,permission: {build: string, container: string, action: string}}]}
+    */
     let usersList = []
-    let users = args[5].split(":/:")
-    for (let user of users) {
-        let username = user.split(":")[0]
-        let per = user.split(":")[1].split("|")
-        let userPermissions = {
-            build: per[0],
-            container: per[1],
-            action: per[2],
+    if (args[3] != 'true') {
+        let users = args[5].split(":/:")
+        for (let user of users) {
+            let username = user.split(":")[0]
+            let per = user.split(":")[1].split("|")
+            let userPermissions = {
+                build: per[0],
+                container: per[1],
+                action: per[2],
+            }
+            usersList.push({ username: username, permission: userPermissions })
         }
-        usersList.push({ username: username, permission: userPermissions })
     }
     if (args[3] != "true") {
         return {
@@ -74,6 +75,7 @@ function getLandData(land) {
         }
     }
 }
+
 
 /**
  * 
@@ -116,6 +118,22 @@ function getPlayerLands(player) {
     for (let land of lands) {
         let landDT = getLandData(land)
         if (landDT.player == player.name) {
+            playerLand.push(landDT)
+        }
+    }
+    return playerLand
+}
+
+/**
+ * 
+ * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: false,permission: {build: string,container: string,action: string}, users: false, public: true}}
+ */
+function getAdminLands() {
+    let lands = worldlog.getScoreboardPlayers("lands").disname
+    let playerLand = []
+    for (let land of lands) {
+        let landDT = getLandData(land)
+        if (!landDT.player) {
             playerLand.push(landDT)
         }
     }
@@ -192,7 +210,8 @@ export function UI(player) {
                 "landCreate": {
                     "at": new Date().getTime(),
                     "name": name,
-                    "step": 1
+                    "step": 1,
+                    "admin": false
                 }
             }
             player.addTag(JSON.stringify(json))
@@ -269,9 +288,10 @@ export function UI(player) {
                     .title("§e§l領地")
                     .button("§e§l權限管理")
                     .button("§e§l查看領地資訊")
+                    .button("§c§l踢出領地")
                     .button("§7§l返回")
                     .show(player).then(res => {
-                        if (res.selection === 2 || !res || res.canceled) return list();
+                        if (res.selection === 3 || !res || res.canceled) return list();
                         if (res.selection === 0) {
                             perMenu()
                             function perMenu() {
@@ -307,14 +327,14 @@ export function UI(player) {
                                                                                 let name = res.formValues[0]
                                                                                 for (let user of land.users) {
                                                                                     if (user.username == name) {
-                                                                                        logfor (player.name, '§c§l>> §e名稱重複!')
+                                                                                        logfor(player.name, '§c§l>> §e名稱重複!')
                                                                                         return Personal()
                                                                                     }
                                                                                 }
                                                                                 cmd(`scoreboard players reset "${transfromLand(land)}" lands`)
-                                                                                land.users.push({username: name, permission: {build: "false", container: "false", action: "true"}})
+                                                                                land.users.push({ username: name, permission: { build: "false", container: "false", action: "true" } })
                                                                                 cmd(`scoreboard players set "${transfromLand(land)}" lands ${land.UID}`).then(() => {
-                                                                                    logfor (player.name, '§a§l>> §e設定成功!')
+                                                                                    logfor(player.name, '§a§l>> §e設定成功!')
                                                                                     return Personal();
                                                                                 })
                                                                             })
@@ -322,33 +342,33 @@ export function UI(player) {
                                                                         let players = []
                                                                         let form = new ui.ActionFormData()
                                                                             .title("§a§l線上玩家新增")
-                                                                            for (let player of mc.world.getAllPlayers()) {
-                                                                                let check = true
-                                                                                for (let user of land.users) {
-                                                                                    if (user.username == player.name) {
-                                                                                        check = false
-                                                                                    }
-                                                                                } 
-                                                                                if (check) {
-                                                                                    players.push(player.name)
+                                                                        for (let player of mc.world.getAllPlayers()) {
+                                                                            let check = true
+                                                                            for (let user of land.users) {
+                                                                                if (user.username == player.name) {
+                                                                                    check = false
                                                                                 }
                                                                             }
-                                                                            for (let player of players) {
-                                                                                form.button(`§e§l${player}`)
+                                                                            if (check) {
+                                                                                players.push(player.name)
                                                                             }
-                                                                            if (players.length == 0) {
-                                                                                return logfor (player.name, `§c§l>> §e沒有玩家可新增!`)
-                                                                            }
-                                                                            form.show(player).then(res => {
-                                                                                if (res.canceled || !res) return;
-                                                                                let selePlayer = players[res.selection]
-                                                                                cmd(`scoreboard players reset "${transfromLand(land)}" lands`)
-                                                                                land.users.push({username: selePlayer, permission: {build: "false", container: "false", action: "true"}})
-                                                                                cmd(`scoreboard players set "${transfromLand(land)}" lands ${land.UID}`).then(() => {
-                                                                                    logfor (player.name, '§a§l>> §e設定成功!')
-                                                                                    return Personal();
-                                                                                })
+                                                                        }
+                                                                        for (let player of players) {
+                                                                            form.button(`§e§l${player}`)
+                                                                        }
+                                                                        if (players.length == 0) {
+                                                                            return logfor(player.name, `§c§l>> §e沒有玩家可新增!`)
+                                                                        }
+                                                                        form.show(player).then(res => {
+                                                                            if (res.canceled || !res) return;
+                                                                            let selePlayer = players[res.selection]
+                                                                            cmd(`scoreboard players reset "${transfromLand(land)}" lands`)
+                                                                            land.users.push({ username: selePlayer, permission: { build: "false", container: "false", action: "true" } })
+                                                                            cmd(`scoreboard players set "${transfromLand(land)}" lands ${land.UID}`).then(() => {
+                                                                                logfor(player.name, '§a§l>> §e設定成功!')
+                                                                                return Personal();
                                                                             })
+                                                                        })
                                                                     } else if (res.selection === 2) {
                                                                         Personal()
                                                                     }
@@ -364,7 +384,7 @@ export function UI(player) {
                                                                 }
                                                             }
                                                             if (players.length == 0) {
-                                                                return logfor (player.name, `§c§l>> §e沒有玩家可刪除`)
+                                                                return logfor(player.name, `§c§l>> §e沒有玩家可刪除`)
                                                             }
                                                             form.show(player).then(res => {
                                                                 if (res.canceled || !res) return;
@@ -388,10 +408,10 @@ export function UI(player) {
                                                                     }
                                                                 }
                                                                 if (players.length == 0) {
-                                                                    return logfor (player.name, '§c§l>> §e沒有玩家可以修改!')
+                                                                    return logfor(player.name, '§c§l>> §e沒有玩家可以修改!')
                                                                 }
                                                                 form.show(player).then(res => {
-                                                                    function changeBoolean (text) {
+                                                                    function changeBoolean(text) {
                                                                         if (text == "true") {
                                                                             return true
                                                                         }
@@ -410,7 +430,7 @@ export function UI(player) {
                                                                             cmd(`scoreboard players reset "${transfromLand(land)}" lands`)
                                                                             let newUsers = land.users.filter(item => item.username !== selePlayer.username);
                                                                             land.users = newUsers
-                                                                            land.users.push({username: selePlayer.username, permission: {build: `${build}`, container: `${container}`, action: "true"}})
+                                                                            land.users.push({ username: selePlayer.username, permission: { build: `${build}`, container: `${container}`, action: "true" } })
                                                                             cmd(`scoreboard players set "${transfromLand(land)}" lands ${land.UID}`).then(() => {
                                                                                 logfor(player.name, `§a§l>> §e設定成功!`)
                                                                                 return Personal();
@@ -425,10 +445,10 @@ export function UI(player) {
                                             }
 
                                         } else if (res.selection === 1) {
-                                            function changeBoolean (text) {
+                                            function changeBoolean(text) {
                                                 if (text == 'true') {
                                                     return true
-                                                } 
+                                                }
                                                 return false
                                             }
                                             let form = new ui.ModalFormData()
@@ -462,6 +482,251 @@ export function UI(player) {
                             let form = new ui.ActionFormData()
                                 .title("§e§l領地資訊")
                                 .body(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}\n\n§a個人:\n${user.join("\n")}`)
+                                .button("§7§l返回")
+                                .show(player).then(res => {
+                                    if (!res || res.selection === 0) return landData(land);
+                                })
+                        } else if (res.selection === 2) {
+                            /**
+                             * @type {mc.Player[]}
+                             */
+                            let players = []
+                            for (let pl of mc.world.getAllPlayers()) {
+                                let playerPos = pl.location
+                                let data = land
+                                let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
+                                let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
+                                let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
+                                let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
+                                if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
+                                    if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
+                                        if (pl.name != player.name) {
+                                            players.push(player)
+                                        }
+                                    }
+                                }
+                            }
+                            if (players.length == 0) {
+                                return logfor(player.name, '§c§l>> §e領地內暫無玩家!')
+                            }
+                            let form = new ui.ActionFormData()
+                                .title('§c§l踢出領地')
+                            for (let player of players) {
+                                form.button(`§e§l${player.name}`)
+                            }
+                            form.show(player).then(res => {
+                                if (res.canceled || !res) return landData(land);
+                                let data = land
+                                let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
+                                let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
+                                let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
+                                let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
+                                /**
+                                 * @type {mc.Player}
+                                 */
+                                let selePlayer = players[res.selection]
+                                let getPos = {x: Number(land.pos.x[getRandomIntInclusive(1, 2)]), z: Number(land.pos.z[getRandomIntInclusive(1, 2)])}
+                                let addSelection = getRandomIntInclusive(1, 2)
+                                let add = getRandomIntInclusive(55, 200)
+                                if (addSelection == 1) { // x改變
+                                    // 偵測範圍
+                                    let get = getPos.x + add
+                                    if (get <= x1 && get >= x2) {
+                                        get = getPos.x - add
+                                    } 
+                                    getPos.x = get
+                                } else { // z改變
+                                    let get = getPos.z + add
+                                    if (get <= z1 && get >= z2) {
+                                        get = getPos.z - add
+                                    } 
+                                    getPos.z = get
+                                }
+                                selePlayer.runCommandAsync(`spreadplayers ${getPos.x} ${getPos.z} 2 3 @s`).then(() => {
+                                    logfor(selePlayer.name, `§c§l>> §e您已被 §b${player.name} §e踢出領地`)
+                                    logfor (player.name, '§a§l>> §e執行成功!')
+                                    return landData(land)
+                                })
+                            })
+                        }
+                    })
+            }
+        })
+    }
+}
+
+export function adminUI(player) {
+    // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
+    // name_,_posx|posz/posx2|posz2_,_ID_,_true_,_build|container|action
+    // createTag: {"landCreate":{"at": number(unixtime), "name": string, "step": number(步驟進行)}}
+    menu()
+    function menu() {
+        let form = new ui.ActionFormData()
+            .title("§e§l公共領地系統")
+            .body(`§e§l`)
+            .button("§a§l新增")
+            .button('§c§l刪除')
+            .button('§e§l查看')
+            .show(player).then(res => {
+                if (res.selection === 0) {
+                    add()
+                } else if (res.selection === 1) {
+                    remove()
+                } else if (res.selection === 2) {
+                    list()
+                }
+            })
+    }
+
+    function add() {
+        let form = new ui.ModalFormData()
+            .title("§a§l新增領地")
+            .textField(`§e§l輸入領地名稱`, `§e§l名稱`)
+        form.show(player).then(res => {
+            if (player.dimension.id != 'minecraft:overworld') {
+                return logfor(player.name, `§c§l>> §e領地不可建於地獄或終界!`)
+            }
+            for (let tag of player.getTags()) {
+                if (tag.includes('{"landCreate":{')) {
+                    let data = JSON.parse(tag)
+                    return logfor(player.name, `§c§l>> §e您的領地建造項目 §b${data.landCreate.name} §e還未結束!`)
+                }
+            }
+            if (!res) return;
+
+            let name = res.formValues[0].trim()
+            let playerLands = getAdminLands()
+            if (name == '') {
+                return logfor(player.name, `§c§l>> §e領地名稱不得為空!`)
+            }
+            for (let land of playerLands) {
+                if (land.name == name) {
+                    return logfor(player.name, `§c§l>> §e領地名稱重複!`)
+                }
+            }
+            // createTag: {"landCreate":{"at": number(unixtime), "name": string, "step": number}}
+            let json = {
+                "landCreate": {
+                    "at": new Date().getTime(),
+                    "name": name,
+                    "step": 1,
+                    "admin": true
+                }
+            }
+            player.addTag(JSON.stringify(json))
+            logfor(player.name, `§a§l>> §e放置隨意方塊在地面即可設置領地範圍 §f(§6建議使用泥土§f)`);
+        })
+    }
+
+    function remove() {
+        if (getAdminLands().length == 0) {
+            return logfor(player.name, '§c§l>> §e找不到公共領地!')
+        }
+        let lands = getAdminLands()
+        let form = new ui.ActionFormData()
+            .title("§c§l刪除領地")
+        for (let land of lands) {
+            let x1 = Math.max(land.pos.x[1], land.pos.x[2])
+            let x2 = Math.min(land.pos.x[1], land.pos.x[2])
+            let z1 = Math.max(land.pos.z[1], land.pos.z[2])
+            let z2 = Math.min(land.pos.z[1], land.pos.z[2])
+            form.button(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2}`)
+        }
+        form.show(player).then(res => {
+            if (!res) return;
+            let selection = res.selection
+            /**
+             * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}}
+             */
+            let land = lands[selection]
+            // MessageFormData 按鈕selection為Button1=1 Button2=0
+            let form = new ui.MessageFormData()
+                .title("§c§l刪除領地確認")
+                .body(`§e§l您正在執行刪除領地 §b${land.name} §e的動作\n§e是否刪除?\n\n§c警告:一旦刪除後就不能復原!`)
+                .button1("§a§l刪除")
+                .button2("§c§l返回")
+                .show(player).then(res => {
+                    if (res.selection === 1) {
+                        let name = transfromLand(land)
+                        cmd(`scoreboard players reset "${name}" lands`);
+                        return logfor(player.name, `§c§l>> §e刪除成功!`);
+                    }
+                    return menu()
+                })
+        })
+    }
+
+    function list() {
+        let lands = getAdminLands()
+        let form = new ui.ActionFormData()
+            .title("§e§l查看公共領地")
+        for (let land of lands) {
+            let x1 = Math.max(land.pos.x[1], land.pos.x[2])
+            let x2 = Math.min(land.pos.x[1], land.pos.x[2])
+            let z1 = Math.max(land.pos.z[1], land.pos.z[2])
+            let z2 = Math.min(land.pos.z[1], land.pos.z[2])
+            form.button(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2}`)
+        }
+        form.show(player).then(res => {
+            if (!res || res.canceled) return;
+            let land = lands[res.selection]
+            landData(land)
+            /**
+             * 
+             * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}} land 
+             */
+            function landData(land) {
+                let x1 = Math.max(land.pos.x[1], land.pos.x[2])
+                let x2 = Math.min(land.pos.x[1], land.pos.x[2])
+                let z1 = Math.max(land.pos.z[1], land.pos.z[2])
+                let z2 = Math.min(land.pos.z[1], land.pos.z[2])
+                let form = new ui.ActionFormData()
+                    .title("§e§l公共領地")
+                    .button("§e§l權限管理")
+                    .button("§e§l查看領地資訊")
+                    .button("§7§l返回")
+                    .show(player).then(res => {
+                        if (res.selection === 2 || !res || res.canceled) return list();
+                        if (res.selection === 0) {
+                            perMenu()
+                            function perMenu() {
+                                let form = new ui.ActionFormData()
+                                    .title("§e§l權限管理")
+                                    .button("§e§l公共")
+                                    .button("§7§l返回")
+                                    .show(player).then(res => {
+                                         if (res.selection === 0) {
+                                            function changeBoolean (text) {
+                                                if (text == 'true') {
+                                                    return true
+                                                } 
+                                                return false
+                                            }
+                                            let form = new ui.ModalFormData()
+                                                .title("§e§l公共權限設定")
+                                                .toggle("§b§l建築/破壞權限", changeBoolean(land.permission.build))
+                                                .toggle("§b§l容器交互權限", changeBoolean(land.permission.container))
+                                                .show(player).then(res => {
+                                                    if (!res || res.canceled) return perMenu();
+                                                    let build = res.formValues[0]
+                                                    let container = res.formValues[1]
+                                                    cmd(`scoreboard players reset "${transfromLand(land)}" lands`)
+                                                    land.permission.build = `${build}`
+                                                    land.permission.container = `${container}`
+                                                    cmd(`scoreboard players set "${transfromLand(land)}" lands ${land.UID}`)
+                                                    logfor(player.name, `§a§l>> §e修改成功!`)
+                                                    return perMenu()
+                                                })
+                                        } else if (res.selection === 1) {
+                                            landData(land)
+                                        }
+                                    })
+                            }
+                        } else if (res.selection === 1) {
+                            let squ = (Math.abs(Number(x1) - Number(x2)) + 1) * (Math.abs(Number(z1) - Number(z2)))
+                            let form = new ui.ActionFormData()
+                                .title("§e§l領地資訊")
+                                .body(`§e§l公共領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}`)
                                 .button("§7§l返回")
                                 .show(player).then(res => {
                                     if (!res || res.selection === 0) return landData(land);

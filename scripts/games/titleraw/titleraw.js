@@ -18,7 +18,7 @@ export function build () {
                         data.tick = data.tick+1
                         data = JSON.stringify(data)
                         player.addTag(data)
-                        display.push(`§l§f${((JSON.parse(data).maxtick - JSON.parse(data).tick) / 20).toFixed(1)}s §a> ` + JSON.parse(data).news + "\n")
+                        display.push(`§l§f${((JSON.parse(data).maxtick - JSON.parse(data).tick) / 20).toFixed(1)}s §7| ` + JSON.parse(data).news + "\n")
                     }
                 }
             }
@@ -39,9 +39,9 @@ export function build () {
             if (S < 10 && S != 0) {
                 disS = "0" + S
             }
-
+            let money = worldlog.getScoreFromMinecraft(player.name, 'money').score
             let time = `§f${disD} §b日 §f${disH} §b小時 §f${disM} §b分鐘 §f${disS} §b秒`
-            titlefor(player.name, `§l${display.join("")}§f遊玩 §7- ${time}`)
+            titlefor(player.name, `§l${display.join("")}§f遊玩 §7- ${time}\n§g金錢 §7- §e${money} `)
         }
     }, 1)
 }

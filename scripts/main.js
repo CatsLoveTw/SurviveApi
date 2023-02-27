@@ -7,18 +7,11 @@ import * as chatCommnad from './games/chatCommands/build.js'
 import * as land from './games/land/build.js'
 import { playerUI } from "./games/UI/player.js"
 import * as titleraw from './games/titleraw/build.js'
+import * as tpa from './games/tpa/build.js'
+import * as bank from './games/bank/build.js'
 
-// world.getDimension("overworld").runCommandAsync("say hi:>")
 
-// let UI = new ui.MessageFormData()
-// .title("測試")
-// .body("測試")
-// .button1("是")
-// .button2("否")
-// .show(world.getAllPlayers()[0]).then(res => {
-//     log(res.selection)
-// })
-
+// 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
 const prefix = '-'
 
 function runCommand (command) {
@@ -48,7 +41,7 @@ world.events.beforeItemUse.subscribe(events => {
     }
 })
 
-// system.runSchedule() 類似於tickEvents
+// system.runSchedule() 類似於tickEvent
 
 const scoreboards = {
     "land_squ": 0,
@@ -58,7 +51,8 @@ const scoreboards = {
     "time": 0,
     "timeD": 0,
     "timeH": 0,
-    "timeM": 0
+    "timeM": 0,
+    "money": 0,
 }
 system.runSchedule(() => {
     let score = {}
@@ -71,6 +65,13 @@ system.runSchedule(() => {
             }
         }
             if (!player.hasTag('newPlayer')) {
+                let json = {
+                    "tpaSetting": {"dontDistrub": false, "sec": 15}
+                }
+                player.addTag(JSON.stringify(json))
+
+
+
                 for (let board in score) {
                     player.runCommandAsync(`scoreboard players add @s "${board}" ${score[board]}`)
                 }
@@ -80,7 +81,7 @@ system.runSchedule(() => {
 }, 1)
 
 
-function getNow_PlayTime () {
+function getPlayTime () {
     let i = 0
     world.events.tick.subscribe(() => {
         i++
@@ -95,6 +96,13 @@ function getNow_PlayTime () {
                     while (sec >= 60) {
                         sec -= 60
                         M ++
+                        if (worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score <= (10000 - 12)) {
+                            let getSquMax = worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score
+                            player.runCommandAsync(`scoreboard players add @s land_squ_max 12`)
+                            let msg = `§g§l線上獎勵 §f> §a您的領地上限擴大了12格! §f(§e現為 §b${Number(getSquMax) + 12} §e格§f)`
+                            let json = { "news": msg, tick: 0, maxtick: 120 }
+                            player.addTag(JSON.stringify(json))
+                        }
                     }
                     while (M >= 60) {
                         M -= 60
@@ -114,7 +122,7 @@ function getNow_PlayTime () {
     })
 }
 
-getNow_PlayTime()
+getPlayTime()
 
 
 
@@ -126,6 +134,8 @@ try {
     chatCommnad.build(prefix)
     land.build()
     titleraw.build()
+    tpa.build()
+    bank.build()
 } catch (e) {log(e)}
 
 

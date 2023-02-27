@@ -2,7 +2,6 @@ import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
-
 /**
  * 
  * @param {string} land 
@@ -20,21 +19,22 @@ function getLandData(land) {
     let z2 = postion[1].split("|")[1]
 
     let permissions = args[4].split("|")
-
     /**
-     * @type {[{username: string,permission: {build: string, container: string, action: string}}]}
-     */
+    * @type {[{username: string,permission: {build: string, container: string, action: string}}]}
+    */
     let usersList = []
-    let users = args[5].split(":/:")
-    for (let user of users) {
-        let username = user.split(":")[0]
-        let per = user.split(":")[1].split("|")
-        let userPermissions = {
-            build: per[0],
-            container: per[1],
-            action: per[2],
+    if (args[3] != 'true') {
+        let users = args[5].split(":/:")
+        for (let user of users) {
+            let username = user.split(":")[0]
+            let per = user.split(":")[1].split("|")
+            let userPermissions = {
+                build: per[0],
+                container: per[1],
+                action: per[2],
+            }
+            usersList.push({ username: username, permission: userPermissions })
         }
-        usersList.push({ username: username, permission: userPermissions })
     }
     if (args[3] != "true") {
         return {
@@ -120,10 +120,10 @@ export function build() {
                         return logfor(player.name, `§c§l>> §e領地不可建於地獄或終界!`)
                     }
                     let data = JSON.parse(tag)
-                    // 偵測過期時間 (5分鐘)
+                    // 偵測過期時間 (3分鐘)
                     if ((getTimes - data.landCreate.at) >= (times * 1000)) {
                         player.removeTag(tag)
-                        logfor(player.name, `§c§l>> §e您建造領地 §b${data.landCreate.name} §e已經超過 §g5分鐘 §e系統已經自動刪除該計畫。`)
+                        logfor(player.name, `§c§l>> §e您建造領地 §b${data.landCreate.name} §e已經超過 §g${times / 60}分鐘 §e系統已經自動刪除該計畫。`)
                     }
                 }
             }
@@ -136,7 +136,7 @@ export function build() {
         let blockPos = events.block.location
         let check = false
         /**
-         * @type {{"landCreate":{"at": number, 'name': string, 'step': number, 'pos': {x: number | false, z: number | false}, 'pos2': {x: number | false, z: number | false}}}}
+         * @type {{"landCreate":{"at": number, 'name': string, 'step': number, 'pos': {x: number | false, z: number | false}, 'pos2': {x: number | false, z: number | false}, 'admin': boolean}}}
          * 
          * Step起始為1
          */
@@ -170,7 +170,8 @@ export function build() {
                     "pos2": {
                         x: false,
                         z: false
-                    }
+                    },
+                    "admin": json.landCreate.admin
                 }
             }
             return player.addTag(JSON.stringify(Json))
@@ -178,10 +179,12 @@ export function build() {
 
         if (Number(json.landCreate.step == 2)) {
             // button1: 1 button2: 0
-            let squ = (Math.abs(json.landCreate.pos.x - blockPos.x) + 1) * (Math.abs(json.landCreate.pos.z - blockPos.z) + 1)
-            if ((squ + worldlog.getScoreFromMinecraft(player.name, "land_squ").score) > worldlog.getScoreFromMinecraft(player.name, "land_squ_max").score || (worldlog.getScoreFromMinecraft(player.name, 'land_land').score + 1) > worldlog.getScoreFromMinecraft(player.name, 'land_land_max').score) {
-                player.removeTag(tags)
-                return logfor(player.name, `§c§l>> §e創建失敗! 領地格數超過上限!`)
+                let squ = (Math.abs(json.landCreate.pos.x - blockPos.x) + 1) * (Math.abs(json.landCreate.pos.z - blockPos.z) + 1)
+                if (!json.landCreate.admin) {
+                if ((squ + worldlog.getScoreFromMinecraft(player.name, "land_squ").score) > worldlog.getScoreFromMinecraft(player.name, "land_squ_max").score || (worldlog.getScoreFromMinecraft(player.name, 'land_land').score + 1) > worldlog.getScoreFromMinecraft(player.name, 'land_land_max').score) {
+                    player.removeTag(tags)
+                    return logfor(player.name, `§c§l>> §e創建失敗! 領地格數超過上限!`)
+                }
             }
             for (let land of worldlog.getScoreboardPlayers("lands").disname) {
                 let data = getLandData(land)
@@ -204,12 +207,16 @@ export function build() {
                 }
             }
             let UI = new ui.MessageFormData()
-                .title("§e§l領地建造確認")
-                .body(`§e§l您成功設定了領地! 最後一步，確認領地訊息是否正確\n§e領地資料為 §f-\n§e領地名稱 §f- §e${json.landCreate.name}\n§e領地範圍 §f- §e${squ} 格 §7(§ex§f:§e ${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)} §f| §ey§f: §e全部 §f| §ez§f: §e${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)}§7)`)
-                .button1("§a§l創建")
-                .button2("§c§l取消")
+                .title("§e§l公共領地建造確認")
+                if (json.landCreate.admin) {
+                    UI.body(`§e§l您成功設定了§b公共§e領地! 最後一步，確認領地訊息是否正確\n§e領地資料為 §f-\n§e領地名稱 §f- §e${json.landCreate.name}\n§e領地範圍 §f- §e${squ} 格 §7(§ex§f:§e ${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)} §f| §ey§f: §e全部 §f| §ez§f: §e${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)}§7)`)
+                } else {
+                   UI.body(`§e§l您成功設定了領地! 最後一步，確認領地訊息是否正確\n§e領地資料為 §f-\n§e領地名稱 §f- §e${json.landCreate.name}\n§e領地範圍 §f- §e${squ} 格 §7(§ex§f:§e ${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)} §f| §ey§f: §e全部 §f| §ez§f: §e${Math.min(json.landCreate.pos.x, blockPos.x)}§f-§e${Math.max(json.landCreate.pos.x, blockPos.x)}§7)`)
+                }
+                UI.button1("§a§l創建")
+                UI.button2("§c§l取消")
                 .show(player).then(res => {
-                    if (!res || res.selection === 0) {
+                    if (!res || res.selection === 0 || res.canceled) {
                         player.removeTag(tags)
                         return logfor(player.name, `§c§l>> §e取消成功!`)
                     }
@@ -217,13 +224,20 @@ export function build() {
                         let land = json.landCreate
                         // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
                         let ID = 1
+                        let landData = ''
                         if (worldlog.getScoreboardPlayers("lands").score.length > 0) {
                             ID = Math.max(worldlog.getScoreboardPlayers('lands').score) + 1
                         }
-                        let landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false_,_${player.name}:true|true|true`
+                        if (!json.landCreate.admin) {
+                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false_,_${player.name}:true|true|true`
+                        } else {
+                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_true_,_false|false|false`
+                        }
                         cmd(`scoreboard players set "${landData}" lands ${ID}`)
-                        player.runCommandAsync(`scoreboard players add @s "land_squ" ${squ}`)
-                        player.runCommandAsync(`scoreboard players add @s "land_land" 1`)
+                        if (!json.landCreate.admin) {
+                            player.runCommandAsync(`scoreboard players add @s "land_squ" ${squ}`)
+                            player.runCommandAsync(`scoreboard players add @s "land_land" 1`)
+                        }
                         player.removeTag(tags)
                         logfor(player.name, `§a§l>> §e創建成功!`)
                     }
@@ -262,10 +276,12 @@ export function build() {
                                     getPer.container = "true"
                                 }
                                 // 偵測設定權限
-                                for (let user of data.users) {
-                                    if (user.username == player.name) {
-                                        getPer.build = user.permission.build
-                                        getPer.container = user.permission.container
+                                if (!data.public) {
+                                    for (let user of data.users) {
+                                        if (user.username == player.name) {
+                                            getPer.build = user.permission.build
+                                            getPer.container = user.permission.container
+                                        }
                                     }
                                 }
                                 if (getPer.build == "false" && !player.hasTag("admin")) {
@@ -273,12 +289,25 @@ export function build() {
                                 }
 
                                 for (let tag of player.getTags()) {
-                                    let msg = `§3§l>> §e您已經離開領地!`
+                                    let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                                     if (tag.includes(`${msg}`)) {
                                         player.removeTag(tag)
                                     }
                                 }
-                                let msg = `\n§3§l>> §e您已進入了 §b${data.player} §e的領地 §f- §e${data.name} \n§7(§e權限§f:§b建築/破壞 §f- §b${getPer.build} §f| §b容器交互 §f- §b${getPer.container}§7)`
+                                let msg = ''
+                                if (!data.public) {
+                                    if (!player.hasTag('admin')) {
+                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} \n§7(§e權限§f:§b建築/破壞 §f- §b${getPer.build} §f| §b容器交互 §f- §b${getPer.container}§7)`
+                                    } else {
+                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} \n§7(§e權限§f:§b建築/破壞 §f- §6管理員 §f| §b容器交互 §f- §6管理員§7)`
+                                    }
+                                } else {
+                                    if (!player.hasTag('admin')) {
+                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} \n§7(§e權限§f:§b建築/破壞 §f- §b${getPer.build} §f| §b容器交互 §f- §b${getPer.container}§7)`
+                                    } else {
+                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} \n§7(§e權限§f:§b建築/破壞 §f- §6管理員 §f| §b容器交互 §f- §6管理員§7)`
+                                    }
+                                }
                                 player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 100 }))
                                 let json = {
                                     inLand: {
@@ -319,12 +348,17 @@ export function build() {
                         if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
                         } else {
                             for (let tag of player.getTags()) {
-                                let msg = `§3§l>> §e您已進入了 §b${data.player} §e的領地 §f- §e${data.name}`
+                                let msg = ''
+                                if (!data.public) {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地`
+                                } else {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name}`
+                                }
                                 if (tag.replace("\n", "").includes(`${msg}`)) {
                                     player.removeTag(tag)
                                 }
                             }
-                            let msg = `§3§l>> §e您已經離開領地!`
+                            let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             player.removeTag(tag)
                             if (!player.hasTag('admin')) {
@@ -334,12 +368,17 @@ export function build() {
                         if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
                         } else {
                             for (let tag of player.getTags()) {
-                                let msg = `§3§l>> §e您已進入了 §b${data.player} §e的領地 §f- §e${data.name}`
+                                let msg = ''
+                                if (!data.public) {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地`
+                                } else {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name}`
+                                }
                                 if (tag.replace("\n", "").includes(`${msg}`)) {
                                     player.removeTag(tag)
                                 }
                             }
-                            let msg = `§3§l>> §e您已經離開領地!`
+                            let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             player.removeTag(tag)
                             if (!player.hasTag('admin')) {
@@ -362,7 +401,7 @@ export function build() {
                          * @type {{inLand: {land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string}}}}
                          */
                 let landData = JSON.parse(tag)
-                if (landData.inLand.per.container == "false") {
+                if (landData.inLand.per.container == "false" && !player.hasTag('admin')) {
                     events.cancel = true
                 }
             }
