@@ -41,11 +41,13 @@ export const chatCommands = [
                                 }
                                 values += `§7| `
                             }
-                            let only = '§a無'
                             if (command.adminOnly) {
-                                only = '§c有'
+                                if (player.hasTag('admin')) {
+                                    CommandList.push(`§a§l指令 §f- §a${command.command} §f(§6管理員限定§f)\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}`)
+                                }
+                            } else {
+                                CommandList.push(`§a§l指令 §f- §a${command.command}\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}`)
                             }
-                            CommandList.push(`§a§l指令 §f- §a${command.command}\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}\n§b§l管理員限定 §f- §b${only}`)
                         }
                     }
                     logfor(player.name, `§f§l-------------------------\n${CommandList.join("\n§f§l-------------------------\n")}\n§f§l-------------------------`)

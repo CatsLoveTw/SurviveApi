@@ -18,7 +18,7 @@ export function build(prefix) {
             let command = commandtext.split(" ")[0]
             try {
                 let getCommand = chatCommands[command].chatCommands[0]
-                if (getCommand.command) {
+                if (getCommand.command && !getCommand.adminOnly) {
                     const error = () => {
                         return logfor(player.name, `§e§l>> §c指令語法錯誤，請參閱 -help ${command}`)
                     }
@@ -26,8 +26,20 @@ export function build(prefix) {
                         return getCommand.run(player, message, error)
                     } catch (e) { log(e) }
                 }
+                if (getCommand.command && getCommand.adminOnly) {
+                    if (player.hasTag("admin")) {
+                        const error = () => {
+                            return logfor(player.name, `§e§l>> §c指令語法錯誤，請參閱 -help ${command}`)
+                        }
+                        try {
+                            return getCommand.run(player, message, error)
+                        } catch (e) { log(e) }
+                    } else {
+                        return logfor(player.name, `§3§l>> §c找不到該指令`)
+                    }
+                }
             } catch {
-                logfor(player.name, `§e§l>> §c找不到該指令`)
+                logfor(player.name, `§3§l>> §c找不到該指令`)
             }
         }
     })
