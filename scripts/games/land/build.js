@@ -10,6 +10,8 @@ export function build () {
     }
     const boards = {
         "lands": "領地",
+        "lands_nether": "地獄領地",
+        "lands_end": "終界領地",
         "land_squ": "已建造格數",
         "land_land": "已建造領地數",
         "land_squ_max": "最大格數",

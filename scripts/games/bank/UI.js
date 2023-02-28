@@ -151,6 +151,8 @@ export function UI (player) {
                             selePlayer.addTag(JSON.stringify({ "news": TargetMsg, tick: 0, maxtick: 30 * 20 }))
                             player.addTag(JSON.stringify(Senderjson))
                             selePlayer.addTag(JSON.stringify(Targetjson))
+                            player.runCommandAsync(`scoreboard players remove @s money ${sendMoney}`)
+                            selePlayer.runCommandAsync(`scoreboard players add @s money ${sendMoney}`)
                         })
                 })
             }

@@ -18,8 +18,26 @@ function runCommand (command) {
     world.getDimension("overworld").runCommandAsync(command);
 }
 
+// for (let player of world.getAllPlayers()) {
+//     for (let tag of player.getTags()) {
+//         if (tag.startsWith('{"news":')) {
+//             player.removeTag(tag)
+//         }
+//     }
+// }
 
+const boards = {
+    "time": "秒",
+    "timeM": '分',
+    "timeH": "時",
+    'timeD': "天",
+}
 
+for (let board in boards) {
+    try {
+        cmd(`scoreboard objectives add "${board}" dummy "${boards[board]}"`)
+    } catch {}
+}
 
 
 
@@ -65,8 +83,13 @@ system.runSchedule(() => {
             }
         }
             if (!player.hasTag('newPlayer')) {
+                for (let tag of player.getTags()) {
+                    if (tag.includes("tpaSetting")) {
+                        player.removeTag(tag)
+                    }
+                }
                 let json = {
-                    "tpaSetting": {"dontDistrub": false, "sec": 15}
+                    "tpaSetting": {"dontDistrub": false, "sec": 60}
                 }
                 player.addTag(JSON.stringify(json))
 

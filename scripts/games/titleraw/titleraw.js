@@ -41,7 +41,7 @@ export function build () {
             }
             let money = worldlog.getScoreFromMinecraft(player.name, 'money').score
             let time = `§f${disD} §b日 §f${disH} §b小時 §f${disM} §b分鐘 §f${disS} §b秒`
-            titlefor(player.name, `§l${display.join("")}§f遊玩 §7- ${time}\n§g金錢 §7- §e${money} `)
+            titlefor(player.name, `§l${display.join("")}§g金錢 §7- §e${money} `)
         }
     }, 1)
 }

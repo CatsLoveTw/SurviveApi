@@ -108,9 +108,9 @@ export function UI (player) {
                             selePlayer.addTag(JSON.stringify(Reqed))
                             player.addTag(JSON.stringify(Req))
                             let msg = `§a§lTpa請求 §f> §e您已向 §b${selePlayer.name} §e發送請求，等待回復...`
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: duration * 20 }))
+                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             msg = `§a§lTpa邀請 §f> §b${player.name} §e${tpaMsg}，輸入 §a-tpa accept 同意 §c-tpa deny 拒絕...`
-                            selePlayer.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: duration * 20 }))
+                            selePlayer.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             logfor(player.name, `§a§l>> §e請求發送成功，等待回應... (您也可以輸入-tpa delete 撤回請求) §f(§b對方§f: ${selePlayer.name} §b持續時間§f: ${duration}s§f)`)
                             logfor(selePlayer.name, `§e§l>> §b${player.name} §e發送了tpa請求，${tpaMsg}，可輸入 §a-tpa accept 接受 §c-tpa deny 拒絕 §f(§b訊息§f: §b${message}§f)`)
                         })
