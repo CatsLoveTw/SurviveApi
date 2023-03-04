@@ -241,7 +241,7 @@ class worldlogs {
         let getentity = []
         for (let player of playerobj) {
             disname.push(player.displayName)
-            score.push(this.getScoreFromMinecraft(player.displayName, scoreboardID).score)
+            score.push(Number(this.getScoreFromMinecraft(player.displayName, scoreboardID).score))
             type.push(player.type)
             // log(player.type)
             // if (player.type == 1 || player.type == 2) {

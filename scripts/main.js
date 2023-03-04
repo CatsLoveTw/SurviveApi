@@ -18,19 +18,20 @@ function runCommand (command) {
     world.getDimension("overworld").runCommandAsync(command);
 }
 
-// for (let player of world.getAllPlayers()) {
-//     for (let tag of player.getTags()) {
-//         if (tag.startsWith('{"news":')) {
-//             player.removeTag(tag)
-//         }
-//     }
-// }
+for (let player of world.getAllPlayers()) {
+    for (let tag of player.getTags()) {
+        if (tag.startsWith('{"news":')) {
+            player.removeTag(tag)
+        }
+    }
+}
 
 const boards = {
     "time": "秒",
     "timeM": '分',
     "timeH": "時",
     'timeD': "天",
+    "menu": "§l---§e伺服器資訊§f---"
 }
 
 for (let board in boards) {
@@ -145,7 +146,45 @@ function getPlayTime () {
     })
 }
 
+function displayMenu() {
+    function changeScore (scorename, scoreData) {
+        try {
+            let deleteScore = []
+            for (let score of world.scoreboard.getObjective("menu").getParticipants()) {
+                if (score.displayName.indexOf(scorename) != -1) {
+                    deleteScore.push(score.displayName)
+                }
+            }
+            for (let i in deleteScore) {
+                cmd(`scoreboard players reset "${deleteScore[i]}" menu`)
+            }
+        } catch (e) { world.say(e) }
+        cmd(`scoreboard players set "§l§e${scorename} §7- §b${scoreData}" menu 0`)
+    }
+    mc.system.runSchedule(() => {
+        let date = new Date();
+        let h = date.getUTCHours() + 8
+        let m = date.getMinutes()
+        let s = date.getSeconds()
+        let bh = 0
+        let bm = 0
+        let bs = 0
+        if (h < 10) {
+            bh = "0" + h
+        } else { bh = h }
+        if (m < 10) {
+            bm = "0" + m
+        } else { bm = m }
+        if (s < 10) {
+            bs = '0' + s
+        } else { bs = s }
+        let dates = `${bh}:${bm}:${bs}`
+        changeScore("現在時間", dates)
+    }, 1)
+}
+
 getPlayTime()
+displayMenu()
 
 
 

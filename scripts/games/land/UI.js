@@ -116,10 +116,10 @@ function transfromLand(landData) {
 function getPlayerLands(player, dimension) {
     let lands = worldlog.getScoreboardPlayers("lands").disname
     if (dimension == 'nether') {
-        land = worldlog.getScoreboardPlayers("lands_nether").disname
+        lands = worldlog.getScoreboardPlayers("lands_nether").disname
     }
     if (dimension == 'end') {
-        land = worldlog.getScoreboardPlayers('lands_end').disname
+        lands = worldlog.getScoreboardPlayers('lands_end').disname
     }
     let playerLand = []
     for (let land of lands) {
@@ -1412,6 +1412,11 @@ export function UI(player) {
     }
 }
 
+
+/**
+ * 
+ * @param {mc.Player} player 
+ */
 export function adminUI(player) {
     // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
     // name_,_posx|posz/posx2|posz2_,_ID_,_true_,_build|container|action

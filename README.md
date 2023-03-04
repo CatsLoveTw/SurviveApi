@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--1.6-blue)
+![version](https://img.shields.io/badge/Version-Dev--1.7-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.63+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -9,6 +9,11 @@
 這是一個生存地圖專用的Gametest腳本\
 提供多樣化的內容遊玩\
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
+
+### 更新內容
+- 領地系統 (重疊偵測等...)
+- 伺服器專用計分板 (menu)
+- 選單新增圖片
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
@@ -25,8 +30,8 @@
 - 玩家互傳功能
 - 銀行系統
 - 轉帳系統
+- 伺服器專用計分板 (menu)
 ### 即將更新
-- 交易系統
 - 商店系統
 ### 未修復的問題
 - 領地外可操作領地內部方塊 (解決方式未知)

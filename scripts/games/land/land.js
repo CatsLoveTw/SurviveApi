@@ -115,10 +115,6 @@ export function build() {
             for (let tag of player.getTags()) {
                 // createTag: {"landCreate":{"at": number(unixtime), "name": string, "step": number(步驟進行)}}
                 if (tag.includes('{"landCreate":{')) {
-                    if (player.dimension.id != 'minecraft:overworld') {
-                        player.removeTag(tag)
-                        return logfor(player.name, `§c§l>> §e領地不可建於地獄或終界!`)
-                    }
                     let data = JSON.parse(tag)
                     // 偵測過期時間 (3分鐘)
                     if ((getTimes - data.landCreate.at) >= (times * 1000)) {
@@ -152,8 +148,13 @@ export function build() {
         if (!check) {
             return;
         }
-
-        cmd(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
+        if (json.landCreate.dime == 'over') {
+            cmd(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
+        } else if (json.landCreate.dime == 'nether') {
+            mc.world.getDimension(mc.MinecraftDimensionTypes.nether).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
+        } else if (json.landCreate.dime == 'end') {
+            mc.world.getDimension(mc.MinecraftDimensionTypes.theEnd).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
+        }
         player.runCommandAsync(`give @s ${events.block.typeId}`)
         if (Number(json.landCreate.step) == 1) {
             logfor(player.name, `§a§l>> §e成功設置第一點! §f(§bx§f:§b${blockPos.x} §7| §bz§f:§b${blockPos.z}§f)`)
@@ -193,38 +194,42 @@ export function build() {
                     return logfor(player.name, `§c§l>> §e創建失敗! 領地格數超過上限!`)
                 }
             }
-            for (let land of worldlog.getScoreboardPlayers("lands").disname) {
-                let data = getLandData(land)
-                let x = json.landCreate.pos.x
-                let x2 = blockPos.x
-                let z = json.landCreate.pos.z
-                let z2 = blockPos.z
-
-                for (let i = Math.min(Number(x), Number(x2)); i <= Math.max(Number(x), Number(x2)); i++) {
-                    for (let j = Math.min(Number(z), Number(z2)); j <= Math.max(Number(z), Number(z2)); j++) {
-                        if (data.pos.x[1] == i && data.pos.z[1] == j) {
-                            player.removeTag(tags)
-                            let msg = `§e§l領地系統 §f> §a您正在建造領地 §7-`
-                            for (let tag of player.getTags()) {
-                                if (tag.includes(msg)) {
-                                    player.removeTag(tag)
+            let allLand = worldlog.getScoreboardPlayers("lands").disname
+            if (json.landCreate.dime == 'nether') {
+                allLand = worldlog.getScoreboardPlayers('lands_nether').disname
+            }
+            if (json.landCreate.dime == 'end') {
+                allLand = worldlog.getScoreboardPlayers('lands_end').disname
+            }
+            try {
+                if (allLand.length > 0) {
+                    for (let landD of allLand) {
+                        let land = getLandData(landD)
+                        let x = json.landCreate.pos.x
+                        let x2 = blockPos.x
+                        let z = json.landCreate.pos.z
+                        let z2 = blockPos.z
+                        for (let i = Math.min(Number(x), Number(x2)); i <= Math.max(Number(x), Number(x2)); i++) {
+                            for (let j = Math.min(Number(z), Number(z2)); j <= Math.max(Number(z), Number(z2)); j++) {
+                                let landX = Math.min(Number(land.pos.x[1]), Number(land.pos.x[2]))
+                                let landX2 = Math.max(Number(land.pos.x[1]), Number(land.pos.x[2]))
+                                let landZ = Math.min(Number(land.pos.z[1]), Number(land.pos.z[2]))
+                                let landZ2 = Math.max(Number(land.pos.z[1]), Number(land.pos.z[2]))
+                                if ((i >= landX && i <= landX2) && (j >= landZ && j <= landZ2)) {
+                                    player.removeTag(tags)
+                                    let msg = `§e§l領地系統 §f> §a您正在建造領地 §7-`
+                                    for (let tag of player.getTags()) {
+                                        if (tag.includes(msg)) {
+                                            player.removeTag(tag)
+                                        }
+                                    }
+                                    return logfor(player.name, `§c§l>> §e領地重疊!`)
                                 }
                             }
-                            return logfor(player.name, `§c§l>> §e領地重疊!`)
-                        }
-                        if (data.pos.x[2] == i && data.pos.z[2] == j) {
-                            player.removeTag(tags)
-                            let msg = `§e§l領地系統 §f> §a您正在建造領地 §7-`
-                            for (let tag of player.getTags()) {
-                                if (tag.includes(msg)) {
-                                    player.removeTag(tag)
-                                }
-                            }
-                            return logfor(player.name, `§c§l>> §e領地重疊!`)
                         }
                     }
                 }
-            }
+            } catch (e) { log(e) }
             let UI = new ui.MessageFormData()
                 .title("§e§l領地建造確認")
                 if (json.landCreate.admin) {
@@ -250,8 +255,17 @@ export function build() {
                         // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
                         let ID = 1
                         let landData = ''
-                        if (worldlog.getScoreboardPlayers("lands").score.length > 0) {
-                            ID = Math.max(worldlog.getScoreboardPlayers('lands').score) + 1
+                        let IDs = worldlog.getScoreboardPlayers("lands").score
+                        if (json.landCreate.dime == 'nether') {
+                            IDs = worldlog.getScoreboardPlayers('lands_nether').score
+                        }
+                        if (json.landCreate.dime == 'end') {
+                            IDs = worldlog.getScoreboardPlayers('lands_end').score
+                        }
+                        if (IDs.length > 0) {
+                            let max = IDs[0]
+                            IDs.forEach(item => max = item > max ? item : max)
+                            ID = max + 1
                         }
                         if (!json.landCreate.admin) {
                             landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false_,_${player.name}:true|true|true`
@@ -645,7 +659,26 @@ export function build() {
                             dime = mc.MinecraftDimensionTypes.theEnd
                         }
                         // 這是個超蠢的方法 拜託不要學><
-                        if ((Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) || player.dimension.id.toLowerCase() != dime) {
+                        if (player.dimension.id.toLowerCase() != dime) {
+                            for (let tag of player.getTags()) {
+                                let msg = ''
+                                if (!data.public) {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地`
+                                } else {
+                                    msg = `§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name}`
+                                }
+                                if (tag.replace("\n", "").includes(`${msg}`)) {
+                                    player.removeTag(tag)
+                                }
+                            }
+                            let msg = `§e§l領地系統 §f> §c您已經離開領地!`
+                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            player.removeTag(tag)
+                            if (!player.hasTag('admin')) {
+                                player.runCommandAsync("gamemode s")
+                            }
+                        }
+                        if ((Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2)) {
                         } else {
                             for (let tag of player.getTags()) {
                                 let msg = ''
@@ -665,7 +698,7 @@ export function build() {
                                 player.runCommandAsync("gamemode s")
                             }
                         }
-                        if ((Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) || player.dimension.id.toLowerCase() != dime) {
+                        if ((Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2)) {
                         } else {
                             for (let tag of player.getTags()) {
                                 let msg = ''
@@ -702,14 +735,24 @@ export function build() {
                          */
                 let landData = JSON.parse(tag)
                 if (landData.inLand.per.container == "false" && !player.hasTag('admin')) {
-                    events.cancel = true
-                    let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
-                    for (let tag of player.getTags()) {
-                        if (tag.includes(msg)) {
-                            return;
+                    let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.blockLocation)
+                    let denyBlocks = [
+                        'chest',
+                        'fence_gate',
+                        'door',
+                    ]
+                    for (let block of denyBlocks) {
+                        if (getBlock.typeId.includes(block)) {
+                            events.cancel = true
+                            let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
+                            for (let tag of player.getTags()) {
+                                if (tag.includes(msg)) {
+                                    player.removeTag(tag)
+                                }
+                            }
+                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                         }
                     }
-                    player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                 }
             }
         }

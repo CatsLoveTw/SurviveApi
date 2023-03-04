@@ -4,14 +4,16 @@ import * as land from '../land/UI.js'
 import { adminUI } from './admin.js';
 import * as tpa from '../tpa/UI.js'
 import * as bank from '../bank/UI.js'
+import { logfor } from '../../lib/GametestFunctions.js';
 
 export function playerUI (player) {
     let form = new ui.ActionFormData()
         .title("§e§l玩家選單")
-        .button("§e§l領地功能")
-        .button("§e§l玩家互傳功能(tpa)")
-        .button("§e§l銀行功能")
-        .button("§e§l管理員選單")
+        .button("§e§l領地功能", 'textures/ui/worldsIcon.png')
+        .button("§e§l玩家互傳功能(tpa)", 'textures/ui/dressing_room_skins.png')
+        .button("§e§l銀行功能", 'textures/ui/MCoin.png')
+        .button("§e§l個人資訊", 'textures/ui/icon_alex.png')
+        .button("§e§l管理員選單", 'textures/ui/permissions_op_crown.png')
         .show(player).then(res => {
             if (!res) return;
             if (res.selection === 0) {
@@ -21,6 +23,8 @@ export function playerUI (player) {
             } else if (res.selection === 2) {
                 bank.UI(player)
             } else if (res.selection === 3) {
+                return logfor(player.name, `§3§l>> §e敬請期待...`)
+            } else if (res.selection === 4) {
                 if (player.hasTag("admin")) {
                     adminUI(player)
                 } else {
