@@ -55,7 +55,7 @@ export function build () {
                         // 刪除訊息
                         for (let tag of player.getTags()) {
                             if (tag.includes(deleteMsgSource)) {
-                                getSource.removeTag(tag)
+                                player.removeTag(tag)
                             }
                         }
                         player.removeTag(tag)

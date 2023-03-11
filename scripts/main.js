@@ -9,6 +9,8 @@ import { playerUI } from "./games/UI/player.js"
 import * as titleraw from './games/titleraw/build.js'
 import * as tpa from './games/tpa/build.js'
 import * as bank from './games/bank/build.js'
+import * as home from './games/home/build.js'
+import * as menu from './games/menu/build.js'
 
 
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
@@ -48,15 +50,6 @@ world.events.beforeChat.subscribe(events => {
     events.cancel = true
     if (!message.startsWith(prefix)) {
         runCommand(`tellraw @a {"rawtext":[{"text":"§e§l${player.name} §7> §f${message}"}]}`)
-    }
-})
-
-world.events.beforeItemUse.subscribe(events => {
-    const {source: player, item} = events
-    if (player.typeId == "minecraft:player") {
-        if (item.typeId == "minecraft:compass") {
-            playerUI(player)
-        }
     }
 })
 
@@ -198,6 +191,8 @@ try {
     titleraw.build()
     tpa.build()
     bank.build()
+    home.build()
+    menu.build()
 } catch (e) {log(e)}
 
 

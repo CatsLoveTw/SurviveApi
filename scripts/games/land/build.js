@@ -1,11 +1,13 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
+import { worldlog } from '../../lib/function.js'
 import { log, cmd } from '../../lib/GametestFunctions.js'
 import * as land from './land.js'
+import { getLandData } from './UI.js'
 
 
-export function build () {
-    function addBoard (ID, Display) {
+export function build() {
+    function addBoard(ID, Display) {
         cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
@@ -21,6 +23,35 @@ export function build () {
         for (let board in boards) {
             addBoard(board, boards[board])
         }
-    } catch {}
+    } catch { }
     land.build()
+}
+
+/**
+ * 
+ * @param {mc.Player} player 
+ */
+export function checkInLand(player) {
+    let index = 0
+    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
+        index = 1
+    }
+    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
+        index = 2
+    }
+    let landSelection = ['lands', 'lands_nether', 'lands_end']
+    for (let land of worldlog.getScoreboardPlayers(landSelection[index]).disname) {
+        let data = getLandData(land)
+        let playerPos = player.location
+        let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
+        let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
+        let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
+        let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
+        if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
+            if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
+                return data;
+            }
+        }
+    }
+    return false;
 }

@@ -27,9 +27,18 @@ export const chatCommands = [
                              * @type {{command: string, des: string, values: string[][], adminOnly: boolean, run: Function}}
                              */
                             let command = chatCommand[j].chatCommands[i]
-                            let values = ''
-                            for (let value of command.values) {
-                                values += `§g§l-${command.command} `
+                            CommandList.push(`§f-§a${command.command}`)
+                        }
+                    }
+                    logfor(player.name, `§e§l所有的指令 §f- §e共 §b${CommandList.length} §e條\n§e若要更加了解指令內容及範例，可打上 §b-help 指令名稱\n§r${CommandList.join('\n')}`)
+                } else {
+                    let CommandList = []
+                    try {
+                        let command = chatCommand[args[1]].chatCommands[0]
+                        let values = ''
+                        for (let value of command.values) {
+                            values += `§g§l-${command.command} `
+                            if (value.length > 1) {
                                 for (let i in value) {
                                     let val = value[i]
                                     if (JSON.stringify(val).includes("{")) {
@@ -39,35 +48,13 @@ export const chatCommands = [
                                     }
                                     values += `${val} `
                                 }
-                                values += `§7| `
-                            }
-                            if (command.adminOnly) {
-                                if (player.hasTag('admin')) {
-                                    CommandList.push(`§a§l指令 §f- §a${command.command} §f(§6管理員限定§f)\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}`)
-                                }
                             } else {
-                                CommandList.push(`§a§l指令 §f- §a${command.command}\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}`)
-                            }
-                        }
-                    }
-                    logfor(player.name, `§f§l-------------------------\n${CommandList.join("\n§f§l-------------------------\n")}\n§f§l-------------------------`)
-                } else {
-                    let CommandList = []
-                    try {
-                        let command = chatCommand[args[1]].chatCommands[0]
-                        let values = ''
-                        for (let value of command.values) {
-                            values += `§g§l-${command.command} `
-                            for (let i in value) {
-                                let val = value[i]
-                                if (JSON.stringify(val).includes("{")) {
-                                    for (let j in val) {
-                                        val = `§g§l${j} §f(§g${val[j]}§f)`
-                                    }
-                                }
-                                values += `${val} `
+                                values += `${value} `
                             }
                             values += `§7| `
+                        }
+                        if (command.values.length == 0) {
+                            values += `§g§l-${command.command} <空> §7| `
                         }
                         let only = '§a無'
                         if (command.adminOnly) {
@@ -75,7 +62,7 @@ export const chatCommands = [
                         }
                         CommandList.push(`§a§l指令 §f- §a${command.command}\n§e介紹 §f- §e${command.des}\n§g§l格式 §f- §g${values.slice(0, values.length - 4)}\n§b§l管理員限定 §f- §b${only}`)
                         logfor(player.name, `§f§l-------------------------\n${CommandList.join("\n§f§l-------------------------\n")}\n§f§l-------------------------`)
-                    } catch { 
+                    } catch (e) {
                         logfor (player.name, `§c§l>> §e查無指令`)
                     }
                 }

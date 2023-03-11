@@ -54,7 +54,7 @@ export function UI (player) {
                     let form = new ui.ModalFormData()
                         .title("§e§l玩家互傳請求設定")
                         .toggle("§e§l要求對方傳送到這裡", false)
-                        .textField("§b§l請求訊息", "訊息", "我可以傳送到你那裡嗎?")
+                        .textField("§b§l請求訊息", "訊息", "未設定訊息")
                         .show(player).then(res => {
                             /**
                              * @type {{"tpaSetting": {"dontDistrub": boolean, "sec": number}}}

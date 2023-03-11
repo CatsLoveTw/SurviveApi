@@ -63,8 +63,16 @@ export const chatCommands = [
                                     let deleteMsgSource = `§e您已向 §b${json.tpaReqed.reqName} §e發送請求，等待回復...`
                                     let deleteMsgReqed = `§b${json.tpaReqed.source} §e${tpaMsgs[json.tpaReqed.tpa]}，輸入 §a-tpa accept 同意 §c-tpa deny 拒絕...`
                                     // 刪除訊息
-                                    player.removeTag(deleteMsgReqed)
-                                    getSource.removeTag(deleteMsgSource)
+                                    for (let tag of player.getTags()) {
+                                        if (tag.includes(deleteMsgReqed)) {
+                                            player.removeTag(tag)
+                                        }
+                                    }
+                                    for (let tag of getSource.getTags()) {
+                                        if (tag.includes(deleteMsgSource)) {
+                                            getSource.removeTag(tag)
+                                        }
+                                    }
                                     // 刪除請求
                                     player.removeTag(tag)
                                     let removeJSON = {
@@ -195,6 +203,13 @@ export const chatCommands = [
                             }
                             if (!getSource || !reqed) {
                                 player.removeTag(tag)
+                                let deleteMsgSource = `§e您已向 §b${json.tpaReq.reqName} §e發送請求，等待回復...`
+                                // 刪除訊息
+                                for (let tag of player.getTags()) {
+                                    if (tag.includes(deleteMsgSource)) {
+                                        player.removeTag(tag)
+                                    }
+                                }
                                 return logfor(player.name, `§a§l>> §etpa請求刪除成功!`)
                             }
                             logfor(player.name, `§a§l>> §etpa請求刪除成功!`)
