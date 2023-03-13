@@ -44,7 +44,12 @@ export function build() {
                     check = true
                 }
                 if (!check) {
-                    logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除!`)
+                    /**
+                    * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
+                    */
+                    let getData = JSON.parse(tag)
+                    logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除! §f- §c${getData.home.name}`)
+                    player.removeTag(tag)
                 }
             }
         }
