@@ -6,7 +6,7 @@ export const chatCommands = [
     // 設定被請求Tag - {"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     {
         command: 'getmenu',
-        des: '取得選單系統 §f(§c請確認背包是否已滿§f)',
+        des: '取得選單系統 (請確認背包是否已滿)',
         values: [],
         adminOnly: false,
         run:

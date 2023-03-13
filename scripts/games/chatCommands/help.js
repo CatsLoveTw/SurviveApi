@@ -27,7 +27,7 @@ export const chatCommands = [
                              * @type {{command: string, des: string, values: string[][], adminOnly: boolean, run: Function}}
                              */
                             let command = chatCommand[j].chatCommands[i]
-                            CommandList.push(`§f-§a${command.command}`)
+                            CommandList.push(`§f-§a${command.command} §7- ${command.des}`)
                         }
                     }
                     logfor(player.name, `§e§l所有的指令 §f- §e共 §b${CommandList.length} §e條\n§e若要更加了解指令內容及範例，可打上 §b-help 指令名稱\n§r${CommandList.join('\n')}`)
@@ -49,7 +49,14 @@ export const chatCommands = [
                                     values += `${val} `
                                 }
                             } else {
-                                values += `${value} `
+                                let val = value[0]
+                                if (JSON.stringify(val).includes("{")) {
+                                    for (let j in val) {
+                                        val = `§g§l${j} §f(§g${val[j]}§f)`
+                                    }
+                                }
+                                values += `${val} `
+                                // values += `${value} `
                             }
                             values += `§7| `
                         }

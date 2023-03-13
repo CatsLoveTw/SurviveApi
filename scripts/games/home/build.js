@@ -20,34 +20,35 @@ export function build() {
     // 設定請求Tag - {"homeShare": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     // 設定被請求Tag - {"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     // Source `§e您已向 §b${json.homeShare.sharedName} §e發送分享請求，等待回復...`
-    // shared `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
-    
-    for (let player of mc.world.getAllPlayers()) {
-        for (let tag of player.getTags()) {
-            let dimensions = ["lands", "lands_nether", "lands_end"]
-            let check = false
-            let index = 0
-            if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
-                index = 1
-            }
-            if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
-                index = 2
-            }
-            let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
-            for (let land of lands) {
-                let data = getLandData(land)
-                if (!tag.startsWith('{"home":')) return;
-                if (!tag.includes(JSON.stringify(data.pos))) return;
-                if (!tag.includes(data.UID)) return;
-                if (!tag.includes(data.name)) return;
-                if (!tag.includes(data.player)) return;
-                check = true
-            }
-            if (!check) {
-                logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除!`)
+    // shared `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
+    mc.system.runSchedule(() => {
+        for (let player of mc.world.getAllPlayers()) {
+            for (let tag of player.getTags()) {
+                let dimensions = ["lands", "lands_nether", "lands_end"]
+                let check = false
+                let index = 0
+                if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
+                    index = 1
+                }
+                if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
+                    index = 2
+                }
+                let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
+                for (let land of lands) {
+                    let data = getLandData(land)
+                    if (!tag.startsWith('{"home":')) return;
+                    if (!tag.includes(JSON.stringify(data.pos))) return;
+                    if (!tag.includes(data.UID)) return;
+                    if (!tag.includes(data.name)) return;
+                    if (!tag.includes(data.player)) return;
+                    check = true
+                }
+                if (!check) {
+                    logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除!`)
+                }
             }
         }
-    }
+    }, 1)
 
     // 檢查請求/被請求到期 §
     mc.system.runSchedule(() => {
@@ -117,7 +118,7 @@ export function build() {
                         }
                     }
                     if (!check) {
-                        let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
+                        let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
                         // 刪除訊息
                         for (let tag of player.getTags()) {
                             if (tag.includes(deleteMsgReqed)) {

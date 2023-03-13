@@ -11,6 +11,8 @@ import * as tpa from './games/tpa/build.js'
 import * as bank from './games/bank/build.js'
 import * as home from './games/home/build.js'
 import * as menu from './games/menu/build.js'
+import * as rtp from './games/rtp/build.js'
+import * as death from './games/death/build.js'
 
 
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
@@ -18,6 +20,34 @@ const prefix = '-'
 
 function runCommand (command) {
     world.getDimension("overworld").runCommandAsync(command);
+}
+
+function getMenu (player) {
+    /**
+    * @type {mc.EntityInventoryComponent}
+    */
+    let inv = player.getComponent("inventory")
+    let count = 0
+    let Slot = 0
+    for (let i = 0; i < 36; i++) {
+        if (Slot == 0) {
+            try {
+                if (inv.container.getItem(i).typeId) {
+                    count++
+                } else {
+                    Slot = i
+                }
+            } catch {
+                Slot = i
+            }
+        }
+    }
+    if (count == 36) return logfor(player.name, `§c§l>> §e背包已滿，請稍後嘗試!`)
+
+    let newItem = new mc.ItemStack(mc.MinecraftItemTypes.compass, 1)
+    newItem.nameTag = `§e§l選單系統`
+    newItem.setLore(["§e§l右鍵/長按螢幕開啟選單"])
+    inv.container.setItem(Slot, newItem)
 }
 
 for (let player of world.getAllPlayers()) {
@@ -47,9 +77,16 @@ for (let board in boards) {
 world.events.beforeChat.subscribe(events => {
     let player = events.sender;
     let message = events.message;
+    let displayDimension = '§a§l主世界'
+    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
+        displayDimension = '§c§l地獄'
+    }
+    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
+        displayDimension = '§b§l終界'
+    }
     events.cancel = true
     if (!message.startsWith(prefix)) {
-        runCommand(`tellraw @a {"rawtext":[{"text":"§e§l${player.name} §7> §f${message}"}]}`)
+        runCommand(`tellraw @a {"rawtext":[{"text":"§l${displayDimension} §f| §e${player.name} §7> §f${message}"}]}`)
     }
 })
 
@@ -59,12 +96,14 @@ const scoreboards = {
     "land_squ": 0,
     "land_squ_max": 500,
     "land_land": 0,
-    "land_land_max": 20,
+    "land_land_max": 30,
     "time": 0,
     "timeD": 0,
     "timeH": 0,
     "timeM": 0,
     "money": 0,
+    "rtp_time": 0,
+    'death': 0
 }
 system.runSchedule(() => {
     let score = {}
@@ -92,6 +131,10 @@ system.runSchedule(() => {
                 for (let board in score) {
                     player.runCommandAsync(`scoreboard players add @s "${board}" ${score[board]}`)
                 }
+
+                // 給予選單 / 提示
+                logfor(player.name, '§3§l>> §e本伺服器擁有自訂義指令之功能，請輸入 §b-help §e獲取更多。')
+                getMenu(player)
                 player.addTag("newPlayer")
             }
     }
@@ -113,10 +156,10 @@ function getPlayTime () {
                     while (sec >= 60) {
                         sec -= 60
                         M ++
-                        if (worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score <= (10000 - 12)) {
+                        if (worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score <= (500000 - 60)) {
                             let getSquMax = worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score
-                            player.runCommandAsync(`scoreboard players add @s land_squ_max 12`)
-                            let msg = `§g§l線上獎勵 §f> §a您的領地上限擴大了12格! §f(§e現為 §b${Number(getSquMax) + 12} §e格§f)`
+                            player.runCommandAsync(`scoreboard players add @s land_squ_max 60`)
+                            let msg = `§g§l線上獎勵 §f> §a您的領地上限擴大了60格! §f(§e現為 §b${Number(getSquMax) + 60} §e格§f)`
                             let json = { "news": msg, tick: 0, maxtick: 120 }
                             player.addTag(JSON.stringify(json))
                         }
@@ -125,7 +168,7 @@ function getPlayTime () {
                         M -= 60
                         H ++
                     }
-                    while (H >= 60) {
+                    while (H >= 24) {
                         H -= 24
                         D ++
                     }
@@ -193,6 +236,8 @@ try {
     bank.build()
     home.build()
     menu.build()
+    rtp.build()
+    death.build()
 } catch (e) {log(e)}
 
 

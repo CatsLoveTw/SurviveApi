@@ -5,6 +5,7 @@ import { adminUI } from './admin.js';
 import * as tpa from '../tpa/UI.js'
 import * as bank from '../bank/UI.js'
 import * as home from '../home/UI.js'
+import * as profile from '../profile/UI.js'
 import { log, logfor } from '../../lib/GametestFunctions.js';
 
 export function playerUI (player) {
@@ -29,7 +30,8 @@ export function playerUI (player) {
                 home.UI(player)
                 } catch (e) {log(e)}
             } else if (res.selection === 4) {
-                return logfor(player.name, `§3§l>> §e敬請期待...`)
+                profile.UI(player)
+                // return logfor(player.name, `§3§l>> §e敬請期待...`)
             } else if (res.selection === 5) {
                 if (player.hasTag("admin")) {
                     adminUI(player)

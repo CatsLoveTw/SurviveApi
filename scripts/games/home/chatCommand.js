@@ -6,11 +6,11 @@ export const chatCommands = [
     // 設定被請求Tag - {"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     {
         command: 'sharehome',
-        des: '分享傳送點功能',
+        des: '分享傳送點功能 (被分享時可用)',
         values: [
-            [{ "accept": '被分享時可用' }],
-            [{ "deny": "被分享時可用" }],
-            [{ "delete": "分享時可用" }]
+            ['accept'],
+            ['deny'],
+            ['delete']
         ],
         adminOnly: false,
         run:
@@ -54,7 +54,7 @@ export const chatCommands = [
                             }
                             player.addTag(JSON.stringify(json.homeShared.homeData))
                             let deleteMsgSource = `§e您已向 §b${json.homeShared.sharedName} §e發送分享請求，等待回復...`
-                            let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
+                            let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
                             // 刪除訊息
                             for (let tag of player.getTags()) {
                                 if (tag.includes(deleteMsgReqed)) {
@@ -78,6 +78,9 @@ export const chatCommands = [
                                 }
                             }
                             getSource.removeTag(JSON.stringify(removeJSON))
+                            player.addTag(JSON.stringify(json.homeShared.homeData))
+                            logfor(player.name, `§a§l>> §e接受成功!`)
+                            logfor(getSource.name, `§a§l>> §e請求已被對方接受!`)
                             check = true
                         }
                     } else if (args[1] == 'deny') {
@@ -85,7 +88,7 @@ export const chatCommands = [
                             /**
                              * @type {{"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}}
                              */
-                            let json = JSON.parse
+                            let json = JSON.parse(tag)
                             /**
                              * @type {mc.Player}
                              */
@@ -109,7 +112,7 @@ export const chatCommands = [
                             logfor(player.name, `§a§l>> §e拒絕成功!`)
                             logfor(getSource.name, `§c§l>> §e請求失敗，對方拒絕了分享請求`)
                             let deleteMsgSource = `§e您已向 §b${json.homeShared.sharedName} §e發送分享請求，等待回復...`
-                            let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
+                            let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
                             // 刪除訊息
                             for (let tag of player.getTags()) {
                                 if (tag.includes(deleteMsgReqed)) {
@@ -164,7 +167,7 @@ export const chatCommands = [
                             logfor(player.name, `§a§l>> §e傳送點分享請求刪除成功!`)
                             logfor(reqed.name, `§3§l>> §b${player.name} §e已撤回了傳送點分享請求`)
                             let deleteMsgSource = `§e您已向 §b${json.homeShare.sharedName} §e發送分享請求，等待回復...`
-                            let deleteMsgReqed = `§b${json.homeShare.source} §e想要分享傳送點給你 §f- §e${json.homeShare.homeData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
+                            let deleteMsgReqed = `§b${json.homeShare.source} §e想要分享傳送點給你 §f- §e${json.homeShare.homeData.home.name}`
                             // 刪除訊息
                             for (let tag of player.getTags()) {
                                 if (tag.includes(deleteMsgSource)) {

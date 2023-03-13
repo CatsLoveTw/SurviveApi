@@ -231,6 +231,19 @@ export function UI(player) {
                                             .show(player).then(res => {
                                                 if (res.canceled) return;
                                                 if (res.selection === 0) {
+                                                    for (let postag of player.getTags()) {
+                                                        if (postag.startsWith('{"back":')) {
+                                                            player.removeTag(postag)
+                                                        }
+                                                    }
+                                                    let json = {
+                                                        "back": {
+                                                            "x": seleHome.pos.x,
+                                                            "y": seleHome.pos.y,
+                                                            "z": seleHome.pos.z
+                                                        }
+                                                    }
+                                                    player.addTag(JSON.stringify(json))
                                                     player.runCommandAsync(`tp @s ${seleHome.pos.x} ${seleHome.pos.y} ${seleHome.pos.z}`)
                                                     logfor(player.name, `§a§l>> §e傳送成功!`)
                                                 }
@@ -261,7 +274,7 @@ export function UI(player) {
                                                         let other = otherPlayers[res.selection]
 
                                                         let sourceMessage = `§e您已向 §b${other.name} §e發送分享請求，等待回復...`
-                                                        let sharedMessage = `§b${player.name} §e想要分享傳送點給你 §f- §e${getData.home.name}，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`
+                                                        let sharedMessage = `§b${player.name} §e想要分享傳送點給你 §f- §e${getData.home.name}`
 
                                                         let shareJSON = {
                                                             "homeShare": {
@@ -284,11 +297,12 @@ export function UI(player) {
                                                         let shareMessageSend = { "news": sourceMessage, tick: 0, maxtick: 30 * 20 }
                                                         let sharedMessageSend = { "news": sharedMessage, tick: 0, maxtick: 30 * 20 }
 
-                                                        player.addTag(shareJSON)
-                                                        player.addTag(shareMessageSend)
-                                                        other.addTag(sharedJSON)
-                                                        other.addTag(shareMessageSend)
-                                                        logfor(player.name, `§a§l>> §e分享請求發送成功，等待回應...`)
+                                                        player.addTag(JSON.stringify(shareJSON))
+                                                        player.addTag(JSON.stringify(shareMessageSend))
+                                                        other.addTag(JSON.stringify(sharedJSON))
+                                                        other.addTag(JSON.stringify(sharedMessageSend))
+                                                        logfor(player.name, `§a§l>> §e分享請求發送成功，等待回應... §f(§e也可輸入 §b-sharehome delete §e刪除請求§f)`)
+                                                        logfor(other.name, `§3§l>> §b${player.name} §e想要分享傳送點給你，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`)
                                                     })
                                                 }
                                                 if (res.selection === 3) {
@@ -505,9 +519,22 @@ export function publicUI (player) {
                             .show(player).then(res => {
                                 if (res.canceled || res.selection === 1) return lookForServerPublicHome();
                                 if (res.selection === 0) {
+                                    for (let postag of player.getTags()) {
+                                        if (postag.startsWith('{"back":')) {
+                                            player.removeTag(postag)
+                                        }
+                                    }
                                     let x = homeData.pos.x
                                     let y = homeData.pos.y
                                     let z = homeData.pos.z
+                                    let json = {
+                                        "back": {
+                                            "x": x,
+                                            "y": y,
+                                            "z": z
+                                        }
+                                    }
+                                    player.addTag(JSON.stringify(json))
                                     player.runCommandAsync(`tp @s ${x} ${y} ${z}`)
                                     logfor(player.name, `§a§l>> §e傳送成功!`)
                                 }
@@ -622,9 +649,22 @@ export function publicUI (player) {
                                 .show(player).then(res => {
                                     if (res.canceled || res.selection === 2) return lookForPersonalHome();
                                     if (res.selection === 0) {
+                                        for (let postag of player.getTags()) {
+                                            if (postag.startsWith('{"back":')) {
+                                                player.removeTag(postag)
+                                            }
+                                        }
                                         let x = homeData.pos.x
                                         let y = homeData.pos.y
                                         let z = homeData.pos.z
+                                        let json = {
+                                            "back": {
+                                                "x": x,
+                                                "y": y,
+                                                "z": z
+                                            }
+                                        }
+                                        player.addTag(JSON.stringify(json))
                                         player.runCommandAsync(`tp @s ${x} ${y} ${z}`)
                                         logfor(player.name, `§a§l>> §e傳送成功!`)
                                     }
