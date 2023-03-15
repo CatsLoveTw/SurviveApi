@@ -235,6 +235,9 @@ class worldlogs {
     */
     getScoreboardPlayers (scoreboardID) {
         let playerobj = world.scoreboard.getObjective(scoreboardID).getParticipants()
+        if (playerobj.length == 0 || !playerobj) {
+            return {"disname": [], "score": [], "type": [], "entity": []}
+        }
         let disname = []
         let score = []
         let type = [] 

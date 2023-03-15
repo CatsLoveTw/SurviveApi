@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--1.9.1-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.0-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.63+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,7 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 1.9)
+#### 之前 (DEV 1.9 && DEV 1.9.1)
 - 修復領地踢出玩家BUG
 - 可能修復公共領地無法新增之問題
 - 新增聊天顯示維度功能
@@ -23,14 +23,19 @@
 - 新增 **-back** 指令
 - 新增 **-rtp** 指令
 - 新增個人資訊
-
-#### 現在
 - 修復領地刪除時傳送點無法刪除之問題
 
+#### 現在
+- 新增公告功能
+- 修改金錢顯示
+- 新增2種管理員權限
+- 移除銀行系統 (獨立轉帳系統)
+- 新增商店系統
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
 - 公共領地系統
+- 商店系統
 
 ### 擁有內容
 - 聊天訊息樣式修改
@@ -47,9 +52,9 @@
 - 銀行系統
 - 轉帳系統
 - 伺服器專用計分板 (menu)
-### 即將更新
 - 商店系統
 - 公告功能
+### 即將更新
 ### 未修復的問題
 - 領地權限更改訊息在特殊情況下重複發送
 ### 提醒

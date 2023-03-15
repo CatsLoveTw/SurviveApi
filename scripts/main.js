@@ -13,6 +13,9 @@ import * as home from './games/home/build.js'
 import * as menu from './games/menu/build.js'
 import * as rtp from './games/rtp/build.js'
 import * as death from './games/death/build.js'
+import * as notice from './games/notice/build.js'
+import * as adminSetting from './games/UI/adminSetting/build.js'
+import * as shop from './games/shop/build.js'
 
 
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
@@ -140,6 +143,11 @@ system.runSchedule(() => {
     }
 }, 1)
 
+// 無敵
+mc.world.events.playerJoin.subscribe(event => {
+    let player = event.player
+    player.addEffect(mc.MinecraftEffectTypes.resistance, 10, 255, false)
+})
 
 function getPlayTime () {
     let i = 0
@@ -238,6 +246,9 @@ try {
     menu.build()
     rtp.build()
     death.build()
+    notice.build()
+    adminSetting.build()
+    shop.build()
 } catch (e) {log(e)}
 
 
