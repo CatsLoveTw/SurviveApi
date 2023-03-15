@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.0-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.0.1-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.63+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,26 +11,16 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 1.9 && DEV 1.9.1)
-- 修復領地踢出玩家BUG
-- 可能修復公共領地無法新增之問題
-- 新增聊天顯示維度功能
-- 新增領地交互權限限制 - 熔爐 高爐 煙燻爐
-- 若玩家擁有領地破壞/建築權限，即可享有飛行功能
-- 修改 **-help** 內容 (新增介紹)
-- 修復 **-help sharehome** 介紹顯示錯誤問題
-- 領地格數增加/上限調整
-- 新增 **-back** 指令
-- 新增 **-rtp** 指令
-- 新增個人資訊
-- 修復領地刪除時傳送點無法刪除之問題
-
-#### 現在
+#### 之前 (DEV 2.0)
 - 新增公告功能
 - 修改金錢顯示
 - 新增2種管理員權限
 - 移除銀行系統 (獨立轉帳系統)
 - 新增商店系統
+
+#### 現在
+- 移除轉帳30s退款功能
+- 修改 **-rtp** 傳送距離
 
 ### 測試中內容
 - 領地系統 (多種維度支援)

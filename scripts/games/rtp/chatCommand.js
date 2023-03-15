@@ -24,8 +24,8 @@ export const chatCommands = [
                     return logfor(player.name, `§c§l>> §e您的隨機傳送冷卻還未結束! §f(§e剩餘 §b${rtp_time} §e秒§f)`)
                 }
                 
-                let x = getRandomIntInclusive(0, 9999999)
-                let z = getRandomIntInclusive(0, 9999999)
+                let x = getRandomIntInclusive(0, 100000)
+                let z = getRandomIntInclusive(0, 100000)
                 player.runCommandAsync(`effect @s blindness 5 255 true`)
                 player.runCommandAsync(`effect @s resistance 15 255 true`)
                 player.runCommandAsync(`effect @s slowness 5 255 true`)
