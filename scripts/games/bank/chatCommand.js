@@ -31,7 +31,7 @@ export const chatCommands = [
                          * @type {{"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}}
                          */
                         let json = JSON.parse(tag)
-                        for (let pl of mc.world.getAllPlayers()) {
+                        for (let pl of mc.world.getPlayers()) {
                             if (pl.name == json.senderTM.target) {
                                 let getMoney = json.senderTM.value
                                 let SenderMsg = `§a§l銀行系統 §f> §e您可以在30秒內無條件收回該轉帳 輸入-tm back`

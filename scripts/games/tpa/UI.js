@@ -20,7 +20,7 @@ export function UI (player) {
             if (res.canceled || !res) return;
             if (res.selection === 0) {
                 let players = []
-                for (let pl of mc.world.getAllPlayers()) {
+                for (let pl of mc.world.getPlayers()) {
                     if (pl.name != player.name) {
                         players.push(pl)
                     }

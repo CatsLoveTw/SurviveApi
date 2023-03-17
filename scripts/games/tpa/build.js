@@ -7,8 +7,8 @@ export function build () {
     // 設定被請求Tag - {"tpaReqed": {"source": string, "reqName": string, "tpa": number, 'message': string, "duration": number, "startTime": number}}
     // source 請求玩家名稱 reqName 被請求玩家名稱 tpa - 0 請求玩家傳送至被請求玩家 / 1 被請求玩家傳送至請求玩家 duration 持續時間 startTime 開始時間 (unixTime - 毫秒)
     // 檢查請求/被請求到期 §
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"tpaReq":')) {
                     /**
@@ -36,8 +36,8 @@ export function build () {
         }
     }, 1)
     // 偵測對方下線
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"tpaReq":')) {
                     /**
@@ -45,7 +45,7 @@ export function build () {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.tpaReq.reqName) {
                             check = true                            
                         }
@@ -68,7 +68,7 @@ export function build () {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.tpaReqed.source) {
                             check = true                            
                         }
@@ -91,8 +91,8 @@ export function build () {
     }, 2)
     
     // 偵測下線玩家又上線的tag清除
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"tpaReq":')) {
                     /**
@@ -100,7 +100,7 @@ export function build () {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.tpaReq.reqName) {
                             for (let tag of player.getTags()) {
                                 let json2 = {
@@ -130,7 +130,7 @@ export function build () {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.tpaReqed.source) {
                             for (let tag of player.getTags()) {
                                 let json2 = {

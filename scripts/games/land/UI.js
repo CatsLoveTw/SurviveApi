@@ -300,7 +300,7 @@ export function UI(player) {
                                 cmd(`scoreboard players reset "${name}" ${landID}`).then(() => {
                                     player.runCommandAsync(`scoreboard players add @s "land_squ" -${squ}`)
                                     player.runCommandAsync(`scoreboard players add @s "land_land" -1`)
-                                    for (let pl of mc.world.getAllPlayers()) {
+                                    for (let pl of mc.world.getPlayers()) {
                                         for (let tag of pl.getTags()) {
                                             if (tag.startsWith('{"inLand":') && tag.includes(JSON.stringify(land.pos)) && tag.includes(land.UID) && tag.includes(land.name)) {
                                                 pl.removeTag(tag)
@@ -402,7 +402,7 @@ export function UI(player) {
                                                                                 let players = []
                                                                                 let form = new ui.ActionFormData()
                                                                                     .title("§a§l線上玩家新增")
-                                                                                for (let player of mc.world.getAllPlayers()) {
+                                                                                for (let player of mc.world.getPlayers()) {
                                                                                     let check = true
                                                                                     for (let user of land.users) {
                                                                                         if (user.username == player.name) {
@@ -555,7 +555,7 @@ export function UI(player) {
                                      * @type {mc.Player[]}
                                      */
                                     let players = []
-                                    for (let pl of mc.world.getAllPlayers()) {
+                                    for (let pl of mc.world.getPlayers()) {
                                         let playerPos = pl.location
                                         let data = land
                                         let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))

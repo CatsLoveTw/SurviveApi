@@ -59,7 +59,7 @@ export function adminUI (player) {
                 let message = res.formValues[1].trim()
                 if (title == '' || message == '') return logfor(player.name, `§c§l>> §e標題或內容不可為空!`)
                 cmd(`scoreboard players set "title:${title}.___.message:${message}" notice 0`)
-                for (let player of mc.world.getAllPlayers()) {
+                for (let player of mc.world.getPlayers()) {
                     player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§f§l---§e伺服器公告新增§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
                 }
                 return logfor(player.name, `§a§l>> §e新增成功!`)
@@ -90,7 +90,7 @@ export function adminUI (player) {
                 getData.message = message
                 getData.title = title
                 cmd(`scoreboard players set "${transfromNotice(getData)}" notice 0`)
-                for (let player of mc.world.getAllPlayers()) {
+                for (let player of mc.world.getPlayers()) {
                     player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§f§l---§e伺服器公告更改§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
                 }
                 return logfor(player.name, `§a§l>> §e設定成功!`)

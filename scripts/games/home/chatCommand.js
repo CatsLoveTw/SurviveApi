@@ -40,7 +40,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.homeShared.source) {
                                     getSource = player
                                 }
@@ -97,7 +97,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.homeShared.source) {
                                     getSource = player
                                 }
@@ -152,7 +152,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.homeShare.source) {
                                     getSource = player
                                 }

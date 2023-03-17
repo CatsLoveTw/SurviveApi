@@ -43,7 +43,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.tpaReqed.source) {
                                     getSource = player
                                 }
@@ -136,7 +136,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.tpaReqed.source) {
                                     getSource = player
                                 }
@@ -193,7 +193,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getAllPlayers()) {
+                            for (let player of mc.world.getPlayers()) {
                                 if (player.name == json.tpaReq.source) {
                                     getSource = player
                                 }

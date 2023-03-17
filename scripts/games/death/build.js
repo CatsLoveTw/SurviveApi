@@ -15,8 +15,8 @@ export function build() {
         }
     } catch { }
 
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             /**
              * @type {mc.EntityHealthComponent}
              */

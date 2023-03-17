@@ -16,10 +16,10 @@ export function build () {
         }
     } catch { }
 
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         let getDeletesPlayer = worldlog.getScoreboardPlayers('adminDelete').disname
         for (let deletePlayer of getDeletesPlayer) {
-            for (let player of mc.world.getAllPlayers()) {
+            for (let player of mc.world.getPlayers()) {
                 if (deletePlayer == player.name) {
                     player.removeTag(`admin`)
                     cmd(`scoreboard players reset "${deletePlayer}" adminDelete`)

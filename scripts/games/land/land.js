@@ -127,7 +127,7 @@ export function build() {
             try {
                 let x = Math.trunc(player.location.x)
                 let z = Math.trunc(player.location.z)
-                let block = mc.world.getDimension(player.dimension.id).getBlock(new mc.BlockLocation(x, i, z))
+                let block = mc.world.getDimension(player.dimension.id).getBlock({x: x, y: i, z: z})
                 if (block.typeId != 'minecraft:air') {
                     y = i
                 }
@@ -138,8 +138,8 @@ export function build() {
     }
 
     // 偵測是否建造過久 / 玩家在其他維度建造領地隻偵測
-    mc.system.runSchedule(() => {
-        let players = mc.world.getAllPlayers();
+    mc.system.runInterval(() => {
+        let players = mc.world.getPlayers();
         for (let player of players) {
             let getTimes = new Date().getTime(); // unixTime 毫秒
             for (let tag of player.getTags()) {
@@ -329,13 +329,13 @@ export function build() {
     })
 
     // 偵測進入領地 + 模式切換 dime: over nether end
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         // Inland tag = {'inLand": {"land": land, "per": {"build": string, "container": string}}}
         try {
             let getAllLand = worldlog.getScoreboardPlayers('lands').disname
             for (let land of getAllLand) {
                 let data = getLandData(land)
-                for (let player of mc.world.getAllPlayers()) {
+                for (let player of mc.world.getPlayers()) {
                     let check = true
                     for (let tag of player.getTags()) {
                         if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:overworld') {
@@ -437,7 +437,7 @@ export function build() {
             let getAllLand = worldlog.getScoreboardPlayers('lands_nether').disname
             for (let land of getAllLand) {
                 let data = getLandData(land)
-                for (let player of mc.world.getAllPlayers()) {
+                for (let player of mc.world.getPlayers()) {
                     let check = true
                     for (let tag of player.getTags()) {
                         if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:nether') {
@@ -533,7 +533,7 @@ export function build() {
             let getAllLand = worldlog.getScoreboardPlayers('lands_end').disname
             for (let land of getAllLand) {
                 let data = getLandData(land)
-                for (let player of mc.world.getAllPlayers()) {
+                for (let player of mc.world.getPlayers()) {
                     let check = true
                     for (let tag of player.getTags()) {
                         if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:the_end') {
@@ -628,8 +628,8 @@ export function build() {
     }, 1)
 
     // 領地權限更改偵測
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"inLand":')) {
                     /**
@@ -698,8 +698,8 @@ export function build() {
     }, 3)
 
     // 領地公共權限更改偵測
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"inLand":') && !player.hasTag('admin')) {
                     /**
@@ -763,10 +763,10 @@ export function build() {
     }, 3)
 
     // 偵測離開領地
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         // §
         try {
-            for (let player of mc.world.getAllPlayers()) {
+            for (let player of mc.world.getPlayers()) {
                 for (let tag of player.getTags()) {
                     if (tag.startsWith('{"inLand":')) {
                         /**
@@ -861,7 +861,7 @@ export function build() {
 
     // 偵測交互
     mc.world.events.beforeItemUseOn.subscribe(events => {
-        const { source: player, blockLocation } = events
+        const { source: player, getBlockLocation } = events
         for (let tag of player.getTags()) {
             if (tag.startsWith('{"inLand":')) {
                 /**
@@ -869,7 +869,7 @@ export function build() {
                          */
                 let landData = JSON.parse(tag)
                 if (landData.inLand.per.container == "false" && !player.hasTag('admin')) {
-                    let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.blockLocation)
+                    let getBlock = mc.world.getDimension(player.dimension.id).getBlock(getBlockLocation())
                     let denyBlocks = [
                         'chest',
                         'gate',
@@ -902,8 +902,8 @@ export function build() {
 
     // 使用
     mc.world.events.beforeItemUseOn.subscribe(events => {
-        const { source: player, blockLocation } = events
-        let landData = checkInLand_Pos(blockLocation.x, blockLocation.z, player.dimension.id)
+        const { source: player, getBlockLocation } = events
+        let landData = checkInLand_Pos(getBlockLocation().x, getBlockLocation().z, player.dimension.id)
         if (!landData) return;
         let getPer = { "container": "false" }
         // 偵測公共權限
@@ -919,7 +919,7 @@ export function build() {
             }
         }
         if (getPer.container == "false" && !player.hasTag('admin')) {
-            let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.blockLocation)
+            let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.getBlockLocation())
             let denyBlocks = [
                 'chest',
                 'gate',

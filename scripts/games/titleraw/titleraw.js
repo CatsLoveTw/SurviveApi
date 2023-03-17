@@ -5,8 +5,8 @@ import { cmd, log, titlefor } from '../../lib/GametestFunctions'
 
 export function build () {
     // {"news": msg, tick: 0, maxtick: 20}
-    mc.system.runSchedule(() => {
-        for (let player of world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of world.getPlayers()) {
             let display = []
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"news"')) {

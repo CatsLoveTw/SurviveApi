@@ -10,11 +10,11 @@ export function build () {
         cmd(`scoreboard objectives add sysTM dummy "§e§l還錢請求待處理清單"`)
     } catch {}
     // 偵測結束
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         // 轉帳系統tag 給錢: {"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}
         // 收到錢: {"targetTM": {"value": number, "sender": string, "target": string, "startTime": number}}
         // value 轉帳金額 sender 轉帳人 target 收帳者 startTime 開始時間 §
-        for (let player of mc.world.getAllPlayers()) {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.includes('{"senderTM":')) {
                     /**
@@ -41,7 +41,7 @@ export function build () {
     }, 1)
 
     // 偵測對方上線 ${json.senderTM.target}_._${json.senderTM.value}_._${json.senderTM.sender}
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         let disnames = worldlog.getScoreboardPlayers('sysTM').disname
         for (let disname of disnames) {
             let args = disname.split("_._")
@@ -52,7 +52,7 @@ export function build () {
             let value = args[1]
             let TargetMsg = `§a§l銀行系統 §f> §e注意 §b${args[2]} §e可在30秒內收回轉帳交易!`
             let sendMsg = `§c§l>> §e轉帳交易已被 §b${player.name} §e收回`
-            for (let player of mc.world.getAllPlayers()) {
+            for (let player of mc.world.getPlayers()) {
                 if (player.name == args[0]) {
                     target = player
                 }

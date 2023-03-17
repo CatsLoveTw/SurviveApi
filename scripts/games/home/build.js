@@ -21,8 +21,8 @@ export function build() {
     // 設定被請求Tag - {"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     // Source `§e您已向 §b${json.homeShare.sharedName} §e發送分享請求，等待回復...`
     // shared `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 let dimensions = ["lands", "lands_nether", "lands_end"]
                 let check = false
@@ -56,8 +56,8 @@ export function build() {
     }, 1)
 
     // 檢查請求/被請求到期 §
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -85,8 +85,8 @@ export function build() {
         }
     }, 1)
     // 偵測對方下線
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -94,7 +94,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShare.sharedName) {
                             check = true                            
                         }
@@ -117,7 +117,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShared.source) {
                             check = true                            
                         }
@@ -139,8 +139,8 @@ export function build() {
     }, 2)
     
     // 偵測下線玩家又上線的tag清除
-    mc.system.runSchedule(() => {
-        for (let player of mc.world.getAllPlayers()) {
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -148,7 +148,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShare.sharedName) {
                             for (let tag of player.getTags()) {
                                 let json2 = {
@@ -177,7 +177,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getAllPlayers()) {
+                    for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShared.source) {
                             for (let tag of player.getTags()) {
                                 let json2 = {

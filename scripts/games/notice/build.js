@@ -18,7 +18,7 @@ export function build() {
     } catch { }
 
     // 基本設定
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         if (worldlog.getScoreboardPlayers('notice').disname.length === 0) {
             // 設定預設公告
             cmd(`scoreboard players set "title:伺服器規範.___.message:§f歡迎來到該伺服器，請遵守以下規則§f:§b請勿刷頻及散布不實言論，這是聊天室基本之禮儀。" notice 0`)

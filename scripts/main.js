@@ -17,7 +17,7 @@ import * as notice from './games/notice/build.js'
 import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 
-
+try {
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
 const prefix = '-'
 
@@ -53,7 +53,7 @@ function getMenu (player) {
     inv.container.setItem(Slot, newItem)
 }
 
-for (let player of world.getAllPlayers()) {
+for (let player of world.getPlayers()) {
     for (let tag of player.getTags()) {
         if (tag.startsWith('{"news":')) {
             player.removeTag(tag)
@@ -93,7 +93,7 @@ world.events.beforeChat.subscribe(events => {
     }
 })
 
-// system.runSchedule() 類似於tickEvent
+// system.runInterval() 類似於tickEvent
 
 const scoreboards = {
     "land_squ": 0,
@@ -108,9 +108,9 @@ const scoreboards = {
     "rtp_time": 0,
     'death': 0
 }
-system.runSchedule(() => {
+system.runInterval(() => {
     let score = {}
-    for (let player of world.getAllPlayers()) {
+    for (let player of world.getPlayers()) {
         for (let board in scoreboards) {
             if (scoreboards[board] == 0) { 
                 player.runCommandAsync(`scoreboard players add @s "${board}" ${scoreboards[board]}`)
@@ -151,7 +151,8 @@ mc.world.events.playerJoin.subscribe(event => {
 
 function getPlayTime () {
     let i = 0
-    world.events.tick.subscribe(() => {
+    
+    system.runInterval(() => {
         i++
         if (i == 20) {
             i = 0
@@ -205,7 +206,7 @@ function displayMenu() {
         } catch (e) { world.say(e) }
         cmd(`scoreboard players set "§l§e${scorename} §7- §b${scoreData}" menu 0`)
     }
-    mc.system.runSchedule(() => {
+    mc.system.runInterval(() => {
         let date = new Date();
         let h = date.getUTCHours() + 8
         let m = date.getMinutes()
@@ -260,3 +261,4 @@ try {
 
 
 
+} catch (e) {log(e)}
