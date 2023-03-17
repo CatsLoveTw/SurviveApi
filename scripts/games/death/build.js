@@ -15,33 +15,24 @@ export function build() {
         }
     } catch { }
 
-    mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
-            /**
-             * @type {mc.EntityHealthComponent}
-             */
-            let getHealth = player.getComponent("health")
-            if (getHealth.current > 0) {
-                player.addTag("live")
-            }
-            if (getHealth.current <= 0 && player.hasTag('live')) {
-                player.runCommandAsync(`scoreboard players add @s death 1`)
-                for (let postag of player.getTags()) {
-                    if (postag.startsWith('{"back":')) {
-                        player.removeTag(postag)
-                    }
+    mc.world.events.entityDie.subscribe((events) => {
+        let player = events.deadEntity
+        if (player.typeId == 'minecraft:player') {
+            player.runCommandAsync(`scoreboard players add @s death 1`)
+            for (let postag of player.getTags()) {
+                if (postag.startsWith('{"back":')) {
+                    player.removeTag(postag)
                 }
-                let json = {
-                    "back": {
-                        "x": player.location.x,
-                        "y": player.location.y,
-                        "z": player.location.z
-                    }
-                }
-                player.addTag(JSON.stringify(json))
-                player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到死亡點!"}]}`)
-                player.removeTag("live")
             }
+            let json = {
+                "back": {
+                    "x": player.location.x,
+                    "y": player.location.y,
+                    "z": player.location.z
+                }
+            }
+            player.addTag(JSON.stringify(json))
+            player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到死亡點!"}]}`)
         }
     })
 }

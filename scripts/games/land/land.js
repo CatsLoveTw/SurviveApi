@@ -133,8 +133,11 @@ export function build() {
                 }
             } catch (e) {log(e)}
         }
-        player.runCommandAsync(`tp @s ~ ${y+1} ~`)
-        player.runCommandAsync(`effect @s resistance 1 255 true`)
+        let playerY = Math.trunc(player.location.y)
+        if (Math.abs(playerY - y) > 3) {
+            player.runCommandAsync(`tp @s ~ ${y+1} ~`)
+            player.runCommandAsync(`effect @s resistance 1 255 true`)
+        }
     }
 
     // 偵測是否建造過久 / 玩家在其他維度建造領地隻偵測

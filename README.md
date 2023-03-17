@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.0.2-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.0.3-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,7 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 2.0 && DEV 2.0.1)
+#### 之前 (DEV 2.0 && DEV 2.0.1 && DEV 2.0.2)
 - 新增公告功能
 - 修改金錢顯示
 - 新增2種管理員權限
@@ -19,9 +19,10 @@
 - 新增商店系統
 - 移除轉帳30s退款功能
 - 修改 **-rtp** 傳送距離
+- 支援V1.19.70
 
 #### 現在
-- 支援V1.19.70
+- 調整離開領地時的傳送偵測
 
 ### 測試中內容
 - 領地系統 (多種維度支援)

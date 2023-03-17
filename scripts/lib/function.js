@@ -51,169 +51,159 @@ function getScore (player, scoreName) {
 //     add
 // }
 
+/**
+ * 世界記分板資料庫系統
+ */
 
-class worldDBs {
-    constructor () {
-        let alldb = []
-        for (let id of worldlog.getScoreobjs["id"]) {
-            if (id.startsWith("DB")) {
-                alldb.push(id.replace("DB", ''))
+class worldDB {
+    // 內容 - key:,value: 
+    /**
+     * 
+     * @param {string} DBID 輸入資料庫ID
+     */
+    constructor (DBID) {
+        this.id = DBID
+    }
+    /**
+     * 新增資料庫
+     * @returns {Promise<mc.ScoreboardObjective>}
+     */
+    async addDB () {
+        await cmd(`scoreboard objectives add "DB:${this.id}" dummy`)
+        let allBoards = mc.world.scoreboard.getObjectives()
+        for (let board of allBoards) {
+            if (board.id == `DB:${this.id}`) {
+                return board
             }
-        } 
-        this.getAllDB = alldb
-    }
-    addDB (Name) {
-        try{cmd (`scoreboard objectives add "DB:${Name}" dummy`)} catch {}
-    }
-    removeDB (Name) {
-        try {cmd (`scoreboard objectives remove "DB:${Name}"`)} catch {} 
-    }
-    add (TEXTName, DBID, DBText_array) {
-        cmd (`scoreboard players set "${TEXTName + ' text:' + DBText_array.join(',')}" "DB:${DBID}" 0`)
-    }
-    set (TEXTName, DBID, DBText_array) {
-        let serid = []
-        let ser = []
-       for (let name of worldlog.getScoreboardPlayers(`DB:${DBID}`)["disname"]) {
-        if (name.startsWith(TEXTName)) {
-            ser.push(name)
-            serid.push(name.split(" ")[0])
         }
-       }
-       if (serid.length == 0) {
+    }
+    /**
+     * 刪除資料庫
+     */
+    removeDB () {
+        cmd(`scoreboard objectives remove "DB:${this.id}" dummy`)
+    }
+    /**
+     * 確認資料庫是否存在
+     */
+    checkDB () {
+        let allBoards = mc.world.scoreboard.getObjectives()
+        for (let board of allBoards) {
+            if (board.id == `DB:${this.id}`) {
+                return true
+            }
+        }
         return false
-       } else {
-        cmd (`scoreboard players reset "${ser}" "DB:${DBID}"`)
-        cmd (`scoreboard players set "${TEXTName + ' text:' + DBText_array.join(',')}" "DB:${DBID}" 0`)
-        return true
     }
-    }
-    remove (TEXTName, DBID) {
-        let serid = []
-        for (let name of worldlog.getScoreboardPlayers(`DB:${DBID}`)["disname"]) {
-            if (name.startsWith(TEXTName)) {
-                serid.push(name)
+    /**
+     * 取得資料庫記分板
+     */
+    getDB () {
+        let allBoards = mc.world.scoreboard.getObjectives()
+        for (let board of allBoards) {
+            if (board.id == `DB:${this.id}`) {
+                return board
             }
         }
-        if (serid.length == 0) {
-            return false
+        return this.addDB()
+    }
+
+    /**
+     * 確認資料是否存在
+     * @param {string} key
+     */
+    async checkData (key) {
+        if (!this.checkDB()) {
+            this.addDB()
+            return {value: "", check: false}
+        }
+
+        let db = await this.getDB()
+        let datas = db.getParticipants()
+        for (let data of datas) {
+            let Datakey = data.displayName.replace("key:", '').split(",value:")[0]
+            let DataValue = data.displayName.split(",value:")[1]
+            if (Datakey == key) {
+                return {value: DataValue, check: true}
+            }
+        }
+        return {value: "", check: false}
+    }
+
+    /**
+     * 設定資料
+     * @param {string} key 鍵 (搜尋值用)
+     * @param {any[] | string | number | boolean} value 值
+     */
+    async setData (key, value) {
+        if (!this.checkDB()) {
+            await this.addDB()
+        }
+        let data = await this.checkData(key)
+        if (data.check == true) {
+            cmd(`scoreboard players reset "key:${key},value:${data.value}" DB:${this.id}`)
+            if (Array.isArray(value)) {
+                cmd(`scoreboard players set "key:${key},value:${value.join("___")}" DB:${this.id} 0`)
+            } else {
+                cmd(`scoreboard players set "key:${key},value:${value}" DB:${this.id} 0`)
+            }
         } else {
-            for (let id of serid) {
-            cmd (`scoreboard players reset "${id}" "DB:${DBID}"`)
+            if (Array.isArray(value)) {
+                cmd(`scoreboard players set "key:${key},value:${value.join("___")}" DB:${this.id} 0`)
+            } else {
+                cmd(`scoreboard players set "key:${key},value:${value}" DB:${this.id} 0`)
+            }
         }
     }
+    /**
+     * 刪除資料
+     * @param {string} key 鍵
+     */
+    async removeData (key) {
+        let data = await this.checkData(key)
+        if (data.check) {
+            cmd(`scoreboard players remove "key:${key},value:${data.value}" DB:${this.id}`)
+        }
     }
-    DBPlayerlist (DBID) {
-        let getDBp = worldlog.getScoreboardPlayers(`DB:${DBID}`)
-        let textname = []
-        let text = []
-        for (let name of getDBp) {
-            textname.push(name.split(':')[0].replace(" text", ''))
-            text.push(name.split(':')[1])
+    /**
+     * 取得資料值
+     * @param {string} key 
+     * @returns {Promise<false | {key: string;values: string[];isArray: true;} | {key: string;values: string;isArray: false;}>}
+     */
+    async getData (key) {
+        let data = await this.checkData(key)
+        if (!data.check) return false
+        let values = data.value
+        if (data.value.indexOf('___') != -1) {
+            return {key: key, values: values.split("___"), isArray: true}
         }
-        return {"textname": textname, 'text': text}
+        return {key: key, values: values, isArray: false}
     }
-    getDBPlayerScoreData (DBplayerName, DBID) {
-        let allp = worldDB.DBPlayerlist(DBID)
-        for (let i in allp) {
-        if (allp['textname'][i].startsWith(DBplayerName)) {
-            var Dbtextname = allp['textname'][i]
-            var DBTEXT = allp['text'][i]
+
+
+    /**
+     * 
+     * @returns {{key: string;values: string[];isArray: true;} | {key: string;values: string;isArray: false;}}
+     */
+    async getAllData () {
+        let datas = []
+        let db = await this.getDB()
+        for (let data of db.getParticipants()) {
+            let key = data.displayName.replace("key:", '').split(",value:")[0]
+            let a = await this.getData(key)
+            datas.push(a)
         }
-        }
-        // this.adds = wd
-        return {"DBTEXTNAME": Dbtextname, "DBTEXT": DBTEXT}
+        return datas
     }
 }
 
 
 class worldlogs {
     constructor () {
-        let playerdata = []
-        let playername = []
-        for (let player of world.getPlayers()) {
-            playerdata.push(player)
-            playername.push(player.name)
-        }
-        /**
-         * @type {{Data: mc.Player, Name: string}}
-         * @回傳
-         * 物件 {}
-         * @內容
-         * Data: PlayerClass (mc.Player) 
-         * 
-         * Name: 玩家名稱 (mc.Player.name)
-         * 
-         * @提醒 這個資料可能會有錯誤!
-         */
-        this.getPlayers = {"Data": playerdata, "Name": playername}
-        // 取得玩家
 
-
-        let entitydata = []
-        let entitynameTag = []
-        let entityid = []
-        for (let entity of world.getDimension("overworld").getEntities()) {
-            entitydata.push(entity)
-            let nametag
-            if (!entity.nameTag) {
-                 nametag = '無'
-            } else {nametag = entity.nameTag}
-            entitynameTag.push(nametag)
-            entityid.push(entity.id)
-        }
-        /**
-         * @type {{Data: mc.Entity | mc.Player, nameTag: string, ID: string}}
-         * @回傳
-         * 物件 {}
-         * @內容
-         * Data: EntityClass (mc.Entity)
-         * 
-         * nameTag: 生物名 (若沒有取名就沒有)
-         * 
-         * id: 生物ID (例如:羊 = minecraft:sheep)
-         * 
-         * @提醒 這個資料可能會有錯誤!
-         */
-        this.getEntity = {"Data": entitydata, "nameTag": entitynameTag, "id": entityid}
-        // 取得生物
-
-        let scoresname = []
-        let scoresid = []
-        let obj = []
-        for (let scoreobj of world.scoreboard.getObjectives()) {
-            obj.push(scoreobj)
-            scoresname.push(scoreobj.displayName)
-            scoresid.push(scoreobj.id)
-        }
-        /**
-         * @type {{obj: mc.ScoreboardObjective[], displayName: string[], id: string[]}}
-         * @回傳
-         * 物件 {}
-         * @內容
-         * obj: ScoreboardObjective 
-         * 
-         * displayName: 記分板"顯示"名稱
-         * 
-         * id: 記分板名稱
-         * 
-         * @提醒 這個資料可能會有錯誤!
-         */
-        this.getScoreobjs = {"obj": obj, "displayName": scoresname, "id": scoresid}
-        // 取得記分板
-        let onlineplayer = []
-        for (let pl of world.getPlayers()) {
-            onlineplayer.push(pl.name)
-        }
-        /**
-         * @type {number}
-         * @回傳
-         * 數字 number
-         * @內容
-         * 當前玩家人數
-         * @提醒 這個資料可能會有錯誤!
-         */
-        this.getOnlinePlayer = onlineplayer.length
+    }
+    getOnlinePlayer () {
+        return mc.world.getAllPlayers().length;
     }
     /**
      * @param {string | number} nameID 要搜尋的名稱
@@ -295,10 +285,5 @@ class worldlogs {
  * By:Cat1238756
  */
 const worldlog = new worldlogs()
-/**
- * 記分板資料庫 | 未翻譯
- * 
- * By:Cat1238756
- */
-const worldDB = new worldDBs()
+
 export { isNum, randomInt, getScore, worldlog, worldDB, getRandomIntInclusive }
