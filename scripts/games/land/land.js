@@ -1,8 +1,8 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
-import { checkInLand, checkInLand_Pos } from './build.js'
+import { log, cmd, logfor, cmd_Dimension } from '../../lib/GametestFunctions.js'
+import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
 export const times = 180 // 設定過期時間 (秒)
 /**
  * 
@@ -104,6 +104,18 @@ function transfromLand(landData) {
         return `${name}_,_${pos}_,_${UID}_,_${player}_,_${permission}_,_${userList.join(":/:")}`
     }
     return `${name}_,_${pos}_,_${UID}_,_true_,_${permission}`
+}
+
+/**
+ * 
+ * @param {mc.Player} player 
+ */
+function getAdmin(player) {
+    let getPermission = worldlog.getScoreFromMinecraft(player.name, 'permission')
+    if (!getPermission || getPermission.score == 1) {
+        return false
+    }
+    return true
 }
 
 
@@ -374,7 +386,7 @@ export function build() {
                                         }
                                     }
                                 }
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     player.runCommandAsync('gamemode a @s')
                                 }
 
@@ -391,13 +403,13 @@ export function build() {
                                 }
                                 let msg = ''
                                 let perList = []
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l建築/破壞`)
                                 }
-                                if (getPer.container == "false" && !player.hasTag("admin")) {
+                                if (getPer.container == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l容器操作`)
                                 }
-                                if (getPer.portal == "false" && !player.hasTag("admin")) {
+                                if (getPer.portal == "false" && !getAdmin(player)) {
                                     perList.push("§c§l傳送點設置")
                                 }
                                 let displayPer = ''
@@ -405,13 +417,13 @@ export function build() {
                                     displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
                                 }
                                 if (!data.public) {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     }
                                 } else {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
@@ -476,7 +488,7 @@ export function build() {
                                         }
                                     }
                                 }
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     player.runCommandAsync('gamemode a @s')
                                 }
 
@@ -488,13 +500,13 @@ export function build() {
                                 }
                                 let msg = ''
                                 let perList = []
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l建築/破壞`)
                                 }
-                                if (getPer.container == "false" && !player.hasTag("admin")) {
+                                if (getPer.container == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l容器操作`)
                                 }
-                                if (getPer.portal == "false" && !player.hasTag("admin")) {
+                                if (getPer.portal == "false" && !getAdmin(player)) {
                                     perList.push("§c§l傳送點設置")
                                 }
                                 let displayPer = ''
@@ -502,13 +514,13 @@ export function build() {
                                     displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
                                 }
                                 if (!data.public) {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     }
                                 } else {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
@@ -572,7 +584,7 @@ export function build() {
                                         }
                                     }
                                 }
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     player.runCommandAsync('gamemode a @s')
                                 }
 
@@ -584,13 +596,13 @@ export function build() {
                                 }
                                 let msg = ''
                                 let perList = []
-                                if (getPer.build == "false" && !player.hasTag("admin")) {
+                                if (getPer.build == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l建築/破壞`)
                                 }
-                                if (getPer.container == "false" && !player.hasTag("admin")) {
+                                if (getPer.container == "false" && !getAdmin(player)) {
                                     perList.push(`§c§l容器操作`)
                                 }
-                                if (getPer.portal == "false" && !player.hasTag("admin")) {
+                                if (getPer.portal == "false" && !getAdmin(player)) {
                                     perList.push("§c§l傳送點設置")
                                 }
                                 let displayPer = ''
@@ -598,13 +610,13 @@ export function build() {
                                     displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
                                 }
                                 if (!data.public) {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                     }
                                 } else {
-                                    if (!player.hasTag('admin')) {
+                                    if (!getAdmin(player)) {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
                                     } else {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
@@ -704,7 +716,7 @@ export function build() {
     mc.system.runInterval(() => {
         for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
-                if (tag.startsWith('{"inLand":') && !player.hasTag('admin')) {
+                if (tag.startsWith('{"inLand":') && !getAdmin(player)) {
                     /**
                      * @type {{inLand: {dime: string, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string}}}}
                      */
@@ -808,7 +820,7 @@ export function build() {
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             player.removeTag(tag)
-                            if (!player.hasTag('admin')) {
+                            if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
                                 removefly(player)
                             }
@@ -829,7 +841,7 @@ export function build() {
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             player.removeTag(tag)
-                            if (!player.hasTag('admin')) {
+                            if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
                                 removefly(player)
                             }
@@ -850,7 +862,7 @@ export function build() {
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
                             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                             player.removeTag(tag)
-                            if (!player.hasTag('admin')) {
+                            if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
                                 removefly(player)
                             }
@@ -871,7 +883,7 @@ export function build() {
                          * @type {{inLand: {dime: string, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string}}}}
                          */
                 let landData = JSON.parse(tag)
-                if (landData.inLand.per.container == "false" && !player.hasTag('admin')) {
+                if (landData.inLand.per.container == "false" && !getAdmin(player)) {
                     let getBlock = mc.world.getDimension(player.dimension.id).getBlock(getBlockLocation())
                     let denyBlocks = [
                         'chest',
@@ -921,7 +933,7 @@ export function build() {
                 }
             }
         }
-        if (getPer.container == "false" && !player.hasTag('admin')) {
+        if (getPer.container == "false" && !getAdmin(player)) {
             let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.getBlockLocation())
             let denyBlocks = [
                 'chest',
@@ -967,7 +979,7 @@ export function build() {
             }
         }
 
-        if (getPer.build == 'false' && !player.hasTag("admin")) {
+        if (getPer.build == 'false' && !getAdmin(player)) {
             player.runCommandAsync(`setblock ${block.location.x} ${block.location.y} ${block.location.z} air`)
             let msg = `§e§l領地系統 §f> §c您沒有權限放置該方塊!`
             for (let tag of player.getTags()) {
@@ -997,7 +1009,7 @@ export function build() {
                 }
             }
         }
-        if (getPer.build == 'false' && !player.hasTag("admin")) {
+        if (getPer.build == 'false' && !getAdmin(player)) {
             block.setPermutation(brokenBlockPermutation)
             mc.world.getDimension(dimension.id).runCommandAsync(`kill @e[type=item, x=${block.x}, y=${block.y}, z=${block.z}]`)
             let msg = `§e§l領地系統 §f> §c您沒有權限破壞該方塊!`
@@ -1009,4 +1021,33 @@ export function build() {
             player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
         }
     })
+
+    // 偵測TNT爆炸
+    mc.system.runInterval(() => {
+        let dimensions = ['overworld', 'nether', 'the_end']
+        for (let dimension of dimensions) {
+            let query = {
+                type: 'tnt'
+            }
+            for (let entity of mc.world.getDimension(dimension).getEntities(query)) {
+                if (!entity.hasTag('exp')) {
+                    mc.system.runTimeout(() => {
+                        if (checkNearLand_Pos(entity.location.x, entity.location.z, dimension, 3)) {
+                            mc.world.getDimension(dimension).runCommandAsync(`particle minecraft:huge_explosion_emitter ${entity.location.x} ${entity.location.y} ${entity.location.z}`)
+                            for (let entity2 of mc.world.getDimension(dimension).getEntities()) {
+                                if (worldlog.isNear(entity.location, entity2.location, 3)) {
+                                    if (entity2.typeId != 'minecraft:tnt' && entity2.typeId != 'minecraft:item') {
+                                        entity2.runCommandAsync(`playSound random.explode @s`)
+                                        entity2.runCommandAsync(`damage @s 10`)
+                                    }
+                                }
+                            }
+                            entity.kill()
+                        }
+                    }, 79)
+                    entity.addTag('exp')
+                }
+            }
+        }
+    }, 1)
 }

@@ -3,6 +3,10 @@ import * as mc from "@minecraft/server";
 const cmd = function(command) {
     return mc.world.getDimension("overworld").runCommandAsync(command)
 };
+
+const cmd_Dimension = (command, dimension) => {
+    return mc.world.getDimension(dimension).runCommandAsync(command)
+}
   
 const logfor = function(playername,message) {
     let okay_message = message.toString().replaceAll('\"',"''").replaceAll('\\',"/")
@@ -54,4 +58,4 @@ const getSign = function(player) {
 }
 
 
-export {cmd, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}
+export {cmd, cmd_Dimension, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}

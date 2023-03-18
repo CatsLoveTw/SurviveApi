@@ -1,6 +1,7 @@
 import { world } from "@minecraft/server"
 import * as mc from "@minecraft/server"
 import { cmd, log, logfor } from './GametestFunctions.js'
+import { leaderboard } from "./leaderboard.js"
 /**
  * 
  * @param {never} val 
@@ -277,7 +278,34 @@ class worldlogs {
         let res2 = res1.replace(`)`, "")
         return res2
     }
+
+    /**
+     * @param {string | number} scoreboardID 記分板ID
+     * @param {number} rankvalue 要取得的排名
+     * @returns {{name: string, score: number, Index: "測試用 數值(number)", errorNumber: "測試用 紀錄重複計算n次"}}
+     * name: 玩家名稱 score: 分數
+     * @提醒 這個資料可能會有錯誤!
+     */
+    getLeaderboard (scoreboardID, rankvalue) {
+        let lb = leaderboard(scoreboardID, rankvalue)
+        return {'name': lb[0], 'score': lb[1], 'Index': lb[2], 'errorNumber': lb[3]}
+    }
     
+    /**
+     * 
+     * @param {mc.Vector3} pos1 
+     * @param {mc.Vector3} pos2 
+     * @param {Number} near 
+     */
+    isNear (pos1, pos2, near) {
+        let x = Math.abs(pos1.x - pos2.x)
+        let y = Math.abs(pos1.y - pos2.y)
+        let z = Math.abs(pos1.z - pos2.z)
+        if (x <= near && y <= near && z <= near) {
+            return true
+        }
+        return false
+    }
 }
 /**
  * 方便好用的Class - 取得Minecraft各種資料 | 擁有中文註解

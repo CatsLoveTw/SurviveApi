@@ -26,12 +26,14 @@ export function build() {
     }, 20)
 
     mc.world.events.playerJoin.subscribe(events => {
-        let {player} = events
-        for (let notice of worldlog.getScoreboardPlayers('notice').disname) {
-            let data = getNoticeData(notice)
-            let title = data.title
-            let message = data.message
-            player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§f§l---§e伺服器公告§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
-        }
+        let { playerName } = events
+        mc.system.runTimeout(() => {
+            for (let notice of worldlog.getScoreboardPlayers('notice').disname) {
+                let data = getNoticeData(notice)
+                let title = data.title
+                let message = data.message
+                cmd(`tellraw "${playerName}" {"rawtext":[{"text":"§f§l---§e伺服器公告§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
+            }
+        }, 60)
     })
 }

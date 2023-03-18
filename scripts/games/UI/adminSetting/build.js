@@ -17,6 +17,13 @@ export function build () {
     } catch { }
 
     mc.system.runInterval(() => {
+        for (let player of mc.world.getPlayers()) {
+            try {
+                if (worldlog.getScoreFromMinecraft(player.name, 'permission').score == 2) {
+                    player.runCommandAsync(`ability @s mayfly true`)
+                }
+            } catch { }
+        }
         let getDeletesPlayer = worldlog.getScoreboardPlayers('adminDelete').disname
         for (let deletePlayer of getDeletesPlayer) {
             for (let player of mc.world.getPlayers()) {

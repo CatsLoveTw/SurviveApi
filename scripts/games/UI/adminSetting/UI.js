@@ -10,9 +10,6 @@ let dropdown = ['§e§l普通管理員', '§b§l巡查管理員']
  * @param {mc.Player} player 
  */
 export function UI(player) {
-    if (!worldlog.getScoreFromMinecraft(player.name, 'permission')) {
-        return logfor(player.name, `§c§l>> §e您沒有權限使用該功能! §f(§e必須是§b巡查管理員§f)`)
-    }
     let getPermission = worldlog.getScoreFromMinecraft(player.name, `permission`).score
     if (player.hasTag('admin') && getPermission == 2) {
         let form = new ui.ActionFormData()
@@ -134,6 +131,13 @@ export function UI(player) {
                                                 if (res.canceled) return
                                                 let sele = res.formValues[0]
                                                 cmd(`scoreboard players set "${selePlayer}" permission ${sele + 1}`)
+                                                let query = {
+                                                    name: selePlayer
+                                                }
+                                                let Seplayer = mc.world.getPlayers(query)
+                                                if (Seplayer.length > 0 && (sele + 1) == 2) {
+                                                    Seplayer[0].runCommandAsync(`ability @s mayfly false`)
+                                                }
                                                 return logfor(player.name, `§a§l>> §e修改成功!`);
                                             })
                                     }

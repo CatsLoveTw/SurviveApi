@@ -58,7 +58,9 @@ export function checkInLand(player) {
 
 /**
  * 
- * @param {mc.Player} player 
+ * @param {number} x
+ * @param {number} z
+ * @param {string} dimeID
  */
 export function checkInLand_Pos(x, z, dimeID) {
     let index = 0
@@ -81,6 +83,41 @@ export function checkInLand_Pos(x, z, dimeID) {
             if (Math.floor(Number(z)) <= z1 && Math.floor(Number(z)) >= z2) {
                 // log('test2')
                 return data;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * 
+ * @param {number} x
+ * @param {number} z
+ * @param {string} dimeID
+ * @param {number} near
+ */
+export function checkNearLand_Pos(x, z, dimeID, near) {
+    let index = 0
+    if (dimeID == mc.MinecraftDimensionTypes.nether) {
+        index = 1
+    }
+    if (dimeID == mc.MinecraftDimensionTypes.theEnd) {
+        index = 2
+    }
+    let landSelection = ['lands', 'lands_nether', 'lands_end']
+    for (let land of worldlog.getScoreboardPlayers(landSelection[index]).disname) {
+        let data = getLandData(land)
+        let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
+        let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
+        let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
+        let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
+        for (let i = Math.min(Number(x1), Number(x2)); i <= Math.max(Number(x1), Number(x2)); i++) {
+            for (let j = Math.min(Number(z1), Number(z2)); j <= Math.max(Number(z1), Number(z2)); j++) {
+                let checkX = Math.abs(i - x)
+                let checkZ = Math.abs(j - z)
+                if (checkX <= near && checkZ <= near) {
+                    return true
+                }
             }
         }
     }

@@ -145,8 +145,8 @@ system.runInterval(() => {
 
 // 無敵
 mc.world.events.playerJoin.subscribe(event => {
-    let player = event.player
-    player.addEffect(mc.MinecraftEffectTypes.resistance, 10, 255, false)
+    let player = event.playerName
+    cmd(`effect "${player}" resistance 10 255 true`)
 })
 
 function getPlayTime () {
