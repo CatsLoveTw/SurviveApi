@@ -1,13 +1,13 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd, logfor, cmd_Dimension } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
 export const times = 180 // 設定過期時間 (秒)
 /**
  * 
  * @param {string} land 
- * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}}
+ * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
  */
 function getLandData(land) {
     // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
@@ -34,6 +34,7 @@ function getLandData(land) {
                 build: per[0],
                 container: per[1],
                 portal: per[2],
+                fly: per[3]
             }
             usersList.push({ username: username, permission: userPermissions })
         }
@@ -51,6 +52,7 @@ function getLandData(land) {
                 build: permissions[0],
                 container: permissions[1],
                 portal: permissions[2],
+                fly: permissions[3]
             },
             users: usersList,
             public: false,
@@ -68,6 +70,7 @@ function getLandData(land) {
                 build: permissions[0],
                 container: permissions[1],
                 portal: permissions[2],
+                fly: permissions[3]
             },
             users: false,
             public: true,
@@ -112,7 +115,7 @@ function transfromLand(landData) {
  */
 export function getAdmin(player) {
     let getPermission = worldlog.getScoreFromMinecraft(player.name, 'permission')
-    if (!getPermission || getPermission.score == 1) {
+    if (!getPermission || getPermission.score == 1 || !player.hasTag('admin')) {
         return false
     }
     return true
@@ -313,9 +316,9 @@ export function build() {
                             ID = max + 1
                         }
                         if (!json.landCreate.admin) {
-                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false_,_${player.name}:true|true|true`
+                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false|false_,_${player.name}:true|true|true|true`
                         } else {
-                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_true_,_false|false|false`
+                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_true_,_false|false|false|false`
                         }
                         if (json.landCreate.dime == 'over') {
                             cmd(`scoreboard players set "${landData}" lands ${ID}`)
@@ -342,12 +345,43 @@ export function build() {
                 })
         }
     })
-
+    
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getAllPlayers()) {
+            for (let msg of getSign(player)) {
+                /**
+                 * @type {{ "news": string, tick: number, maxtick: number }}
+                 */
+                let msgData = JSON.parse(msg)
+                if (msgData.news.startsWith("§e§l領地系統 §f> §a您正在建造領地 §7- ")) {
+                    for (let tag of player.getTags()) {
+                        if (tag.includes('{"landCreate":{')) {
+                            /**
+                            * @type {{"landCreate":{"dime": string, "at": number, 'name': string, 'step': number, 'pos': {x: number | false, z: number | false}, 'pos2': {x: number | false, z: number | false}, 'admin': boolean}}}
+                            * 
+                            */
+                            let json = {}
+                            json = JSON.parse(tag)
+                            
+                            if (json.landCreate.pos) {
+                                let squ = (Math.abs(json.landCreate.pos.x - Math.floor(player.location.x)) + 1) * (Math.abs(json.landCreate.pos.z - Math.floor(player.location.z)) + 1)
+                                removeSign(msgData.news, player)
+                                let message = `§e§l領地系統 §f> §a您正在建造領地 §7- §b${json.landCreate.name} §f(§e目前格數 §f- §e${squ} §e格§f)`
+                                addSign(message, player, (msgData.maxtick - msgData.tick))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }, 1)
     // 偵測進入領地 + 模式切換 dime: over nether end
     mc.system.runInterval(() => {
         // Inland tag = {'inLand": {"land": land, "per": {"build": string, "container": string}}}
         try {
-            let getAllLand = worldlog.getScoreboardPlayers('lands').disname
+            let landIDs = ['lands', 'lands_nether', 'lands_end']
+            for (let landID of landIDs) {
+            let getAllLand = worldlog.getScoreboardPlayers(landID).disname
             for (let land of getAllLand) {
                 let data = getLandData(land)
                 for (let player of mc.world.getPlayers()) {
@@ -365,7 +399,7 @@ export function build() {
                         let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
                         if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
                             if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
-                                let getPer = { "build": "false", "container": "false", "portal": "false" }
+                                let getPer = { "build": "false", "container": "false", "portal": "false", fly: "false" }
                                 // 偵測公共權限
                                 if (data.permission.build == "true") {
                                     getPer.build = "true"
@@ -376,6 +410,9 @@ export function build() {
                                 if (data.permission.portal == "true") {
                                     getPer.portal = "true"
                                 }
+                                if (data.permission.fly == "true") {
+                                    getPer.fly = 'true'
+                                }
                                 // 偵測設定權限
                                 if (!data.public) {
                                     for (let user of data.users) {
@@ -383,6 +420,7 @@ export function build() {
                                             getPer.build = user.permission.build
                                             getPer.container = user.permission.container
                                             getPer.portal = user.permission.portal
+                                            getPer.fly = user.permission.fly
                                         }
                                     }
                                 }
@@ -390,7 +428,7 @@ export function build() {
                                     player.runCommandAsync('gamemode a @s')
                                 }
 
-                                if (getPer.build == 'true') {
+                                if (getPer.build == 'true' || getPer.fly == "true") {
                                     addfly(player)
                                     logfor(player.name, `§a§l>> §e您可以在領地內飛行!`)
                                 }
@@ -403,18 +441,21 @@ export function build() {
                                 }
                                 let msg = ''
                                 let perList = []
-                                if (getPer.build == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l建築/破壞`)
+                                if (getPer.build == "true" && !getAdmin(player)) {
+                                    perList.push(`§a§l建築/破壞`)
                                 }
-                                if (getPer.container == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l容器操作`)
+                                if ((getPer.container == "true" || getPer.build == "true") && !getAdmin(player)) {
+                                    perList.push(`§a§l容器操作`)
                                 }
-                                if (getPer.portal == "false" && !getAdmin(player)) {
-                                    perList.push("§c§l傳送點設置")
+                                if ((getPer.container == "true" || getPer.build == "true" || getPer.fly == 'true') && !getAdmin(player)) {
+                                    perList.push(`§a§l飛行權限`)
+                                }
+                                if (getPer.portal == "true" && !getAdmin(player)) {
+                                    perList.push("§a§l傳送點設置")
                                 }
                                 let displayPer = ''
                                 if (perList.length > 0) {
-                                    displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
+                                    displayPer = `§e§l擁有的權限§f: §a${perList.join(" §7| §a")}`
                                 }
                                 if (!data.public) {
                                     if (!getAdmin(player)) {
@@ -429,7 +470,7 @@ export function build() {
                                         msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
                                     }
                                 }
-                                player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                                player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 40 }))
                                 let json = {
                                     inLand: {
                                         "dime": "over",
@@ -438,6 +479,7 @@ export function build() {
                                             build: getPer.build,
                                             container: getPer.container,
                                             portal: getPer.portal,
+                                            fly: getPer.fly
                                         }
                                     }
                                 }
@@ -447,198 +489,7 @@ export function build() {
                     }
                 }
             }
-        } catch { }
-        try {
-            let getAllLand = worldlog.getScoreboardPlayers('lands_nether').disname
-            for (let land of getAllLand) {
-                let data = getLandData(land)
-                for (let player of mc.world.getPlayers()) {
-                    let check = true
-                    for (let tag of player.getTags()) {
-                        if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:nether') {
-                            check = false
-                        }
-                    }
-                    if (check) {
-                        let playerPos = player.location
-                        let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
-                        let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
-                        let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
-                        let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
-                        if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
-                            if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
-                                let getPer = { "build": "false", "container": "false", "portal": "false" }
-                                // 偵測公共權限
-                                if (data.permission.build == "true") {
-                                    getPer.build = "true"
-                                }
-                                if (data.permission.container == "true") {
-                                    getPer.container = "true"
-                                }
-                                if (data.permission.portal == "true") {
-                                    getPer.portal = "true"
-                                }
-                                // 偵測設定權限
-                                if (!data.public) {
-                                    for (let user of data.users) {
-                                        if (user.username == player.name) {
-                                            getPer.build = user.permission.build
-                                            getPer.container = user.permission.container
-                                            getPer.portal = user.permission.portal
-                                        }
-                                    }
-                                }
-                                if (getPer.build == "false" && !getAdmin(player)) {
-                                    player.runCommandAsync('gamemode a @s')
-                                }
-
-                                for (let tag of player.getTags()) {
-                                    let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                                    if (tag.includes(`${msg}`)) {
-                                        player.removeTag(tag)
-                                    }
-                                }
-                                let msg = ''
-                                let perList = []
-                                if (getPer.build == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l建築/破壞`)
-                                }
-                                if (getPer.container == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l容器操作`)
-                                }
-                                if (getPer.portal == "false" && !getAdmin(player)) {
-                                    perList.push("§c§l傳送點設置")
-                                }
-                                let displayPer = ''
-                                if (perList.length > 0) {
-                                    displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
-                                }
-                                if (!data.public) {
-                                    if (!getAdmin(player)) {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
-                                    } else {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
-                                    }
-                                } else {
-                                    if (!getAdmin(player)) {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
-                                    } else {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
-                                    }
-                                }
-                                player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
-                                let json = {
-                                    inLand: {
-                                        "dime": 'nether',
-                                        "land": data,
-                                        "per": {
-                                            build: getPer.build,
-                                            container: getPer.container
-                                        }
-                                    }
-                                }
-                                player.addTag(JSON.stringify(json))
-                            }
-                        }
-                    }
-                }
-            }
-        } catch { }
-        try {
-            let getAllLand = worldlog.getScoreboardPlayers('lands_end').disname
-            for (let land of getAllLand) {
-                let data = getLandData(land)
-                for (let player of mc.world.getPlayers()) {
-                    let check = true
-                    for (let tag of player.getTags()) {
-                        if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:the_end') {
-                            check = false
-                        }
-                    }
-                    if (check) {
-                        let playerPos = player.location
-                        let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
-                        let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
-                        let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
-                        let z2 = Math.min(Number(data.pos.z[1]), Number(data.pos.z[2]))
-                        if (Math.floor(playerPos.x) <= x1 && Math.floor(playerPos.x) >= x2) {
-                            if (Math.floor(playerPos.z) <= z1 && Math.floor(playerPos.z) >= z2) {
-                                let getPer = { "build": "false", "container": "false", "portal": "false" }
-                                // 偵測公共權限
-                                if (data.permission.build == "true") {
-                                    getPer.build = "true"
-                                }
-                                if (data.permission.container == "true") {
-                                    getPer.container = "true"
-                                }
-                                if (data.permission.portal == "true") {
-                                    getPer.portal = "true"
-                                }
-                                // 偵測設定權限
-                                if (!data.public) {
-                                    for (let user of data.users) {
-                                        if (user.username == player.name) {
-                                            getPer.build = user.permission.build
-                                            getPer.container = user.permission.container
-                                            getPer.portal = user.permission.portal
-                                        }
-                                    }
-                                }
-                                if (getPer.build == "false" && !getAdmin(player)) {
-                                    player.runCommandAsync('gamemode a @s')
-                                }
-
-                                for (let tag of player.getTags()) {
-                                    let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                                    if (tag.includes(`${msg}`)) {
-                                        player.removeTag(tag)
-                                    }
-                                }
-                                let msg = ''
-                                let perList = []
-                                if (getPer.build == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l建築/破壞`)
-                                }
-                                if (getPer.container == "false" && !getAdmin(player)) {
-                                    perList.push(`§c§l容器操作`)
-                                }
-                                if (getPer.portal == "false" && !getAdmin(player)) {
-                                    perList.push("§c§l傳送點設置")
-                                }
-                                let displayPer = ''
-                                if (perList.length > 0) {
-                                    displayPer = `§e§l沒有的權限§f: §c${perList.join(" §7| §c")}`
-                                }
-                                if (!data.public) {
-                                    if (!getAdmin(player)) {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
-                                    } else {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
-                                    }
-                                } else {
-                                    if (!getAdmin(player)) {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
-                                    } else {
-                                        msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
-                                    }
-                                }
-                                player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
-                                let json = {
-                                    inLand: {
-                                        'dime': 'end',
-                                        "land": data,
-                                        "per": {
-                                            build: getPer.build,
-                                            container: getPer.container
-                                        }
-                                    }
-                                }
-                                player.addTag(JSON.stringify(json))
-                            }
-                        }
-                    }
-                }
-            }
+        }
         } catch { }
     }, 1)
 
@@ -876,7 +727,7 @@ export function build() {
 
     // 偵測交互
     mc.world.events.beforeItemUseOn.subscribe(events => {
-        const { source: player, getBlockLocation } = events
+        const { source: player, blockFace } = events
         for (let tag of player.getTags()) {
             if (tag.startsWith('{"inLand":')) {
                 /**
@@ -884,28 +735,15 @@ export function build() {
                          */
                 let landData = JSON.parse(tag)
                 if (landData.inLand.per.container == "false" && !getAdmin(player)) {
-                    let getBlock = mc.world.getDimension(player.dimension.id).getBlock(getBlockLocation())
-                    let denyBlocks = [
-                        'chest',
-                        'gate',
-                        'door',
-                        'smoker',
-                        'furnace'
-                    ]
-                    for (let block of denyBlocks) {
-                        if (getBlock.typeId.includes(block)) {
-                            if (block == 'door' || block == 'gate') {
-                                player.runCommandAsync('tp ^^^-0.5')
+                    if (landData.inLand.per.build == 'false') {
+                        events.cancel = true
+                        let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
+                        for (let tag of player.getTags()) {
+                            if (tag.includes(msg)) {
+                                player.removeTag(tag)
                             }
-                            events.cancel = true
-                            let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
-                            for (let tag of player.getTags()) {
-                                if (tag.includes(msg)) {
-                                    player.removeTag(tag)
-                                }
-                            }
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                         }
+                        player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
                     }
                 }
             }
@@ -917,46 +755,37 @@ export function build() {
 
     // 使用
     mc.world.events.beforeItemUseOn.subscribe(events => {
-        const { source: player, getBlockLocation } = events
-        let landData = checkInLand_Pos(getBlockLocation().x, getBlockLocation().z, player.dimension.id)
+        const { source: player } = events
+        let getBlock = player.getBlockFromViewDirection()
+        let landData = checkInLand_Pos(getBlock.location.x, getBlock.location.z, player.dimension.id)
         if (!landData) return;
-        let getPer = { "container": "false" }
+        let getPer = { "container": "false", "build": "false" }
         // 偵測公共權限
         if (landData.permission.container == "true") {
             getPer.container = "true"
+        }
+        if (landData.permission.build == "true") {
+            getPer.container = 'true'
         }
         // 偵測設定權限
         if (!landData.public) {
             for (let user of landData.users) {
                 if (user.username == player.name) {
                     getPer.container = user.permission.container
+                    getPer.build = user.permission.build
                 }
             }
         }
-        if (getPer.container == "false" && !getAdmin(player)) {
-            let getBlock = mc.world.getDimension(player.dimension.id).getBlock(events.getBlockLocation())
-            let denyBlocks = [
-                'chest',
-                'gate',
-                'door',
-                'smoker',
-                'furnace'
-            ]
-            for (let block of denyBlocks) {
-                if (getBlock.typeId.includes(block)) {
-                    if (block == 'door' || block == 'gate') {
-                        player.runCommandAsync('tp ^^^-0.5')
-                    }
-                    events.cancel = true
-                    let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
-                    for (let tag of player.getTags()) {
-                        if (tag.includes(msg)) {
-                            player.removeTag(tag)
-                        }
-                    }
-                    player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+        if (getPer.container == "false" && getPer.build == 'false' && !getAdmin(player)) {
+            events.cancel = true
+            let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
+            for (let tag of player.getTags()) {
+                if (tag.includes(msg)) {
+                    player.removeTag(tag)
                 }
             }
+            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+
         }
     })
 
@@ -981,6 +810,7 @@ export function build() {
 
         if (getPer.build == 'false' && !getAdmin(player)) {
             player.runCommandAsync(`setblock ${block.location.x} ${block.location.y} ${block.location.z} air`)
+            player.runCommandAsync(`give @s ${block.typeId}`)
             let msg = `§e§l領地系統 §f> §c您沒有權限放置該方塊!`
             for (let tag of player.getTags()) {
                 if (tag.includes(msg)) {

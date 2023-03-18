@@ -45,7 +45,7 @@ export function getPublicHomeData(home) {
     let y = e[1]
     let z = e[2]
     /**
-     * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}}
+     * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
      */
     let landData = {}
     let getLandScoreBoard = ''

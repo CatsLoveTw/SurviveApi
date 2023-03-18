@@ -10,7 +10,7 @@ import * as land from './land.js'
 /**
  * 
  * @param {string} land 
- * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}}
+ * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean, old: boolean}}
  */
 export function getLandData(land) {
     // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
@@ -33,13 +33,24 @@ export function getLandData(land) {
         for (let user of users) {
             let username = user.split(":")[0]
             let per = user.split(":")[1].split("|")
+            let fly = per[3]
+            if (fly == 'undefined' || !fly) {
+                fly = 'false'
+            }
             let userPermissions = {
                 build: per[0],
                 container: per[1],
                 portal: per[2],
+                fly: fly
             }
             usersList.push({ username: username, permission: userPermissions })
         }
+    }
+    let fly = permissions[3]
+    let old = false
+    if (fly == 'undefined' || !fly) {
+        fly = 'false'
+        old = true
     }
     if (args[3] != "true") {
         return {
@@ -54,9 +65,11 @@ export function getLandData(land) {
                 build: permissions[0],
                 container: permissions[1],
                 portal: permissions[2],
+                fly: fly
             },
             users: usersList,
             public: false,
+            old: old
         }
     } else {
         return {
@@ -71,9 +84,11 @@ export function getLandData(land) {
                 build: permissions[0],
                 container: permissions[1],
                 portal: permissions[2],
+                fly: fly
             },
             users: false,
             public: true,
+            old: old
         }
     }
 }
@@ -81,7 +96,7 @@ export function getLandData(land) {
 
 /**
  * 
- * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}} landData 
+ * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}} landData 
  */
 function transfromLand(landData) {
     // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
@@ -93,17 +108,17 @@ function transfromLand(landData) {
     if (landData.public) {
         player = 'true'
     }
-    let permission = landData.permission.build + "|" + landData.permission.container + "|" + landData.permission.portal
+    let permission = landData.permission.build + "|" + landData.permission.container + "|" + landData.permission.portal + "|" + landData.permission.fly
     if (!landData.public) {
         let userList = []
         /**
-         * @type {[{username: string,permission: {build: string, container: string, portal: string}}]}
+         * @type {[{username: string,permission: {build: string, container: string, portal: string, fly: string}}]}
          */
         let users = landData.users
         for (let user of users) {
             let name = user.username
             let per = user.permission
-            userList.push(`${name}:${per.build}|${per.container}|${per.portal}`)
+            userList.push(`${name}:${per.build}|${per.container}|${per.portal}|${per.fly}`)
         }
         return `${name}_,_${pos}_,_${UID}_,_${player}_,_${permission}_,_${userList.join(":/:")}`
     }
@@ -135,7 +150,6 @@ function getPlayerLands(player, dimension) {
 
 /**
  * @param {'overworld' | 'nether' | 'end'} dime
- * @returns {[{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: false,permission: {build: string,container: string,action: string}, users: false, public: true}]}
  */
 function getAdminLands(dime) {
     let landID = 'lands'
@@ -284,7 +298,7 @@ export function UI(player) {
                     if (!res) return;
                     let selection = res.selection
                     /**
-                     * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}}
+                     * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
                      */
                     let land = lands[selection]
                     // MessageFormData 按鈕selection為Button1=1 Button2=0
@@ -325,12 +339,17 @@ export function UI(player) {
                 let lands = getPlayerLands(player, dime)
                 let form = new ui.ActionFormData()
                     .title("§e§l查看領地")
+                    .body("§e§l權限大小 §f- §e建築>容器>飛行 傳送點獨立 (例如設定建築權限後 容器與飛行權限將會視為開啟)")
                 for (let land of lands) {
                     let x1 = Math.max(land.pos.x[1], land.pos.x[2])
                     let x2 = Math.min(land.pos.x[1], land.pos.x[2])
                     let z1 = Math.max(land.pos.z[1], land.pos.z[2])
                     let z2 = Math.min(land.pos.z[1], land.pos.z[2])
-                    form.button(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2}`)
+                    if (land.old) {
+                        form.button(`§f§l[§c舊 §f- §c請點擊此領並點更新§f]\n§e§l領地名稱 §f- §e${land.name}`)
+                    } else {
+                        form.button(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2}`)
+                    }
                 }
                 form.show(player).then(res => {
                     if (!res || res.canceled) return;
@@ -338,7 +357,7 @@ export function UI(player) {
                     landData(land)
                     /**
                      * 
-                     * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}} land 
+                     * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean, old: boolean}} land 
                      */
                     function landData(land) {
                         let x1 = Math.max(land.pos.x[1], land.pos.x[2])
@@ -351,8 +370,28 @@ export function UI(player) {
                             .button("§e§l查看領地資訊")
                             .button("§c§l踢出領地")
                             .button("§7§l返回")
-                            .show(player).then(res => {
+                            if (land.old) {
+                                form.button("§a§l更新領地")
+                            }
+                            form.show(player).then(res => {
                                 if (res.selection === 3 || !res || res.canceled) return list();
+                                if (res.selection === 4) {
+                                    for (let l2 of worldlog.getScoreboardPlayers(landID).disname) {
+                                        let data = getLandData(l2)
+                                        let check = true
+                                        if (data.name != land.name) check=false;
+                                        if (data.player != land.player) check=false;
+                                        if (data.pos.x[1] != land.pos.x[1]) check=false;
+                                        if (data.pos.x[2] != land.pos.x[2]) check=false;
+                                        if (data.UID != land.UID) check=false;
+                                        if (check) {
+                                            cmd(`scoreboard players reset "${l2}" ${landID}`)
+                                            cmd(`scoreboard players set "${transfromLand(land)}" ${landID} ${land.UID}`)
+                                            logfor(player.name, `§a§l>> §e更新成功!`)
+                                            break;
+                                        }
+                                    }
+                                } 
                                 if (res.selection === 0) {
                                     perMenu()
                                     function perMenu() {
@@ -484,16 +523,18 @@ export function UI(player) {
                                                                                 .title(`§e§l權限設定 - 設定玩家 - ${selePlayer.username}`)
                                                                                 .toggle(`§b建築/破壞權限`, changeBoolean(selePlayer.permission.build))
                                                                                 .toggle('§b§l容器交互權限', changeBoolean(selePlayer.permission.container))
+                                                                                .toggle("§b§l飛行權限", changeBoolean(selePlayer.permission.fly))
                                                                                 .toggle('§b§l傳送點設置權限', changeBoolean(selePlayer.permission.portal))
                                                                                 .show(player).then(res => {
                                                                                     if (!res || res.canceled) return Personal();
                                                                                     let build = res.formValues[0]
                                                                                     let container = res.formValues[1]
-                                                                                    let portal = res.formValues[2]
+                                                                                    let fly = res.formValues[2]
+                                                                                    let portal = res.formValues[3]
                                                                                     cmd(`scoreboard players reset "${transfromLand(land)}" ${landID}`)
                                                                                     let newUsers = land.users.filter(item => item.username !== selePlayer.username);
                                                                                     land.users = newUsers
-                                                                                    land.users.push({ username: selePlayer.username, permission: { build: `${build}`, container: `${container}`, portal: `${portal}` } })
+                                                                                    land.users.push({ username: selePlayer.username, permission: { build: `${build}`, container: `${container}`, portal: `${portal}`, fly: `${fly}` } })
                                                                                     cmd(`scoreboard players set "${transfromLand(land)}" ${landID} ${land.UID}`).then(() => {
                                                                                         logfor(player.name, `§a§l>> §e設定成功!`)
                                                                                         return Personal();
@@ -518,15 +559,18 @@ export function UI(player) {
                                                         .title("§e§l公共權限設定")
                                                         .toggle("§b§l建築/破壞權限", changeBoolean(land.permission.build))
                                                         .toggle("§b§l容器交互權限", changeBoolean(land.permission.container))
+                                                        .toggle("§b§l飛行權限", changeBoolean(land.permission.fly))
                                                         .toggle("§b§l傳送點設置權限", changeBoolean(land.permission.portal))
                                                         .show(player).then(res => {
                                                             if (!res || res.canceled) return perMenu();
                                                             let build = res.formValues[0]
                                                             let container = res.formValues[1]
+                                                            let fly = res.formValues[2]
                                                             cmd(`scoreboard players reset "${transfromLand(land)}" ${landID}`)
                                                             land.permission.build = `${build}`
                                                             land.permission.container = `${container}`
-                                                            land.permission.portal = `${res.formValues[2]}`
+                                                            land.permission.portal = `${res.formValues[3]}`
+                                                            land.permission.fly = `${fly}`
                                                             cmd(`scoreboard players set "${transfromLand(land)}" ${landID} ${land.UID}`)
                                                             logfor(player.name, `§a§l>> §e修改成功!`)
                                                             return perMenu()
@@ -541,12 +585,12 @@ export function UI(player) {
                                     for (let u of land.users) {
                                         let name = u.username
                                         let permission = u.permission
-                                        user.push(`§e§l玩家§f: §e${name} §7| §b建築§f/§b破壞§f: §b${permission.build} §b容器§f: §b${permission.container} §b傳送點設置權§f: §b${permission.portal}`)
+                                        user.push(`§e§l玩家§f: §e${name} §7| §b建築§f/§b破壞§f: §b${permission.build} §b容器§f: §b${permission.container} §b飛行 §f- §b${permission.fly} §b傳送點設置權§f: §b${permission.portal}`)
                                     }
                                     let squ = (Math.abs(Number(x1) - Number(x2)) + 1) * (Math.abs(Number(z1) - Number(z2)))
                                     let form = new ui.ActionFormData()
                                         .title("§e§l領地資訊")
-                                        .body(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}\n§a傳送點設置:${land.permission.portal}\n\n§a個人:\n${user.join("\n")}`)
+                                        .body(`§e§l領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}\n§a飛行:${land.permission.fly}\n§a傳送點設置:${land.permission.portal}\n\n§a個人:\n${user.join("\n")}`)
                                         .button("§7§l返回")
                                         .show(player).then(res => {
                                             if (!res || res.selection === 0) return landData(land);
@@ -761,7 +805,7 @@ export function adminUI(player, dime) {
             landData(land)
             /**
              * 
-             * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}} land 
+             * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}} land
              */
             function landData(land) {
                 let x1 = Math.max(land.pos.x[1], land.pos.x[2])
@@ -794,16 +838,19 @@ export function adminUI(player, dime) {
                                                 .title("§e§l公共權限設定")
                                                 .toggle("§b§l建築/破壞權限", changeBoolean(land.permission.build))
                                                 .toggle("§b§l容器交互權限", changeBoolean(land.permission.container))
+                                                .toggle('§b§l飛行權限', changeBoolean(land.permission.fly))
                                                 .toggle("§b§l傳送點設置權限", changeBoolean(land.permission.portal))
                                                 .show(player).then(res => {
                                                     if (!res || res.canceled) return perMenu();
                                                     let build = res.formValues[0]
                                                     let container = res.formValues[1]
-                                                    let portal = res.formValues[2]
+                                                    let fly = res.formValues[2]
+                                                    let portal = res.formValues[3]
                                                     cmd(`scoreboard players reset "${transfromLand(land)}" ${landID}`)
                                                     land.permission.build = `${build}`
                                                     land.permission.container = `${container}`
                                                     land.permission.portal = `${portal}`
+                                                    land.permission.fly = `${fly}`
                                                     cmd(`scoreboard players set "${transfromLand(land)}" ${landID} ${land.UID}`)
                                                     logfor(player.name, `§a§l>> §e修改成功!`)
                                                     return perMenu()
@@ -817,7 +864,7 @@ export function adminUI(player, dime) {
                             let squ = (Math.abs(Number(x1) - Number(x2)) + 1) * (Math.abs(Number(z1) - Number(z2)))
                             let form = new ui.ActionFormData()
                                 .title("§e§l領地資訊")
-                                .body(`§e§l公共領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}\n§a傳送點設置:${land.permission.portal}`)
+                                .body(`§e§l公共領地名稱 §f- §e${land.name}\n§b領地座標 §f- §bx§7:§b${x1}§f-§b${x2} | §bz§7:§b${z1}§f-§b${z2} §f(§e${squ} 格§f)\n§a§l權限管理:\n\n§a公共:\n§a建築/破壞:${land.permission.build}\n§a容器:${land.permission.container}\n§a飛行:${land.permission.fly}\n§a傳送點設置:${land.permission.portal}`)
                                 .button("§7§l返回")
                                 .show(player).then(res => {
                                     if (!res || res.selection === 0) return landData(land);

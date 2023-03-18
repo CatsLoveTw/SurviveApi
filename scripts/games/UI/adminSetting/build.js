@@ -19,7 +19,7 @@ export function build () {
     mc.system.runInterval(() => {
         for (let player of mc.world.getPlayers()) {
             try {
-                if (worldlog.getScoreFromMinecraft(player.name, 'permission').score == 2) {
+                if (worldlog.getScoreFromMinecraft(player.name, 'permission').score == 2 && player.hasTag("admin")) {
                     player.runCommandAsync(`ability @s mayfly true`)
                 }
             } catch { }
