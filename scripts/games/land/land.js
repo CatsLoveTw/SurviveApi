@@ -110,7 +110,7 @@ function transfromLand(landData) {
  * 
  * @param {mc.Player} player 
  */
-function getAdmin(player) {
+export function getAdmin(player) {
     let getPermission = worldlog.getScoreFromMinecraft(player.name, 'permission')
     if (!getPermission || getPermission.score == 1) {
         return false

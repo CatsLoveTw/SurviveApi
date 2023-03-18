@@ -304,6 +304,7 @@ export function UI(player) {
                                         for (let tag of pl.getTags()) {
                                             if (tag.startsWith('{"inLand":') && tag.includes(JSON.stringify(land.pos)) && tag.includes(land.UID) && tag.includes(land.name)) {
                                                 pl.removeTag(tag)
+                                                pl.runCommandAsync(`ability @s mayfly false`)
                                                 logfor(pl.name, `§3§l>> §e所在領地被刪除!`)
                                             }
                                         }
