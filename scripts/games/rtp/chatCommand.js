@@ -26,13 +26,20 @@ export const chatCommands = [
                 
                 let x = getRandomIntInclusive(-100000, 100000)
                 let z = getRandomIntInclusive(-100000, 100000)
+                let json = {
+                    "back": {
+                        "x": player.location.x,
+                        "y": player.location.y,
+                        "z": player.location.z
+                    }
+                }
+                player.addTag(JSON.stringify(json))
                 player.runCommandAsync(`effect @s blindness 5 255 true`)
                 player.runCommandAsync(`effect @s resistance 15 255 true`)
                 player.runCommandAsync(`effect @s slowness 5 255 true`)
                 player.runCommandAsync(`tp ${x} 350 ${z}`).then(() => {
                     logfor(player.name, `§a§l>> §e傳送成功!`)
                     player.runCommandAsync(`scoreboard players set @s rtp_time ${rtpTime}`)
-                    player.runCommandAsync(`tickingarea remove load`)
                 })
             }
     }

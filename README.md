@@ -1,6 +1,6 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.2-blue)
-![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70+-brightgreen)
+![version](https://img.shields.io/badge/Version-Dev--2.2.1-blue)
+![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.71+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
 > **手機與電腦基岩版皆可使用**\
@@ -11,19 +11,18 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 2.1 && DEV 2.1.1)
-- 修復公告無法顯示之問題
-- rtp範圍支援正負10萬
-- 領地新增防tnt功能
-- 管理員領地權限判斷更改 (全部管理員 -> 巡查管理員)
-
-#### 現在
+#### 之前 (DEV 2.2)
 - 修復在特殊情況下 領地外放置方塊不會歸還的問題
 - 獨立領地飛行權限
 - 修復容器權限失效的問題
 - 調整進入領地後顯示領地資訊的時間 (60tick -> 40tick)
 - 修復管理員標籤刪除後，依然能飛行的問題
 - 新增領地時顯示建造格數
+
+#### 現在
+- 修復在特殊情形使用 **-rtp** 或 **-back** 指令時所造成的錯誤
+- 修改 **-back** 指令在傳送於傳送點時的位置 (傳送點座標 -> 傳送前的座標)
+- **-rtp** 指令也可利用 **-back** 指令回到原位置
 
 ### 測試中內容
 - 領地系統 (多種維度支援)

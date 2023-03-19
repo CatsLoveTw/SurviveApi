@@ -250,7 +250,7 @@ try {
     notice.build()
     adminSetting.build()
     shop.build()
-} catch (e) {log(e)}
+} catch (e) {log("buildError" + e)}
 
 
 

@@ -143,10 +143,11 @@ export function build() {
                 let x = Math.trunc(player.location.x)
                 let z = Math.trunc(player.location.z)
                 let block = mc.world.getDimension(player.dimension.id).getBlock({x: x, y: i, z: z})
+                if (!block) return;
                 if (block.typeId != 'minecraft:air') {
                     y = i
                 }
-            } catch (e) {log(e)}
+            } catch (e) {}
         }
         let playerY = Math.trunc(player.location.y)
         if (Math.abs(playerY - y) > 3) {
@@ -277,7 +278,7 @@ export function build() {
                         }
                     }
                 }
-            } catch (e) { log(e) }
+            } catch (e) { log("land(280)" + e) }
             let UI = new ui.MessageFormData()
                 .title("§e§l領地建造確認")
             if (json.landCreate.admin) {
@@ -721,7 +722,7 @@ export function build() {
                     }
                 }
             }
-        } catch (e) { log(e) }
+        } catch (e) { log("land(724)" + e) }
     }, 1)
 
 

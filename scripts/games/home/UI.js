@@ -238,9 +238,9 @@ export function UI(player) {
                                                     }
                                                     let json = {
                                                         "back": {
-                                                            "x": seleHome.pos.x,
-                                                            "y": seleHome.pos.y,
-                                                            "z": seleHome.pos.z
+                                                            "x": player.location.x,
+                                                            "y": player.location.y,
+                                                            "z": player.location.z
                                                         }
                                                     }
                                                     player.addTag(JSON.stringify(json))
@@ -500,7 +500,7 @@ export function publicUI (player) {
                                         list(newHomes[res.selection])
                                     })
                                 })
-                            } catch (e) {log(e)}
+                            } catch (e) {log("home(503)" + e)}
                         }
                         if (res.selection != 0) {
                             let home = homes[res.selection - 1]
@@ -529,9 +529,9 @@ export function publicUI (player) {
                                     let z = homeData.pos.z
                                     let json = {
                                         "back": {
-                                            "x": x,
-                                            "y": y,
-                                            "z": z
+                                            "x": player.location.x,
+                                            "y": player.location.y,
+                                            "z": player.location.z
                                         }
                                     }
                                     player.addTag(JSON.stringify(json))
@@ -629,7 +629,7 @@ export function publicUI (player) {
                                         list(newHomes[res.selection])
                                     })
                                 })
-                            } catch (e) {log(e)}
+                            } catch (e) {log("home(632)" + e)}
                         }
                         if (res.selection != 0) {
                             let home = homes[res.selection - 1]
@@ -659,9 +659,9 @@ export function publicUI (player) {
                                         let z = homeData.pos.z
                                         let json = {
                                             "back": {
-                                                "x": x,
-                                                "y": y,
-                                                "z": z
+                                                "x": player.location.x,
+                                                "y": player.location.y,
+                                                "z": player.location.z
                                             }
                                         }
                                         player.addTag(JSON.stringify(json))
@@ -678,7 +678,7 @@ export function publicUI (player) {
                     })
                 }
                 }
-            } catch (e) {log(e)}
+            } catch (e) {log("home" + e)}
         } 
         
         )}
