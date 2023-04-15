@@ -76,6 +76,9 @@ for (let board in boards) {
 }
 
 
+system.events.beforeWatchdogTerminate.subscribe(event => {
+    event.cancel = true
+})
 
 world.events.beforeChat.subscribe(events => {
     let player = events.sender;

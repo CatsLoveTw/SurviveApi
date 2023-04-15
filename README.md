@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.2.2-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.2.21-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -23,10 +23,11 @@
 - **-rtp** 指令也可利用 **-back** 指令回到原位置
 
 
-#### 現在
+#### 現在 (DEV 2.2.2 && DEV 2.2.21)
 - 可能修復領地在其他維度不會偵測到的問題 (尚未測試)
 - 新增 **-kill** 指令
 - **-back** 指令修改:若處於不同維度將無法傳送!
+- 可能修復指令碼監視異常問題
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
