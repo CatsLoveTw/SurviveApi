@@ -18,6 +18,19 @@ import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
 
+export const version = "V2.2.31"
+export const updateDate = '2023/4/15 (Sat.)'
+export const updates = {
+    "V2.2.31": [
+        "新增api簡介功能 (-info)"
+    ],
+    "V2.2.3": [
+        "更新排行榜系統，減少效能損耗",
+        "新增金錢排行榜系統",
+        "現在傳送點可能會隨著領地而刪除"
+    ]
+}
+
 try {
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
 const prefix = '-'
