@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server';
 import { ActionFormData, MessageFormData, ModalFormData } from '@minecraft/server-ui';
 import { isNum, worldlog } from '../../lib/function';
 import { cmd, log, logfor } from '../../lib/GametestFunctions';
+import { playerUI } from '../UI/player';
 
 /**
  * 
@@ -37,7 +38,7 @@ export function UI(player) {
         form.button(pl)
     }
     form.show(player).then(res => {
-        if (res.canceled) return UI(player);
+        if (res.canceled) return playerUI(player);
         let max = worldlog.getScoreFromMinecraft(player.name, 'money').score
         /**
          * @type {mc.Player}
