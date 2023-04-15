@@ -1,5 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { worldlog } from '../../lib/function'
 
 export function build () {
     function addBoard(ID, Display) {
@@ -16,7 +17,9 @@ export function build () {
 
     // 將玩家金錢轉移至紀錄排行榜
     for (let player of worldlog.getScoreboardPlayers('money').disname) {
-        let score = worldlog.getScoreFromMinecraft(player, 'money').score
-        cmd(`scoreboard players set "___${player}___" money_save ${score}`)
+        if (player != 'commands.scoreboard.players.offlinePlayerName') {
+            let score = worldlog.getScoreFromMinecraft(player, 'money').score
+            cmd(`scoreboard players set "___${player}___" money_save ${score}`)
+        }
     }
 }
