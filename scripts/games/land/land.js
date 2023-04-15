@@ -388,7 +388,16 @@ export function build() {
                 for (let player of mc.world.getPlayers()) {
                     let check = true
                     for (let tag of player.getTags()) {
-                        if (tag.startsWith('{"inLand":') || player.dimension.id.toLowerCase() != 'minecraft:overworld') {
+                        if (tag.startsWith('{"inLand":')) {
+                            check = false
+                        }
+                        if (landID == 'lands' && player.dimension.id != mc.MinecraftDimensionTypes.overworld) {
+                            check = false
+                        }
+                        if (landID == 'lands_nether' && player.dimension.id != mc.MinecraftDimensionTypes.nether) {
+                            check = false
+                        }
+                        if (landID == 'lands_end' && player.dimension.id != mc.MinecraftDimensionTypes.theEnd) {
                             check = false
                         }
                     }

@@ -28,7 +28,8 @@ export function build() {
                 "back": {
                     "x": player.location.x,
                     "y": player.location.y,
-                    "z": player.location.z
+                    "z": player.location.z,
+                    'dimension': player.dimension.id,
                 }
             }
             player.addTag(JSON.stringify(json))
