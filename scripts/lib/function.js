@@ -282,13 +282,13 @@ class worldlogs {
     /**
      * @param {string | number} scoreboardID 記分板ID
      * @param {number} rankvalue 要取得的排名
-     * @returns {{name: string, score: number, Index: "測試用 數值(number)", errorNumber: "測試用 紀錄重複計算n次"}}
+     * @param {boolean} deleteZero 是否刪除分數為0的玩家排名
      * name: 玩家名稱 score: 分數
      * @提醒 這個資料可能會有錯誤!
      */
-    getLeaderboard (scoreboardID, rankvalue) {
-        let lb = leaderboard(scoreboardID, rankvalue)
-        return {'name': lb[0], 'score': lb[1], 'Index': lb[2], 'errorNumber': lb[3]}
+    getLeaderboard (scoreboardID, rankvalue, deleteZero) {
+        let lb = leaderboard(scoreboardID, rankvalue, deleteZero)
+        return lb
     }
     
     /**

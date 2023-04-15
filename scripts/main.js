@@ -16,6 +16,7 @@ import * as death from './games/death/build.js'
 import * as notice from './games/notice/build.js'
 import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
+import * as money_leaderboard from './games/money_leaderboard/build.js'
 
 try {
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
@@ -253,6 +254,7 @@ try {
     notice.build()
     adminSetting.build()
     shop.build()
+    money_leaderboard.build()
 } catch (e) {log("buildError" + e)}
 
 

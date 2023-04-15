@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.2.22-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.2.3-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,7 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 2.2 && DEV 2.2.1)
+#### 之前 (DEV 2.2 && DEV 2.2.1 && DEV 2.2.2 && DEV 2.2.21 && DEV 2.2.22)
 - 修復在特殊情況下 領地外放置方塊不會歸還的問題
 - 獨立領地飛行權限
 - 修復容器權限失效的問題
@@ -21,14 +21,17 @@
 - 修復在特殊情形使用 **-rtp** 或 **-back** 指令時所造成的錯誤
 - 修改 **-back** 指令在傳送於傳送點時的位置 (傳送點座標 -> 傳送前的座標)
 - **-rtp** 指令也可利用 **-back** 指令回到原位置
-
-
-#### 現在 (DEV 2.2.2 && DEV 2.2.21 && DEV 2.2.22)
 - 可能修復領地在其他維度不會偵測到的問題 (尚未測試)
 - 新增 **-kill** 指令
 - **-back** 指令修改:若處於不同維度將無法傳送!
 - 可能修復指令碼監視異常問題
 - 修復轉帳選單無法退出問題
+
+
+#### 現在
+- 更新排行榜系統，減少效能損耗
+- 新增金錢排行榜系統
+- 現在傳送點**可能**會隨著領地而刪除
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
@@ -52,8 +55,8 @@
 - 伺服器專用計分板 (menu)
 - 商店系統
 - 公告功能
-### 即將更新
 - 金錢排行榜系統
+### 即將更新
 ### 未修復的問題
 - 領地權限更改訊息在特殊情況下重複發送
 ### 提醒

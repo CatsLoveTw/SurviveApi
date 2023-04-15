@@ -346,7 +346,7 @@ export function build() {
                 })
         }
     })
-    
+    // 建造顯示
     mc.system.runInterval(() => {
         for (let player of mc.world.getAllPlayers()) {
             for (let msg of getSign(player)) {

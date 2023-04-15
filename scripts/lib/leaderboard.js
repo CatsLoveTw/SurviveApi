@@ -8,90 +8,45 @@ import { isNum, randomInt, worldlog } from '../lib/function.js'
 function getScore (player, scoreName) {
     return worldlog.getScoreFromMinecraft(player, scoreName).score
 }
-export function leaderboard (scoreObjid, rank) {
-    // 已完成 不須修改
-    let adminplayer = []
-    // for (let player of world.getPlayers()) {
-    //     if (player.hasTag('admin')) {
-    //         adminplayer.push(player.name)
-    //     }
-    // }
+export function leaderboard (scoreObjid, rank, deleteZero) {
+    let scoreboard = world.scoreboard.getObjective(scoreObjid)
 
+    let returnData = []
 
-    let obj1 = world.scoreboard.getObjective(scoreObjid).getParticipants()
-    let playername = []
-    let playerscore = []
-   // log (`obj1 ${obj1.length}`)
-    for (let name of obj1) {
-        if (name.type === 1) {
-        let planame = name.getEntity().nameTag
-        let score = getScore(planame, scoreObjid)
-        //if (Number(score) != 0) {
-        playername.push(planame)
-        playerscore.push(score)
-       // }
-        } else {
-        let score = 0
-        let planame = name.displayName
-
-        if (planame.includes('</?>')) {
-            // log(`admin = ${adminplayer} planame = ${planame.replace('</?>', '')}`)
-            if (!adminplayer.includes(planame.replace('</?>', ''))) {
-            score = getScore(planame, scoreObjid)
-            planame = name.displayName.replace('</?>', '')
-            //log (`planame = ${planame.replace('</?>', '')} score = ${score}`)
-            }
-        } else {
-        score = getScore (planame, scoreObjid)
-        }
-        //if (Number(score) != 0) {
-        playername.push(planame)
-        playerscore.push(score)
-        //}
-
+    let scores = []
+    let names = []
+    for (let participant of scoreboard.getParticipants()) {
+        let score = participant.getScore(scoreboard)
+        let displayName = participant.displayName
+        names.push(displayName)
+        scores.push(score)
     }
-    }
-    let namerank = []
-    let namescore = []
-    let removeindex = []
-    let errornumber = 0
-    let run = 0
-   // log (`rank :${rank} leng:${playername.length}`)
-    if (rank > playername.length) {
-        run = playername.length
-    } else {run = rank}
-   // log (`run ${run}`)
+
+    let run = rank
+    if (rank > names.length) run = names.length;
     for (let i = 0; i < run; i++) {
-        let max = -1
-        let maxindex 
-        for (let j =0; j <= playerscore.length-1; j++) {
-           // log (`j=` + j)
-            //log (`error = ` + errornumber + `playerscore = ` + playerscore[j] + `playername = ` + playername[j])
-            if (removeindex.includes(j)) {
-                errornumber++
-            } else {
-            if (Number(playerscore[j]) > max) {
-                max = playerscore[j]
-                maxindex = j
-               // log (`max = ${maxindex}, max = ${playerscore[j]}`)
+        if (scores.length == 0) break;
+        let max = Math.max(...scores)
+        if (deleteZero && max == 0) break;
+        let len = 0
+        let deleteIndexes = []
+        for (let j in scores) {
+            if (scores[j] === max) {
+                len++
+                let rank = i + 1
+                let score = scores[j]
+                let name = names[j]
+                deleteIndexes.push(j)
+                returnData.push({rank, score, name})
             }
-            }
-            //log (`j = ${j} length` + playerscore.length-1)
-          //  log (`number = ${j}, playerscore = ${playerscore.length -1}, boolen ${Number(j) == playerscore.length-1}`)
-            if (Number(j) == playerscore.length - 1) {
-                //log (`number = ${j}, playerscore = ${playerscore.length -1}, boolen ${Number(j) == playerscore.length-1}`)
-                namerank.push(playername[maxindex])
-                namescore.push(playerscore[maxindex])
-                removeindex.push(maxindex)
-               // log (`name: ${playername[maxindex]}`)
-            }
-        
+        }
+        let removeLen = 0
+        for (let index of deleteIndexes) {
+            index = Number(index) - removeLen
+            removeLen++
+            scores.splice(index, 1)
+            names.splice(index, 1)
         }
     }
-    
-    if (namerank.length == 0) {
-        return false
-    } else {
-    return [namerank, namescore, removeindex, errornumber]
-    }
+    return returnData
 }

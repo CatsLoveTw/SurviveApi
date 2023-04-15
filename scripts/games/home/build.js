@@ -36,12 +36,16 @@ export function build() {
                 let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
                 for (let land of lands) {
                     let data = getLandData(land)
-                    if (!tag.startsWith('{"home":')) return;
-                    if (!tag.includes(JSON.stringify(data.pos))) return;
-                    if (!tag.includes(data.UID)) return;
-                    if (!tag.includes(data.name)) return;
-                    if (!tag.includes(data.player)) return;
-                    check = true
+                    if (!tag.startsWith('{"home":')) break;
+                    if (tag.includes(JSON.stringify(data.pos))) {
+                        if (tag.includes(data.UID)) {
+                            if (tag.includes(data.name)) {
+                                if (tag.includes(data.player)) {
+                                    check = true
+                                }
+                            }
+                        }
+                    }
                 }
                 if (!check) {
                     /**
@@ -96,7 +100,7 @@ export function build() {
                     let check = false
                     for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShare.sharedName) {
-                            check = true                            
+                            check = true
                         }
                     }
                     if (!check) {
@@ -119,7 +123,7 @@ export function build() {
                     let check = false
                     for (let player of mc.world.getPlayers()) {
                         if (player.name == json.homeShared.source) {
-                            check = true                            
+                            check = true
                         }
                     }
                     if (!check) {
@@ -137,7 +141,7 @@ export function build() {
             }
         }
     }, 2)
-    
+
     // 偵測下線玩家又上線的tag清除
     mc.system.runInterval(() => {
         for (let player of mc.world.getPlayers()) {
