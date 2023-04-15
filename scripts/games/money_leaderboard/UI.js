@@ -12,25 +12,25 @@ export function UI (player) {
             if (res.canceled) return;
             let rank = res.formValues[0]
             let deleteZero = res.formValues[1]
-            if (!isNum(rank) || rank > 1 || checkPoint(rank)) return logfor(player.name, `§c§l>> §e名次參數錯誤!`)
+            if (!isNum(rank) || rank < 1 || checkPoint(rank)) return logfor(player.name, `§c§l>> §e名次參數錯誤!`)
             let get = worldlog.getLeaderboard('money_save', Number(rank), deleteZero)
             let text = ''
             if (get.length == 0) return logfor(player.name, `§c§l>> §e找不到您所篩選的玩家!`);
-            text += `§e§l共找到 §b${get.length} §e位玩家的排行~`
+            text += `§e§l共找到 §b${get.length} §e位玩家的排行~\n`
             for (let leader of get) {
                 let name = leader.name.replace(/___/g, '')
-                if (name == player.name) text += ` §7(§e您目前是第 §b${leader.rank} §e名§7)\n`
+                if (name == player.name) text += `§a您目前是第 §b${leader.rank} §a名\n`
             }
             
             for (let leader of get) {
                 let name = leader.name.replace(/___/g, '')
                 if (name == player.name) {
-                    text += `§a§l第${leader.rank}名 §7- §a${name}`
+                    text += `§a§l第${leader.rank}名 §f| §a金錢 §b${leader.score} §a$ §7- §a${name}`
                 } else {
-                    if (leader.rank == 1) text += `§e§l第${leader.rank}名 §7- §e${name}`
-                    if (leader.rank == 2) text += `§g§l第${leader.rank}名 §7- §e${name}`
-                    if (leader.rank == 3) text += `§6§l第${leader.rank}名 §7- §e${name}`
-                    if (leader.rank > 3) text += `§l第${leader.rank}名 §7- §f${name}`
+                    if (leader.rank == 1) text += `§e§l第${leader.rank}名 §f| §e金錢 §b${leader.score} §e$ §7- §e${name}`
+                    if (leader.rank == 2) text += `§g§l第${leader.rank}名 §f| §g金錢 §b${leader.score} §g$ §7- §g${name}`
+                    if (leader.rank == 3) text += `§6§l第${leader.rank}名 §f| §6金錢 §b${leader.score} §6$ §7- §6${name}`
+                    if (leader.rank > 3) text += `§l第${leader.rank}名 §f| §f金錢 §b${leader.score} §f$ §7- §f${name}`
                 }
             }
             let form = new ui.ActionFormData()

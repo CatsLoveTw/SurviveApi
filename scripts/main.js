@@ -18,9 +18,12 @@ import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
 
-export const version = "V2.2.34"
+export const version = "V2.2.35"
 export const updateDate = '2023/4/16 (Sun.)'
 export const updates = {
+    "V2.2.35": [
+        "排行榜bug修復again"
+    ],
     "V2.2.34": [
         "時間顯示錯誤bug修復"
     ],

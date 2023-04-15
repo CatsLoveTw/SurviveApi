@@ -16,10 +16,12 @@ export function build () {
     } catch { }
 
     // 將玩家金錢轉移至紀錄排行榜
-    for (let player of worldlog.getScoreboardPlayers('money').disname) {
-        if (player != 'commands.scoreboard.players.offlinePlayerName') {
-            let score = worldlog.getScoreFromMinecraft(player, 'money').score
-            cmd(`scoreboard players set "___${player}___" money_save ${score}`)
+    mc.system.runInterval(() => {
+        for (let player of worldlog.getScoreboardPlayers('money').disname) {
+            if (player != 'commands.scoreboard.players.offlinePlayerName') {
+                let score = worldlog.getScoreFromMinecraft(player, 'money').score
+                cmd(`scoreboard players set "___${player}___" money_save ${score}`)
+            }
         }
-    }
+    })
 }
