@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server';
 import { ActionFormData, MessageFormData, ModalFormData } from '@minecraft/server-ui';
 import { isNum, worldlog } from '../../lib/function';
-import { cmd, log, logfor } from '../../lib/GametestFunctions';
+import { checkPoint, cmd, log, logfor } from '../../lib/GametestFunctions';
 import { playerUI } from '../UI/player';
 
 /**
@@ -50,7 +50,7 @@ export function UI(player) {
             .show(player).then(res => {
                 if (res.canceled) return;
                 let sendMoney = res.formValues[0].trim()
-                if (sendMoney == '' || Number(sendMoney) < 1 || Number(sendMoney) > max || !isNum(sendMoney)) {
+                if (sendMoney == '' || Number(sendMoney) < 1 || Number(sendMoney) > max || !isNum(sendMoney) || checkPoint(sendMoney)) {
                     return logfor(player.name, `§c§l>> §e參數輸入錯誤!`)
                 }
 

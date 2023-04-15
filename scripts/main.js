@@ -18,9 +18,12 @@ import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
 
-export const version = "V2.2.31"
-export const updateDate = '2023/4/15 (Sat.)'
+export const version = "V2.2.32"
+export const updateDate = '2023/4/16 (Sun.)'
 export const updates = {
+    "V2.2.32": [
+        "修復各系統可輸入小數點數字之問題"
+    ],
     "V2.2.31": [
         "新增api簡介功能 (-info)"
     ],

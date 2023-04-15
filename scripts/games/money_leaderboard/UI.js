@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { isNum, worldlog } from '../../lib/function'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { checkPoint, cmd, log, logfor } from '../../lib/GametestFunctions'
 
 export function UI (player) {
     let form = new ui.ModalFormData()
@@ -12,7 +12,7 @@ export function UI (player) {
             if (res.canceled) return;
             let rank = res.formValues[0]
             let deleteZero = res.formValues[1]
-            if (!isNum(rank) || rank > 1) return logfor(player.name, `§c§l>> §e名次參數錯誤!`)
+            if (!isNum(rank) || rank > 1 || checkPoint(rank)) return logfor(player.name, `§c§l>> §e名次參數錯誤!`)
             let get = worldlog.getLeaderboard('money_save', Number(rank), deleteZero)
             let text = ''
             if (get.length == 0) return logfor(player.name, `§c§l>> §e找不到您所篩選的玩家!`);

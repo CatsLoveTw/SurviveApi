@@ -1,6 +1,6 @@
 import * as ui from '@minecraft/server-ui'
 import * as mc from '@minecraft/server'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { checkPoint, cmd, log, logfor } from '../../lib/GametestFunctions'
 import { isNum, worldlog } from '../../lib/function'
 import { playerUI } from '../UI/player'
 
@@ -166,7 +166,7 @@ function sellUI(player, currenc) {
                 logfor(player.name, '§c§l>> §e參數輸入錯誤!')
                 return sellUI(player)
             }
-            if (!isNum(money) && !all) {
+            if ((!isNum(money) || checkPoint(money)) && !all) {
                 logfor(player.name, `§c§l>> §e參數輸入錯誤!`)
                 return sellUI(player)
             }
@@ -207,7 +207,7 @@ function buyUI(player, item) {
              * @type {number}
              */
             let amount = res.formValues[0]
-            if (!isNum(amount) || amount == '') return logfor(player.name, `§c§l>> §e數量必須為數值!`)
+            if (!isNum(amount) || amount == '' || checkPoint(amount)) return logfor(player.name, `§c§l>> §e數量參數錯誤!`)
             if (amount < 1 || amount > limit) return logfor(player.name, `§c§l>> §e參數過大或過小!`)
             amount = Number(amount)
 
@@ -271,7 +271,7 @@ export function adminUI(player) {
 
                                     // shopSet 紀錄 物品ID___顯示名稱___物品售出價___物品買入價___物品所屬類別
                                     if (id == '' || displayName == '' || buyValue == '' || sellValue == '') return logfor(player.name, `§c§l>> §e參數不可為空!`)
-                                    if (!isNum(buyValue) || !isNum(sellValue)) return logfor(player.name, `§c§l>> §e價格必須為數字!`)
+                                    if (!isNum(buyValue) || !isNum(sellValue) || checkPoint(buyValue) || checkPoint(sellValue)) return logfor(player.name, `§c§l>> §e價格參數錯誤!`)
                                     for (let shop of shops) {
                                         let data = getData(shop)
                                         if (data.id == id) {
@@ -433,7 +433,7 @@ export function adminUI(player) {
                                 
                                                                     // shopSet 紀錄 物品ID___顯示名稱___物品售出價___物品買入價___物品所屬類別
                                                                     if (id == '' || displayName == '' || buyValue == '' || sellValue == '') return logfor(player.name, `§c§l>> §e參數不可為空!`)
-                                                                    if (!isNum(buyValue) || !isNum(sellValue)) return logfor(player.name, `§c§l>> §e價格必須為數字!`)
+                                                                    if (!isNum(buyValue) || !isNum(sellValue) || checkPoint(buyValue) || checkPoint(sellValue)) return logfor(player.name, `§c§l>> §e價格參數錯誤!`)
                                                                     cmd(`scoreboard players reset "${shop.transfrom()}" shopSet`)
                                                                     cmd(`scoreboard players set "${id}___${displayName}___${sellValue}___${buyValue}___${type}" shopSet 0`)
                                                                     return logfor(player.name, `§a§l>> §e修改成功!`)

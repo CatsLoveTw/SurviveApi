@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.2.31-blue)
+![version](https://img.shields.io/badge/Version-Dev--2.2.32-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -17,8 +17,9 @@
 - 現在傳送點**可能**會隨著領地而刪除
 
 
-#### 現在
+#### 現在 (DEV 2.2.31 && NOW)
 - 新增api簡介 (**-info**)
+- 修復各系統可輸入小數點數字之問題
 
 
 ### 測試中內容

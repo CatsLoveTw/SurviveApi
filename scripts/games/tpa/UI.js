@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { isNum } from '../../lib/function';
-import { log, logfor } from '../../lib/GametestFunctions';
+import { checkPoint, log, logfor } from '../../lib/GametestFunctions';
 
 /**
  * 
@@ -138,7 +138,7 @@ export function UI (player) {
                         .show(player).then(res => {
                             let dontDistrub = res.formValues[0]
                             let sec = res.formValues[1].trim()
-                            if (sec == '' || !isNum(sec)) {
+                            if (sec == '' || !isNum(sec) || checkPoint(sec)) {
                                 UI(player)
                                 return logfor(player.name, `§c§l>> §e設定參數錯誤!`)
                             }

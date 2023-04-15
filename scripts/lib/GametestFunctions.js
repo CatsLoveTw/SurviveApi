@@ -57,5 +57,15 @@ const getSign = function(player) {
     return all
 }
 
+/**
+ * 確認數字是否有小數點
+ * @param {number} number 
+ * @returns 
+ */
+export const checkPoint = (number) => {
+    if (number.toString().indexOf('.') != -1) return true
+    return false
+}
+
 
 export {cmd, cmd_Dimension, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}
