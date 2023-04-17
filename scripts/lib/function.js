@@ -61,9 +61,11 @@ class worldDB {
     /**
      * 
      * @param {string} DBID 輸入資料庫ID
+     * @param {string} TableID 輸入TableID (未來更新)
      */
-    constructor (DBID) {
+    constructor (DBID, TableID) {
         this.id = DBID
+        this.TableID = TableID
     }
     /**
      * 新增資料庫
@@ -195,6 +197,45 @@ class worldDB {
             datas.push(a)
         }
         return datas
+    }
+}
+
+class tagJSON {
+    /**
+     * 
+     * @param {mc.Player} player 輸入玩家
+     */
+    constructor (player) {
+        this.player = player
+    }
+
+    /**
+     * @returns {string[]}
+     */
+    get() {
+        let tags = []
+        for (let tag of this.player.getTags()) {
+            if (tag.startsWith('{"')) {
+                tags.push(tag)
+            }
+        }
+        return tags
+    }
+    
+    /**
+     * 
+     * @param {JSON} tag 輸入 JSON
+     */
+    add(tag) {
+        this.player.addTag(JSON.stringify(tag))
+    }
+
+    /**
+     * 
+     * @param {JSON} tag 輸入 JSON 
+     */
+    remove(tag) {
+        return this.player.removeTag(JSON.stringify(tag))
     }
 }
 

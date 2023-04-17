@@ -67,5 +67,15 @@ export const checkPoint = (number) => {
     return false
 }
 
+/**
+ * 
+ * @param {string} text 
+ * @returns 
+ */
+export function deleteColor(text) {
+    var returnText = text
+    returnText = returnText.replace(/§./g, "")
+    return returnText
+}
 
 export {cmd, cmd_Dimension, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}

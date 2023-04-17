@@ -17,29 +17,23 @@ import * as notice from './games/notice/build.js'
 import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
+import * as test from './games/test/build.js'
+import "./games/ban/build.js"
 
-export const version = "V2.2.35"
-export const updateDate = '2023/4/16 (Sun.)'
+export const version = "BETA V2.2.4"
+export const updateDate = '2023/4/17 (Mon.)'
 export const updates = {
-    "V2.2.35": [
-        "排行榜bug修復again"
-    ],
-    "V2.2.34": [
-        "時間顯示錯誤bug修復"
-    ],
-    "V2.2.33": [
-        "排行榜bug修復"
-    ],
-    "V2.2.32": [
-        "修復各系統可輸入小數點數字之問題"
-    ],
-    "V2.2.31": [
-        "新增api簡介功能 (-info)"
-    ],
-    "V2.2.3": [
-        "更新排行榜系統，減少效能損耗",
-        "新增金錢排行榜系統",
-        "現在傳送點可能會隨著領地而刪除"
+    "BETA V2.2.4": [
+        "API正式邁入BETA階段!",
+        "修復領地在特殊情況下無法刪除的問題",
+        "修復金錢排行榜顯示問題",
+        "修復公共 / 普通傳送點無法隨領地移除的問題",
+        "修復特殊情況下無法移除領地的問題",
+        "修復其他維度領地離開偵測異常問題",
+        "飛行權限更改偵測已新增",
+        "修復領地權限更改訊息在特殊情況下重複發送問題",
+        "新增黑名單系統",
+        "銀行系統回歸",
     ]
 }
 
@@ -281,6 +275,7 @@ try {
     adminSetting.build()
     shop.build()
     money_leaderboard.build()
+    test.build()
 } catch (e) {log("buildError" + e)}
 
 

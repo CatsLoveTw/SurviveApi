@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
 import { log, logfor, cmd } from '../../lib/GametestFunctions'
 import { getLandData } from '../land/UI'
+import { getPublicHomeData } from './UI'
 
 export function build() {
     function addBoard(ID, Display) {
@@ -21,10 +22,11 @@ export function build() {
     // 設定被請求Tag - {"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}
     // Source `§e您已向 §b${json.homeShare.sharedName} §e發送分享請求，等待回復...`
     // shared `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
+    // 偵測領地&公共/普通傳送點刪除
     mc.system.runInterval(() => {
+        let dimensions = ["lands", "lands_nether", "lands_end"]
         for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
-                let dimensions = ["lands", "lands_nether", "lands_end"]
                 let check = false
                 let index = 0
                 if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
@@ -34,27 +36,43 @@ export function build() {
                     index = 2
                 }
                 let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
-                for (let land of lands) {
-                    let data = getLandData(land)
-                    if (!tag.startsWith('{"home":')) break;
-                    if (tag.includes(JSON.stringify(data.pos))) {
-                        if (tag.includes(data.UID)) {
-                            if (tag.includes(data.name)) {
-                                if (tag.includes(data.player)) {
-                                    check = true
+                if (tag.startsWith('{"home":')) {
+                    for (let land of lands) {
+                        /**
+                        * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
+                        */
+                        let getData = JSON.parse(tag)
+                        let data = getLandData(land)
+                        let getDataPos = getData.home.land.pos
+                        let dataPos = data.pos
+                        if (getDataPos.x[1] == dataPos.x[1] && getDataPos.x[2] == dataPos.x[2] && getDataPos.z[1] == dataPos.z[1] && getDataPos.z[2] == dataPos.z[2]) {
+                            if (getData.home.land.UID == data.UID) {
+                                if (getData.home.land.name == data.name) {
+                                    if (getData.home.land.player == data.player) {
+                                        check = true
+                                    }
                                 }
                             }
                         }
                     }
+                    if (!check) {
+                        /**
+                        * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
+                        */
+                        let getData = JSON.parse(tag)
+                        logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除! §f- §c${getData.home.name}`)
+                        player.removeTag(tag)
+                    }
                 }
-                if (!check) {
-                    /**
-                    * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-                    */
-                    let getData = JSON.parse(tag)
-                    logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除! §f- §c${getData.home.name}`)
-                    player.removeTag(tag)
-                }
+            }
+        }
+        // 公共傳送點刪除偵測
+        let publicHomes = worldlog.getScoreboardPlayers("publicHome").disname
+        for (let publicHome of publicHomes) {
+            if (!getPublicHomeData(publicHome).landDataCheck) {
+                let homeData = getPublicHomeData(publicHome)
+                logfor(homeData.scoreData.player, `§c§l>> §e偵測到公共傳送點被刪除! §f| §e公共傳送點名 §f- §b${homeData.name} §7| §e領地名 §f- §b${homeData.scoreData.name}`)
+                cmd(`scoreboard players reset "${publicHome}" publicHome`)
             }
         }
     }, 1)

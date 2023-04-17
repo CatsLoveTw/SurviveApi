@@ -25,12 +25,12 @@ export function UI (player) {
             for (let leader of get) {
                 let name = leader.name.replace(/___/g, '')
                 if (name == player.name) {
-                    text += `§a§l第${leader.rank}名 §f| §a金錢 §b${leader.score} §a$ §7- §a${name}`
+                    text += `§a§l第${leader.rank}名 §f| §a金錢 §b${leader.score} §a$ §7- §a${name}\n`
                 } else {
-                    if (leader.rank == 1) text += `§e§l第${leader.rank}名 §f| §e金錢 §b${leader.score} §e$ §7- §e${name}`
-                    if (leader.rank == 2) text += `§g§l第${leader.rank}名 §f| §g金錢 §b${leader.score} §g$ §7- §g${name}`
-                    if (leader.rank == 3) text += `§6§l第${leader.rank}名 §f| §6金錢 §b${leader.score} §6$ §7- §6${name}`
-                    if (leader.rank > 3) text += `§l第${leader.rank}名 §f| §f金錢 §b${leader.score} §f$ §7- §f${name}`
+                    if (leader.rank == 1) text += `§e§l第${leader.rank}名 §f| §e金錢 §b${leader.score} §e$ §7- §e${name}\n`
+                    if (leader.rank == 2) text += `§g§l第${leader.rank}名 §f| §g金錢 §b${leader.score} §g$ §7- §g${name}\n`
+                    if (leader.rank == 3) text += `§6§l第${leader.rank}名 §f| §6金錢 §b${leader.score} §6$ §7- §6${name}\n`
+                    if (leader.rank > 3) text += `§l第${leader.rank}名 §f| §f金錢 §b${leader.score} §f$ §7- §f${name}\n`
                 }
             }
             let form = new ui.ActionFormData()

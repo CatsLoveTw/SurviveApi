@@ -7,6 +7,7 @@ import * as bank from '../bank/UI.js'
 import * as home from '../home/UI.js'
 import * as profile from '../profile/UI.js'
 import * as shop from '../shop/UI.js'
+import * as bankSys from '../bankSystem/UI.js'
 import * as money_leaderboard from '../money_leaderboard/UI.js'
 import { log, logfor } from '../../lib/GametestFunctions.js';
 
@@ -20,6 +21,7 @@ export function playerUI (player) {
         .button("§e§l傳送點功能", 'textures/blocks/portal_placeholder.png')
         .button("§e§l個人資訊", 'textures/ui/icon_alex.png')
         .button("§e§l金錢排行榜", 'textures/ui/MCoin.png')
+        .button("§e§l銀行系統", 'textures/ui/MCoin.png')
         .button("§e§l管理員選單", 'textures/ui/permissions_op_crown.png')
         .show(player).then(res => {
             if (!res) return;
@@ -41,6 +43,8 @@ export function playerUI (player) {
             } else if (res.selection === 6) {
                 money_leaderboard.UI(player)
             } else if (res.selection === 7) {
+                bankSys.playerUI(player)
+            } else if (res.selection === 8) {
                 if (player.hasTag("admin")) {
                     adminUI(player)
                 } else {

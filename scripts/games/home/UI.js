@@ -31,7 +31,7 @@ export function getHomes(player, dimension) {
 /**
  * 
  * @param {string} home
- * @returns {{dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}}}
+ * @returns {{landDataCheck: boolean, scoreData: {name: LANDNAME, pos: {x: {1: LANDpos.x, 2: LANDpos.x2},z: {1: LANDpos.z, 2: LANDpos.z2}},UID: LANDUID,player: LANDPLAYRER}, dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean} | undefined}}
  */
 export function getPublicHomeData(home) {
     let args = home.split('___')
@@ -47,7 +47,8 @@ export function getPublicHomeData(home) {
     /**
      * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
      */
-    let landData = {}
+    let landData
+    let landDataCheck = false
     let getLandScoreBoard = ''
     land = land.replace(":", '')
     let LANDargs = land.split("_,_")
@@ -63,7 +64,21 @@ export function getPublicHomeData(home) {
     }
     let LANDPLAYRER = LANDargs[2]
     let LANDUID = LANDargs[3]
-
+    let data = {
+        name: LANDNAME, 
+        pos: {
+            x: {
+                1: LANDpos.x, 
+                2: LANDpos.x2
+            },
+            z: {
+                1: LANDpos.z, 
+                2: LANDpos.z2
+            }
+        },
+        UID: LANDUID,
+        player: LANDPLAYRER
+    }
     if (dime != 'over') {
         getLandScoreBoard = '_' + dime
     }
@@ -79,10 +94,17 @@ export function getPublicHomeData(home) {
         if (landD.pos.z[2] != LANDpos.z2) check = false;
         if (check) {
             landData = landD
+            landDataCheck = true
         }
     }
 
+    if (!landDataCheck) {
+        landData = undefined
+    }
+
     return {
+        landDataCheck: landDataCheck,
+        scoreData: data,
         dime: dime,
         name: name,
         pos: { x: x, y: y, z: z },
@@ -405,6 +427,7 @@ export function publicUI (player) {
                         .button("§b§l搜尋")
                     for (let home of homes) {
                         let homeData = getPublicHomeData(home)
+                        log(home)
                         let text = `§e§l名稱 §f- §e${homeData.name} §7| §a擁有者 §f- §e${homeData.land.player}\n§e領地名 §f- §e${homeData.land.name}`
                         form.button(text)
                     }

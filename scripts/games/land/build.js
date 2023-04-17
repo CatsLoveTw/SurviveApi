@@ -17,7 +17,9 @@ export function build() {
         "land_squ": "已建造格數",
         "land_land": "已建造領地數",
         "land_squ_max": "最大格數",
-        "land_land_max": "最大領地數"
+        "land_land_max": "最大領地數",
+        "land_squ_save": "暫存領地格數",
+        "land_land_save": "暫存領地數量"
     }
     try {
         for (let board in boards) {

@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-Dev--2.2.35-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.4-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,18 +11,25 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容
-#### 之前 (DEV 2.3)
-- 更新排行榜系統，減少效能損耗
-- 新增金錢排行榜系統
-- 現在傳送點**可能**會隨著領地而刪除
-
-
-#### 現在 (DEV 2.2.31 && DEV 2.2.32 && DEV 2.2.33 && DEV 2.2.34 && NOW)
+#### 之前 (DEV 2.2.3~DEV 2.2.35)
 - 新增api簡介 (**-info**)
 - 修復各系統可輸入小數點數字之問題
 - 排行榜bug修復
 - 時間顯示錯誤bug修復
 - 排行榜bug修復again
+
+
+#### 現在
+- API正式邁入BETA階段!
+- 修復領地在特殊情況下無法刪除的問題
+- 修復金錢排行榜顯示問題
+- 修復公共/普通傳送點無法隨領地移除的問題
+- 修復特殊情況下無法移除領地的問題
+- 修復其他維度領地離開偵測異常問題
+- 飛行權限更改偵測已新增
+- 修復領地權限更改訊息在特殊情況下重複發送問題
+- 新增黑名單系統
+- 銀行系統回歸
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
@@ -35,6 +42,7 @@
 - 管理員選單
 - 基礎領地系統
 - 伺服器公共領地
+- 黑名單系統
 - 傳送點
 - 公共傳送點
 - actionbar功能
@@ -48,16 +56,9 @@
 - 公告功能
 - 金錢排行榜系統
 ### 即將更新
-- 黑名單系統
 - 領地管理功能
 - 玩家互傳新增黑名單功能
 ### 未修復的問題
-- 商店系統退出時會跳出undefined選單
-- 金錢排行榜顯示問題
-- 公共/普通傳送點移除問題
-- 特殊情況下無法移除領地
-- 領地權限更改訊息在特殊情況下重複發送
-- 其他維度領地離開偵測異常
 ### 提醒
 - 本專案所有內容參考於 [官方文本](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/)
 - 本專案可自由下載使用 但請勿**聲稱原作**

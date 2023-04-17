@@ -4,6 +4,7 @@ import * as land from '../land/UI.js'
 import * as notice from '../notice/UI.js'
 import * as adminSetting from './adminSetting/UI.js'
 import * as shop from '../shop/UI.js'
+import * as ban from '../ban/UI.js'
 
 /**
  * 
@@ -16,6 +17,8 @@ export function adminUI (player) {
         .button("§e§l公告設定")
         .button('§e§l管理員設定')
         .button("§e§l商品設定")
+        .button("§e§l黑名單設定")
+        .button("§e§l領地管理")
         .show(player).then(res => {
             if (!res) return;
             if (res.selection === 0) {
@@ -36,6 +39,12 @@ export function adminUI (player) {
             }
             if (res.selection === 3) {
                 shop.adminUI(player)
+            }
+            if (res.selection === 4) {
+                ban.adminUI(player)
+            }
+            if (res.selection === 5) {
+                player.sendMessage("§3§l>> §e敬請期待!")
             }
         })
 }

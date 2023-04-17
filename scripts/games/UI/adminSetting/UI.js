@@ -10,8 +10,7 @@ let dropdown = ['§e§l普通管理員', '§b§l巡查管理員']
  * @param {mc.Player} player 
  */
 export function UI(player) {
-    let getPermission = worldlog.getScoreFromMinecraft(player.name, `permission`).score
-    if (player.hasTag('admin') && getPermission == 2) {
+    if (player.hasTag('admin')) {
         let form = new ui.ActionFormData()
             .title("§e§l設定管理員")
             .button("§a§l新增")
@@ -159,6 +158,6 @@ export function UI(player) {
                 }
             })
     } else {
-        return logfor(player.name, `§c§l>> §e您沒有權限使用該功能! §f(§e必須是§b巡查管理員§f)`)
+        return logfor(player.name, `§c§l>> §e您沒有權限使用該功能!`)
     }
 }

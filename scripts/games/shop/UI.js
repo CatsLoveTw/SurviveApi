@@ -90,6 +90,7 @@ export function UI(player) {
         form1()
         function form1() {
             if (res.selection === types.length) return playerUI(player)
+            if (res.canceled) return;
             /**
              * @type {string}
              */
