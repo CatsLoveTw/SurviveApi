@@ -34,5 +34,5 @@ export function build () {
                 }
             }
         }
-    }, 1)
+    }, 120)
 }

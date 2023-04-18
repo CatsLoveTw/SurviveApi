@@ -23,5 +23,5 @@ export function build () {
                 cmd(`scoreboard players set "___${player}___" money_save ${score}`)
             }
         }
-    })
+    }, 100)
 }

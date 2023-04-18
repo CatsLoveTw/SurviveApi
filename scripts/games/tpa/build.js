@@ -156,5 +156,5 @@ export function build () {
                 }
             }
         }
-    }, 2)
+    }, 20)
 }

@@ -17,4 +17,4 @@ mc.system.runInterval(() => {
             }
         }
     }
-}, 1)
+}, 60)

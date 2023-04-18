@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.5-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.51-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -23,11 +23,15 @@
 - 新增黑名單系統
 - 銀行系統回歸
 
-#### 現在
+#### 現在 (BETA 2.2.5 & NOW)
 - 新增掉落物&經驗清除功能，減少負擔
 - 新增領地管理功能
 - 新增玩家互傳黑名單功能
 - 修復少數的選單顯示問題
+
+- 修復使用傳送點時顯示問題
+- 修改領地飛行機制 (持續給予權限 -> 進入時給予)
+- API進行初步優化，減少執行次數。
 
 ### 測試中內容
 - 領地系統 (多種維度支援)

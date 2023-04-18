@@ -504,7 +504,7 @@ export function build() {
                 }
             }
         } catch { }
-    }, 1)
+    }, 2)
 
     // 領地權限更改偵測
     mc.system.runInterval(() => {
@@ -588,7 +588,7 @@ export function build() {
                 }
             }
         }
-    }, 3)
+    }, 5)
 
     // 領地公共權限更改偵測
     mc.system.runInterval(() => {
@@ -667,7 +667,7 @@ export function build() {
                 }
             }
         }
-    }, 3)
+    }, 5)
 
     // 偵測離開領地
     mc.system.runInterval(() => {
@@ -763,23 +763,6 @@ export function build() {
                 }
             }
         } catch (e) { log("land(724)" + e) }
-    }, 1)
-
-    // 持續給予飛行 2tick
-    mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
-            for (let tag of player.getTags()) {
-                if (tag.startsWith('{"inLand":')) {
-                        /**
-                         * @type {{inLand: {"dime": "over","land": landData,"per": {build: string,container: string,portal: string,fly: string}}}}
-                         */
-                        let landData = JSON.parse(tag)
-                        if (landData.inLand.per.fly == "true") {
-                            addfly(player)
-                        }
-                }
-            }
-        }
     }, 2)
 
     // 偵測交互

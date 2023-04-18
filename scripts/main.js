@@ -21,9 +21,14 @@ import * as test from './games/test/build.js'
 import "./games/ban/build.js"
 import "./system/import.js"
 
-export const version = "BETA V2.2.5"
+export const version = "BETA V2.2.51"
 export const updateDate = '2023/4/18 (Tue.)'
 export const updates = {
+    "BETA 2.2.51": [
+        "修復使用傳送點時顯示問題",
+        "修改領地飛行機制 (持續給予權限 -> 進入時給予)",
+        "API進行初步優化，減少執行次數。",
+    ],
     "BETA V2.2.5": [
         "新增掉落物&經驗清除功能",
         "新增領地管理功能 (管理員選單)",

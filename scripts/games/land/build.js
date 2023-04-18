@@ -43,7 +43,7 @@ export function build() {
                 logfor(player.name, `§3§l>> §e偵測到您的領地被管理員刪除，已經歸還您 §b${land.score.toString().replace("-", "")} §e個領地數。`)
             }
         }
-    }, 1)
+    }, 100)
 }
 
 /**

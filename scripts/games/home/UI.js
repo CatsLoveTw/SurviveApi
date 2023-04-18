@@ -427,7 +427,6 @@ export function publicUI (player) {
                         .button("§b§l搜尋")
                     for (let home of homes) {
                         let homeData = getPublicHomeData(home)
-                        log(home)
                         let text = `§e§l名稱 §f- §e${homeData.name} §7| §a擁有者 §f- §e${homeData.land.player}\n§e領地名 §f- §e${homeData.land.name}`
                         form.button(text)
                     }

@@ -75,7 +75,7 @@ export function build() {
                 cmd(`scoreboard players reset "${publicHome}" publicHome`)
             }
         }
-    }, 1)
+    }, 40)
 
     // 檢查請求/被請求到期 §
     mc.system.runInterval(() => {
@@ -224,5 +224,5 @@ export function build() {
                 }
             }
         }
-    }, 2)
+    }, 20)
 }

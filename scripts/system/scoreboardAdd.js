@@ -81,7 +81,7 @@ system.runInterval(() => {
                 player.addTag("newPlayer")
             }
     }
-}, 1)
+}, 5)
 
 // 紀錄系統資訊
 
