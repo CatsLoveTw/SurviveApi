@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { isNum } from '../../lib/function';
 import { checkPoint, log, logfor } from '../../lib/GametestFunctions';
+import { tpaSetting } from '../../defind';
 
 /**
  * 
@@ -16,6 +17,7 @@ export function UI (player) {
         .title("§e§l玩家互傳功能")
         .button('§e§l互傳系統')
         .button('§6§l設定')
+        .button("§b§l黑名單系統")
         .show(player).then(res => {
             if (res.canceled || !res) return;
             if (res.selection === 0) {
@@ -64,6 +66,10 @@ export function UI (player) {
                             for (let tag of selePlayer.getTags()) {
                                 if (tag.startsWith('{"tpaReqed":')) {
                                     return logfor(player.name, `§3§l>> §e玩家正在被其他人請求，請稍後再試...`)
+                                }
+                                if (tag.startsWith('{"tpaSetting":')) {
+                                    let data = new tpaSetting().getDataFromTag(tag)
+                                    if (data.banlist.includes(player.name)) return logfor(player.name, `§c§l>> §e您已被他人設定為黑名單對象，請稍後再試!`)
                                 }
                                 if (tag.startsWith('{"tpaSetting":')) {
                                     settingJSON = JSON.parse(tag)
@@ -119,18 +125,18 @@ export function UI (player) {
                 setting()
                 function setting () {
                     /**
-                     * @type {{"tpaSetting": {"dontDistrub": boolean, 'sec': number}}}
+                     * @type {tpaSetting}
                      */
-                    let tpaSetting = {}
+                    let tpaSetting_ = {}
                     let settingTag = ''
                     for (let tag of player.getTags()) {
                         if (tag.startsWith('{"tpaSetting":')) {
                             settingTag = tag
-                            tpaSetting = JSON.parse(tag)
+                            tpaSetting_ = new tpaSetting().getDataFromTag(tag)
                         }
                     }
-                    let dontDistrub = tpaSetting.tpaSetting.dontDistrub
-                    let sec = tpaSetting.tpaSetting.sec
+                    let dontDistrub = tpaSetting_.Distrub
+                    let sec = tpaSetting_.sec
                     let form = new ui.ModalFormData()
                         .title("§e§l玩家互傳 - 設定")
                         .toggle("§c§l請勿打擾", dontDistrub)
@@ -144,13 +150,114 @@ export function UI (player) {
                             }
                             sec = Number(sec)
                             player.removeTag(settingTag)
-                            tpaSetting.tpaSetting.dontDistrub = dontDistrub
-                            tpaSetting.tpaSetting.sec = sec
-                            player.addTag(JSON.stringify(tpaSetting))
+                            let newTag = new tpaSetting(sec, dontDistrub, tpaSetting_.banlist, false).transformToTag()
+                            player.addTag(newTag)
                             logfor(player.name, `§a§l>> §e設定成功!`)
                             return UI(player)
                         })
                 }
+            } else if (res.selection === 2) {
+                function ban () {
+                let form = new ui.ActionFormData()
+                    .title("§e§l黑名單系統")
+                    .button("§a§l新增")
+                    .button("§c§l刪除")
+                    .button("§7§l返回")
+                    .show(player).then(res => {
+                        if (res.selection === 2) return UI(player)
+                        if (res.selection === 0) {
+                            function add (name) {
+                                let settingTag
+                                for (let tag of player.getTags()) {
+                                    if (tag.startsWith('{"tpaSetting":')) {
+                                        settingTag = tag
+                                    }
+                                }
+                                let data = new tpaSetting().getDataFromTag(settingTag)
+                                if (data.banlist.includes(name)) return logfor(player.name, `§c§l>> §e新增失敗，名稱重複!`);
+                                if (name == player.name) return logfor(player.name, `§c§l>> §e不可黑名單自己!`)
+                                player.removeTag(settingTag)
+                                data.banlist.push(name)
+                                player.addTag(new tpaSetting(data.sec, data.Distrub, data.banlist, false).transformToTag());
+                                return logfor(player.name, `§a§l>> §e新增成功!`)
+                            }
+                            
+                            let form = new ui.ActionFormData()
+                                .title('§e§l黑名單系統 §f- §a新增')
+                                .button("§b§l線上玩家新增")
+                                .button("§e§l手動新增")
+                                .button("§7§l返回")
+                                .show(player).then(res => {
+                                    if (res.selection === 2) return ban()
+                                    if (res.selection === 0) {
+                                        let settingTag
+                                        for (let tag of player.getTags()) {
+                                            if (tag.startsWith('{"tpaSetting":')) {
+                                                settingTag = tag
+                                            }
+                                        }
+                                        let data = new tpaSetting().getDataFromTag(settingTag)
+                                        let players = []
+                                        let form = new ui.ActionFormData()
+                                            .title('§e§l黑名單系統 §f- §b線上玩家新增')
+                                        for (let pl of mc.world.getAllPlayers()) {
+                                            let getlist = data.banlist
+                                            if (!getlist.includes(pl.name) && pl.name != player.name) {
+                                                players.push(pl)
+                                                form.button("§e§l" + pl.name)
+                                            }
+                                        }
+                                        if (players.length == 0) return logfor(player.name, `§c§l>> §e沒有玩家可新增`)
+                                        form.show(player).then(res => {
+                                            if (res.canceled) return;
+                                            let selePlayer = players[res.selection]
+                                            add(selePlayer.name)
+                                        })
+                                    }
+
+                                    if (res.selection === 1) {
+                                        let form = new ui.ModalFormData()
+                                            .title('§e§l黑名單系統 §f- §e手動新增')
+                                            .textField("§e§l輸入玩家名稱", "名稱")
+                                            .show(player).then(res => {
+                                                if (res.canceled) return;
+                                                let name = res.formValues[0]
+                                                if (name.trim() == '') return logfor(player.name, `§c§l>> §e名稱不得為空!`)
+                                                add(name)
+                                            })
+                                    }
+                                })
+                        }
+
+                        if (res.selection === 1) {
+                            let settingTag
+                            for (let tag of player.getTags()) {
+                                if (tag.startsWith('{"tpaSetting":')) {
+                                    settingTag = tag
+                                }
+                            }
+                            let data = new tpaSetting().getDataFromTag(settingTag)
+                            let banlist = data.banlist
+                            let form = new ui.ActionFormData()
+                                .title("§b§l黑名單系統 §f- §c刪除")
+                            for (let ban of banlist) {
+                                form.button(ban)
+                            }
+                            form.button('§7§l返回')
+                            form.show(player).then(res => {
+                                if (res.canceled) return;
+                                if (res.selection === banlist.length) return ban();
+                                let selePlayer = banlist[res.selection]
+                                banlist.splice(banlist.indexOf(selePlayer), 1)
+                                player.removeTag(settingTag)
+                                player.addTag(new tpaSetting(data.sec, data.Distrub, banlist, false).transformToTag())
+                                return logfor(player.name, `§a§l>> §e刪除成功!`) 
+                            })
+                        }
+                    })
+            
+                }
+                ban()
             }
         })
 }

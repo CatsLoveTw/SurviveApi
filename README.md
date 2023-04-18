@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.4-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.5-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -12,14 +12,6 @@
 
 ### 更新內容
 #### 之前 (DEV 2.2.3~DEV 2.2.35)
-- 新增api簡介 (**-info**)
-- 修復各系統可輸入小數點數字之問題
-- 排行榜bug修復
-- 時間顯示錯誤bug修復
-- 排行榜bug修復again
-
-
-#### 現在
 - API正式邁入BETA階段!
 - 修復領地在特殊情況下無法刪除的問題
 - 修復金錢排行榜顯示問題
@@ -30,6 +22,12 @@
 - 修復領地權限更改訊息在特殊情況下重複發送問題
 - 新增黑名單系統
 - 銀行系統回歸
+
+#### 現在
+- 新增掉落物&經驗清除功能，減少負擔
+- 新增領地管理功能
+- 新增玩家互傳黑名單功能
+- 修復少數的選單顯示問題
 
 ### 測試中內容
 - 領地系統 (多種維度支援)
@@ -56,8 +54,6 @@
 - 公告功能
 - 金錢排行榜系統
 ### 即將更新
-- 領地管理功能
-- 玩家互傳新增黑名單功能
 ### 未修復的問題
 ### 提醒
 - 本專案所有內容參考於 [官方文本](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/)

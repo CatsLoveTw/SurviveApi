@@ -19,10 +19,16 @@ import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
 import * as test from './games/test/build.js'
 import "./games/ban/build.js"
+import "./system/import.js"
 
-export const version = "BETA V2.2.4"
-export const updateDate = '2023/4/17 (Mon.)'
+export const version = "BETA V2.2.5"
+export const updateDate = '2023/4/18 (Tue.)'
 export const updates = {
+    "BETA V2.2.5": [
+        "新增掉落物&經驗清除功能",
+        "新增領地管理功能 (管理員選單)",
+        "新增tpa黑名單系統",
+    ],
     "BETA V2.2.4": [
         "API正式邁入BETA階段!",
         "修復領地在特殊情況下無法刪除的問題",
@@ -36,42 +42,10 @@ export const updates = {
         "銀行系統回歸",
     ]
 }
+export const prefix = '-'
 
 try {
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
-const prefix = '-'
-
-function runCommand (command) {
-    world.getDimension("overworld").runCommandAsync(command);
-}
-
-function getMenu (player) {
-    /**
-    * @type {mc.EntityInventoryComponent}
-    */
-    let inv = player.getComponent("inventory")
-    let count = 0
-    let Slot = 0
-    for (let i = 0; i < 36; i++) {
-        if (Slot == 0) {
-            try {
-                if (inv.container.getItem(i).typeId) {
-                    count++
-                } else {
-                    Slot = i
-                }
-            } catch {
-                Slot = i
-            }
-        }
-    }
-    if (count == 36) return logfor(player.name, `§c§l>> §e背包已滿，請稍後嘗試!`)
-
-    let newItem = new mc.ItemStack(mc.MinecraftItemTypes.compass, 1)
-    newItem.nameTag = `§e§l選單系統`
-    newItem.setLore(["§e§l右鍵/長按螢幕開啟選單"])
-    inv.container.setItem(Slot, newItem)
-}
 
 for (let player of world.getPlayers()) {
     for (let tag of player.getTags()) {
@@ -81,184 +55,12 @@ for (let player of world.getPlayers()) {
     }
 }
 
-const boards = {
-    "time": "秒",
-    "timeM": '分',
-    "timeH": "時",
-    'timeD': "天",
-    "menu": "§l---§e伺服器資訊§f---"
-}
-
-for (let board in boards) {
-    try {
-        cmd(`scoreboard objectives add "${board}" dummy "${boards[board]}"`)
-    } catch {}
-}
-
 
 system.events.beforeWatchdogTerminate.subscribe(event => {
     event.cancel = true
 })
 
-world.events.beforeChat.subscribe(events => {
-    let player = events.sender;
-    let message = events.message;
-    let displayDimension = '§a§l主世界'
-    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
-        displayDimension = '§c§l地獄'
-    }
-    if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
-        displayDimension = '§b§l終界'
-    }
-    events.cancel = true
-    if (!message.startsWith(prefix)) {
-        runCommand(`tellraw @a {"rawtext":[{"text":"§l${displayDimension} §f| §e${player.name} §7> §f${message}"}]}`)
-    }
-})
-
 // system.runInterval() 類似於tickEvent
-
-const scoreboards = {
-    "land_squ": 0,
-    "land_squ_max": 500,
-    "land_land": 0,
-    "land_land_max": 30,
-    "time": 0,
-    "timeD": 0,
-    "timeH": 0,
-    "timeM": 0,
-    "money": 0,
-    "rtp_time": 0,
-    'death': 0
-}
-system.runInterval(() => {
-    let score = {}
-    for (let player of world.getPlayers()) {
-        for (let board in scoreboards) {
-            if (scoreboards[board] == 0) { 
-                player.runCommandAsync(`scoreboard players add @s "${board}" ${scoreboards[board]}`)
-            } else {
-                score[board] = scoreboards[board]
-            }
-        }
-            if (!player.hasTag('newPlayer')) {
-                for (let tag of player.getTags()) {
-                    if (tag.includes("tpaSetting")) {
-                        player.removeTag(tag)
-                    }
-                }
-                let json = {
-                    "tpaSetting": {"dontDistrub": false, "sec": 60}
-                }
-                player.addTag(JSON.stringify(json))
-
-
-
-                for (let board in score) {
-                    player.runCommandAsync(`scoreboard players add @s "${board}" ${score[board]}`)
-                }
-
-                // 給予選單 / 提示
-                logfor(player.name, '§3§l>> §e本伺服器擁有自訂義指令之功能，請輸入 §b-help §e獲取更多。')
-                getMenu(player)
-                player.addTag("newPlayer")
-            }
-    }
-}, 1)
-
-// 無敵
-mc.world.events.playerJoin.subscribe(event => {
-    let player = event.playerName
-    cmd(`effect "${player}" resistance 10 255 true`)
-})
-
-function getPlayTime () {
-    let i = 0
-    
-    system.runInterval(() => {
-        i++
-        if (i == 20) {
-            i = 0
-            for (let player of world.getPlayers()) {
-                player.runCommandAsync(`scoreboard players add @s time 1`).then(() => {
-                    let sec = worldlog.getScoreFromMinecraft(player.name, "time").score
-                    let M = worldlog.getScoreFromMinecraft(player.name, "timeM").score
-                    let H = worldlog.getScoreFromMinecraft(player.name, "timeH").score
-                    let D = worldlog.getScoreFromMinecraft(player.name, "timeD").score
-                    while (sec >= 60) {
-                        sec -= 60
-                        M ++
-                        if (worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score <= (500000 - 60)) {
-                            let getSquMax = worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score
-                            player.runCommandAsync(`scoreboard players add @s land_squ_max 60`)
-                            let msg = `§g§l線上獎勵 §f> §a您的領地上限擴大了60格! §f(§e現為 §b${Number(getSquMax) + 60} §e格§f)`
-                            let json = { "news": msg, tick: 0, maxtick: 120 }
-                            player.addTag(JSON.stringify(json))
-                        }
-                    }
-                    while (M >= 60) {
-                        M -= 60
-                        H ++
-                    }
-                    while (H >= 24) {
-                        H -= 24
-                        D ++
-                    }
-                    player.runCommandAsync(`scoreboard players set @s time ${sec}`)
-                    player.runCommandAsync(`scoreboard players set @s timeM ${M}`)
-                    player.runCommandAsync(`scoreboard players set @s timeH ${H}`)
-                    player.runCommandAsync(`scoreboard players set @s timeD ${D}`)
-                })
-            }
-        }
-    })
-}
-
-function displayMenu() {
-    function changeScore (scorename, scoreData) {
-        try {
-            let deleteScore = []
-            for (let score of world.scoreboard.getObjective("menu").getParticipants()) {
-                if (score.displayName.indexOf(scorename) != -1) {
-                    deleteScore.push(score.displayName)
-                }
-            }
-            for (let i in deleteScore) {
-                cmd(`scoreboard players reset "${deleteScore[i]}" menu`)
-            }
-        } catch (e) { world.say(e) }
-        cmd(`scoreboard players set "§l§e${scorename} §7- §b${scoreData}" menu 0`)
-    }
-    mc.system.runInterval(() => {
-        let date = new Date();
-        let h = date.getUTCHours() + 8
-        let m = date.getMinutes()
-        let s = date.getSeconds()
-        let bh = 0
-        let bm = 0
-        let bs = 0
-        if (h > 23) {h = h-24}
-        if (h < 10) {
-            bh = "0" + h
-        } else { bh = h }
-        if (m < 10) {
-            bm = "0" + m
-        } else { bm = m }
-        if (s < 10) {
-            bs = '0' + s
-        } else { bs = s }
-        let dates = `${bh}:${bm}:${bs}`
-        changeScore("現在時間", dates)
-    }, 1)
-}
-
-getPlayTime()
-displayMenu()
-
-
-
-
-
 
 // build
 try {
@@ -277,14 +79,4 @@ try {
     money_leaderboard.build()
     test.build()
 } catch (e) {log("buildError" + e)}
-
-
-
-
-
-
-
-
-
-
 } catch (e) {log(e)}

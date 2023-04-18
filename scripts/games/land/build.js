@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 import * as land from './land.js'
 import { getLandData } from './UI.js'
 
@@ -27,6 +27,23 @@ export function build() {
         }
     } catch { }
     land.build()
+
+    mc.system.runInterval(() => {
+        for (let player of mc.world.getAllPlayers()) {
+            let squ = worldlog.getScoreFromMinecraft(player.name, 'land_squ_save')
+            let land = worldlog.getScoreFromMinecraft(player.name, 'land_land_save')
+            if (squ) {
+                cmd(`scoreboard players reset "${player.name}" land_squ_save`)
+                player.runCommandAsync(`scoreboard players add @s land_squ ${squ.score}`)
+                logfor(player.name, `§3§l>> §e偵測到您的領地被管理員刪除，已經歸還您 §b${squ.score.toString().replace("-", "")} §e格領地格數。`)
+            }
+            if (land) {
+                cmd(`scoreboard players reset "${player.name}" land_land_save`)
+                player.runCommandAsync(`scoreboard players add @s land_land ${land.score}`)
+                logfor(player.name, `§3§l>> §e偵測到您的領地被管理員刪除，已經歸還您 §b${land.score.toString().replace("-", "")} §e個領地數。`)
+            }
+        }
+    }, 1)
 }
 
 /**

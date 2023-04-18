@@ -44,7 +44,8 @@ export function adminUI (player) {
                 ban.adminUI(player)
             }
             if (res.selection === 5) {
-                player.sendMessage("§3§l>> §e敬請期待!")
+                land.listLandUI(player)
+                // player.sendMessage("§3§l>> §e敬請期待!")
             }
         })
 }
