@@ -24,9 +24,23 @@ export const chatCommands = [
                 } else if (args[1] == 'update') {
                     let text = ''
                     for (let i in updatedata.updates) {
-                        text += `§e§l版本 §7- §e${i}\n`
+                        text += `§e§l版本 §7- §e${i}\n§f(§b更新內容 §7| §b影響程度§f)\n`
                         for (let j in updatedata.updates[i]) {
-                            text += `§f§l${Number(j)+1}.${updatedata.updates[i][j]}\n`
+                            let update = updatedata.updates[i][j]
+                            let args = update.split(" | ")
+                            let context = args[0]
+                            let affect = args[1]
+                            let displayEffect = ''
+                            if (affect.startsWith('低')) {
+                                displayEffect += `§7${affect}`
+                            }
+                            if (affect.startsWith('中')) {
+                                displayEffect += `§6${affect}`
+                            }
+                            if (affect.startsWith('高')) {
+                                displayEffect += `§c${affect}`
+                            }
+                            text += `§f§l${Number(j)+1}.${context} §f| ${displayEffect}§e\n`
                         }
                     }
                     logfor(player.name, text)

@@ -38,4 +38,4 @@ mc.system.runInterval(() => {
     } else { bs = s }
     let dates = `${bh}:${bm}:${bs}`
     changeScore("現在時間", dates)
-}, 20)
+}, 5)

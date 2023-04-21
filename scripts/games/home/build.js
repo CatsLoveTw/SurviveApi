@@ -28,41 +28,36 @@ export function build() {
         for (let player of mc.world.getPlayers()) {
             for (let tag of player.getTags()) {
                 let check = false
-                let index = 0
-                if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
-                    index = 1
-                }
-                if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.theEnd) {
-                    index = 2
-                }
-                let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
-                if (tag.startsWith('{"home":')) {
-                    for (let land of lands) {
-                        /**
-                        * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-                        */
-                        let getData = JSON.parse(tag)
-                        let data = getLandData(land)
-                        let getDataPos = getData.home.land.pos
-                        let dataPos = data.pos
-                        if (getDataPos.x[1] == dataPos.x[1] && getDataPos.x[2] == dataPos.x[2] && getDataPos.z[1] == dataPos.z[1] && getDataPos.z[2] == dataPos.z[2]) {
-                            if (getData.home.land.UID == data.UID) {
-                                if (getData.home.land.name == data.name) {
-                                    if (getData.home.land.player == data.player) {
-                                        check = true
+                for (let index in dimensions) {
+                    let lands = worldlog.getScoreboardPlayers(dimensions[index]).disname
+                    if (tag.startsWith('{"home":')) {
+                        for (let land of lands) {
+                            /**
+                            * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
+                            */
+                            let getData = JSON.parse(tag)
+                            let data = getLandData(land)
+                            let getDataPos = getData.home.land.pos
+                            let dataPos = data.pos
+                            if (getDataPos.x[1] == dataPos.x[1] && getDataPos.x[2] == dataPos.x[2] && getDataPos.z[1] == dataPos.z[1] && getDataPos.z[2] == dataPos.z[2]) {
+                                if (getData.home.land.UID == data.UID) {
+                                    if (getData.home.land.name == data.name) {
+                                        if (getData.home.land.player == data.player) {
+                                            check = true
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    if (!check) {
-                        /**
-                        * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-                        */
-                        let getData = JSON.parse(tag)
-                        logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除! §f- §c${getData.home.name}`)
-                        player.removeTag(tag)
-                    }
+                }
+                if (!check) {
+                    /**
+                    * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
+                    */
+                    let getData = JSON.parse(tag)
+                    logfor(player.name, `§c§l>> §e偵測到傳送點所在領地被刪除! §f- §c${getData.home.name}`)
+                    player.removeTag(tag)
                 }
             }
         }

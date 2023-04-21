@@ -31,7 +31,7 @@ export function getHomes(player, dimension) {
 /**
  * 
  * @param {string} home
- * @returns {{landDataCheck: boolean, scoreData: {name: LANDNAME, pos: {x: {1: LANDpos.x, 2: LANDpos.x2},z: {1: LANDpos.z, 2: LANDpos.z2}},UID: LANDUID,player: LANDPLAYRER}, dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean} | undefined}}
+ * @returns {{landDataCheck: boolean, scoreData: {name: LANDNAME, pos: {x: {1: LANDpos.x, 2: LANDpos.x2},z: {1: LANDpos.z, 2: LANDpos.z2}},UID: LANDUID,player: LANDPLAYRER}, dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean} | undefined}}
  */
 export function getPublicHomeData(home) {
     let args = home.split('___')
@@ -532,7 +532,7 @@ export function publicUI (player) {
                         function list (home) {
                         let homeData = getPublicHomeData(home)
                         
-                        let permission = `\n§b§l建築/破壞權限 §f- §b${homeData.land.permission.build}\n§b§l容器權限 §f- §b${homeData.land.permission.container}\n§b§l傳送點設置權限 §f- §b${homeData.land.permission.portal}`
+                        let permission = `\n§b§l建築/破壞權限 §f- §b${homeData.land.permission.build}\n§b§l容器權限 §f- §b${homeData.land.permission.container}\n§b§l傳送點設置權限 §f- §b${homeData.land.permission.portal}\n§b飛行權限 §f- §b${homeData.land.permission.fly}`
                         let description = `§e§l傳送點名稱 §f- §e${homeData.name}\n§a§l擁有者 §f- §a${homeData.land.player}\n§e領地名 §f- §e${homeData.land.name}\n§b領地預設權限 §f- §b${permission}`
                         let form = new ui.ActionFormData()
                             .title(`§e§l伺服器公共傳送點查看 §f- §e${homeData.name}`)

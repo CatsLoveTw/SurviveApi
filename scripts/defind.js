@@ -1,22 +1,5 @@
 // 該檔案僅供定義class等功能。 (我真的傻...忘了class的存在)
 
-class tpaSettingUpdateSuccessful {
-    /**
-     * 
-     * @param {boolean} old 
-     * @param {string | undefined} newTag 
-     */
-    constructor (old, newTag) {
-        this.run = true
-        this.old = old
-        this.newTag = newTag
-    }
-}
-class tpaSettingUpdateError {
-    constructor () {
-        this.run = false
-    }
-}
 export class tpaSetting {
     /**
      * 若沒有數值，可以選擇不填入。
@@ -70,6 +53,23 @@ export class tpaSetting {
      * @returns 
      */
     check_old_and_updateTag (tag) {
+        class tpaSettingUpdateSuccessful {
+            /**
+             * 
+             * @param {boolean} old 
+             * @param {string | undefined} newTag 
+             */
+            constructor (old, newTag) {
+                this.run = true
+                this.old = old
+                this.newTag = newTag
+            }
+        }
+        class tpaSettingUpdateError {
+            constructor () {
+                this.run = false
+            }
+        }
         let data = this.getDataFromTag(tag)
         if (tag.includes('tpaSetting') && !data) {
             return new tpaSettingUpdateSuccessful(true, new tpaSetting(60, false, [], false).transformToTag())
