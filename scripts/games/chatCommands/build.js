@@ -17,7 +17,7 @@ export function build(prefix) {
             let commandtext = message.slice(prefix.length).trim()
             let command = commandtext.split(" ")[0]
             try {
-                let getCommand = chatCommands[command].chatCommands[0]
+                let getCommand = chatCommands[command.toLowerCase()].chatCommands[0]
                 if (getCommand.command && !getCommand.adminOnly) {
                     const error = () => {
                         return logfor(player.name, `§e§l>> §c指令語法錯誤，請參閱 -help ${command}`)

@@ -78,4 +78,23 @@ export function deleteColor(text) {
     return returnText
 }
 
+/**
+ * 
+ * @param {string} text 
+ * @param {string} searchText 
+ */
+export function getSearchTextLength (text, searchText) {
+    let t = text
+    let len = 0
+    while (true) {
+        if (t.indexOf(searchText) != -1) {
+            len++
+            t = t.replace(searchText, "")
+        } else {
+            break;
+        }
+    }
+    return len
+}
+
 export {cmd, cmd_Dimension, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}

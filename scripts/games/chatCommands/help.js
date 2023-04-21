@@ -34,7 +34,7 @@ export const chatCommands = [
                 } else {
                     let CommandList = []
                     try {
-                        let command = chatCommand[args[1]].chatCommands[0]
+                        let command = chatCommand[args[1].toLowerCase()].chatCommands[0]
                         let values = ''
                         for (let value of command.values) {
                             values += `§g§l-${command.command} `

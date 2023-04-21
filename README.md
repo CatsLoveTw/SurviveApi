@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.52-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.53-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,7 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容 (內容 | 影響程度)
-#### 之前 (BETA 2.2.4)
+#### 之前 (BETA 2.2.4 & BETA 2.2.5)
 - API正式邁入BETA階段! | 低
 - 修復領地在特殊情況下無法刪除的問題 | 高
 - 修復金錢排行榜顯示問題 | 中+
@@ -21,17 +21,22 @@
 - 修復領地權限更改訊息在特殊情況下重複發送問題 | 低+
 - 新增黑名單系統 | 中+
 - 銀行系統回歸 | 中+
-
-#### 現在 (BETA 2.2.5 & BETA 2.2.51 & NOW)
 - 新增掉落物&經驗清除功能，減少負擔 | 中
 - 新增領地管理功能 | 中
 - 新增玩家互傳黑名單功能 | 中
 - 修復少數的選單顯示問題 | 中
+
+#### 現在 (BETA 2.2.51 & BETA 2.2.52 & NOW)
 - 修復使用傳送點時顯示問題 | 低+
 - 修改領地飛行機制 (持續給予權限 -> 進入時給予) | 高
 - API進行初步優化，減少執行次數 | 高
 - 修復傳送點因錯誤偵測而遭移除的問題 | 高
 - 公共傳送點選單新增飛行權限顯示 | 低
+- 現在自訂指令系統大小寫皆可偵測 | 低
+- 新增物品標籤功能 **-setItemTag** | 低+
+- 新增死亡訊息 | 低+
+- 修復第一次加入時沒有選單的問題 | 中
+- 更改 -info update 顯示訊息 | 低
 
 ### 測試中內容
 - 領地系統 (多種維度支援)

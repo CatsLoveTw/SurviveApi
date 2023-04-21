@@ -1,6 +1,6 @@
 import { world, system } from '@minecraft/server'
 import * as mc from '@minecraft/server'
-import { cmd, logfor } from '../lib/GametestFunctions'
+import { cmd, log, logfor } from '../lib/GametestFunctions'
 import { tpaSetting } from '../defind'
 
 
@@ -59,7 +59,7 @@ system.runInterval(() => {
             }
         }
             if (!player.hasTag('newPlayer')) {
-
+                log(`§b§l>> §e歡迎 ${player.name} 加入SCC大家庭~`)
                 // tpa設定
                 for (let tag of player.getTags()) {
                     if (tag.includes("tpaSetting")) {
@@ -74,7 +74,6 @@ system.runInterval(() => {
                 for (let board in score) {
                     player.runCommandAsync(`scoreboard players add @s "${board}" ${score[board]}`)
                 }
-                getmenu
                 // 給予選單 / 提示
                 logfor(player.name, '§3§l>> §e本伺服器擁有自訂義指令之功能，請輸入 §b-help §e獲取更多。')
                 getMenu(player)

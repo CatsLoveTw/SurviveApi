@@ -1,8 +1,10 @@
 import * as mc from '@minecraft/server'
-import { worldlog } from '../../lib/function'
+import { getRandomIntInclusive, worldlog } from '../../lib/function'
 import { log, logfor, cmd } from '../../lib/GametestFunctions'
+import { dieMessages } from '../../main'
 
 export function build() {
+    cmd(`gamerule showdeathmessages false`)
     function addBoard(ID, Display) {
         cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
@@ -34,6 +36,8 @@ export function build() {
             }
             player.addTag(JSON.stringify(json))
             player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到死亡點!"}]}`)
+            let dieMessage = dieMessages[getRandomIntInclusive(0, dieMessages.length-1)]
+            log(`§c§l死亡訊息 §f> §b${player.name} §e${dieMessage}`)
         }
     })
 }
