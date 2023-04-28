@@ -1,8 +1,8 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
 import { log, logfor, cmd } from '../../lib/GametestFunctions'
-import { getLandData } from '../land/UI'
 import { getPublicHomeData } from './UI'
+import { getLandData } from '../land/defind'
 
 export function build() {
     function addBoard(ID, Display) {

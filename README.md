@@ -1,6 +1,6 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.53-blue)
-![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.70~1.19.73+-brightgreen)
+![version](https://img.shields.io/badge/Version-BETA--2.2.6-blue)
+![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.80+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
 > **手機與電腦基岩版皆可使用**\
@@ -11,22 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容 (內容 | 影響程度)
-#### 之前 (BETA 2.2.4 & BETA 2.2.5)
-- API正式邁入BETA階段! | 低
-- 修復領地在特殊情況下無法刪除的問題 | 高
-- 修復金錢排行榜顯示問題 | 中+
-- 修復公共/普通傳送點無法隨領地移除的問題 | 高
-- 修復其他維度領地離開偵測異常問題 | 高
-- 飛行權限更改偵測已新增 | 中
-- 修復領地權限更改訊息在特殊情況下重複發送問題 | 低+
-- 新增黑名單系統 | 中+
-- 銀行系統回歸 | 中+
-- 新增掉落物&經驗清除功能，減少負擔 | 中
-- 新增領地管理功能 | 中
-- 新增玩家互傳黑名單功能 | 中
-- 修復少數的選單顯示問題 | 中
-
-#### 現在 (BETA 2.2.51 & BETA 2.2.52 & NOW)
+#### 之前 (BETA 2.2.51 & BETA 2.2.52 & BETA 2.2.53)
 - 修復使用傳送點時顯示問題 | 低+
 - 修改領地飛行機制 (持續給予權限 -> 進入時給予) | 高
 - API進行初步優化，減少執行次數 | 高
@@ -38,10 +23,19 @@
 - 修復第一次加入時沒有選單的問題 | 中
 - 更改 -info update 顯示訊息 | 低
 
+#### 現在
+- 支持版本V1.19.80+ | 必備
+- 掉落物移除上限 400 -> 250 個數量 | 中
+- 新增領地時，已可及時觀看上限格數 | 中
+- 因系統限制，領地最大暫限20000格 | 極高
+- 領地防爆功能已可在公共權限內調整，並新增提示 | 中+
+- 修復可跨維度傳送公共傳送點的問題 | 中+
+- 掉落物移除BUG已修復 | 極高
+- 修復rtp在其他維度傳送時可能遇到的問題 | 中
+
 ### 測試中內容
-- 領地系統 (多種維度支援)
+- 領地系統 (多種維度支援 / 新版架構)
 - 公共領地系統
-- 商店系統
 
 ### 擁有內容
 - 聊天訊息樣式修改

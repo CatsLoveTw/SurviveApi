@@ -40,6 +40,12 @@ export const chatCommands = [
                             if (affect.startsWith('高')) {
                                 score += 3 + (getSearchTextLength(affect, "+") * 0.5)
                             }
+                            if (affect.startsWith('極高')) {
+                                score += 4.5 + (getSearchTextLength(affect, "+") * 0.5)
+                            }
+                            if (affect.startsWith('必備')) {
+                                score += 7 + (getSearchTextLength(affect, "+") * 0.5)
+                            }
                         }
                         let level = Number(i.split(" | ")[1])
                         score += all * level
@@ -53,27 +59,27 @@ export const chatCommands = [
                             affect += '§6§l中'
                             deleteScore = 2
                         }
-                        if (average >= 3 && average < 4.5) {
+                        if (average >= 3 && average < 5) {
                             affect += '§c§l高'
                             deleteScore = 3
                         }
-                        if (average >= 4.5 && average < 5.5) {
+                        if (average >= 5 && average < 7.5) {
                             affect += '§c§l極高'
-                            deleteScore = 4.5
+                            deleteScore = 5
                         }
-                        if (average >= 5.5 && average < 7.5) {
+                        if (average >= 7.5 && average < 9.5) {
                             affect += '§d§l必備'
-                            deleteScore = 5.5
+                            deleteScore = 7.5
                         }
                         // plus
                         let dicimal = average - deleteScore
                         if (dicimal >= 0.5) {
                             affect += "+"
                             if (dicimal >= 0.6) {
-                                affect += (dicimal - 0.5).toFixed(1)
+                                affect += "§f" + (dicimal - 0.5).toFixed(2)
                             }
                         }
-                        affect += "§7 (" + average.toFixed(1) + ")"
+                        affect += "§7 (" + average.toFixed(2) + ")"
                         text += `\n§e§l版本 §7- §e${i.split(" | ")[0]} §7| ${affect}\n`
                         for (let j in updatedata.updates[i]) {
                             let update = updatedata.updates[i][j]
@@ -89,6 +95,12 @@ export const chatCommands = [
                             }
                             if (affect.startsWith('高')) {
                                 displayEffect += `§c${affect}`
+                            }
+                            if (affect.startsWith('極高')) {
+                                displayEffect += `§c${affect}`
+                            }
+                            if (affect.startsWith('必備')) {
+                                displayEffect += `§d${affect}`
                             }
                             text += `§f§l${Number(j)+1}.${context} §f| ${displayEffect}§e\n`
                         }

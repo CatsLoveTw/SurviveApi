@@ -3,111 +3,8 @@ import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
+import { getLandData } from './defind.js'
 export const times = 180 // 設定過期時間 (秒)
-/**
- * 
- * @param {string} land 
- * @returns {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
- */
-function getLandData(land) {
-    // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
-    // name_,_posx|posz/posx2|posz2_,_ID_,_true_,_build|container|action
-    let args = land.split("_,_")
-
-    let postion = args[1].split("/")
-    let x = postion[0].split("|")[0]
-    let x2 = postion[1].split("|")[0]
-    let z = postion[0].split("|")[1]
-    let z2 = postion[1].split("|")[1]
-
-    let permissions = args[4].split("|")
-    /**
-    * @type {[{username: string,permission: {build: string, container: string, portal: string}}]}
-    */
-    let usersList = []
-    if (args[3] != 'true') {
-        let users = args[5].split(":/:")
-        for (let user of users) {
-            let username = user.split(":")[0]
-            let per = user.split(":")[1].split("|")
-            let userPermissions = {
-                build: per[0],
-                container: per[1],
-                portal: per[2],
-                fly: per[3]
-            }
-            usersList.push({ username: username, permission: userPermissions })
-        }
-    }
-    if (args[3] != "true") {
-        return {
-            name: args[0],
-            pos: {
-                x: { 1: x, 2: x2 },
-                z: { 1: z, 2: z2 },
-            },
-            UID: args[2],
-            player: args[3],
-            permission: {
-                build: permissions[0],
-                container: permissions[1],
-                portal: permissions[2],
-                fly: permissions[3]
-            },
-            users: usersList,
-            public: false,
-        }
-    } else {
-        return {
-            name: args[0],
-            pos: {
-                x: { 1: x, 2: x2 },
-                z: { 1: z, 2: z2 },
-            },
-            UID: args[2],
-            player: false,
-            permission: {
-                build: permissions[0],
-                container: permissions[1],
-                portal: permissions[2],
-                fly: permissions[3]
-            },
-            users: false,
-            public: true,
-        }
-    }
-}
-
-/**
- * 
- * @param {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}} landData 
- */
-function transfromLand(landData) {
-    // name_,_posx|posz/posx2|posz2_,_ID_,_player_,_build|container|action_,_players:build|container|action:/:
-    // name_,_posx|posz/posx2|posz2_,_ID_,_true_,_build|container|action
-    let name = landData.name;
-    let pos = landData.pos.x[1] + "|" + landData.pos.z[1] + "/" + landData.pos.x[2] + "|" + landData.pos.z[2]
-    let UID = landData.UID;
-    let player = landData.player
-    if (landData.public) {
-        player = 'true'
-    }
-    let permission = landData.permission.build + "|" + landData.permission.container + "|" + landData.permission.action
-    if (!landData.public) {
-        let userList = []
-        /**
-         * @type {[{username: string,permission: {build: string, container: string, action: string}}]}
-         */
-        let users = landData.users
-        for (let user of users) {
-            let name = user.username
-            let per = user.permission
-            userList.push(`${name}:${per.build}|${per.container}|${per.action}`)
-        }
-        return `${name}_,_${pos}_,_${UID}_,_${player}_,_${permission}_,_${userList.join(":/:")}`
-    }
-    return `${name}_,_${pos}_,_${UID}_,_true_,_${permission}`
-}
 
 /**
  * 
@@ -181,7 +78,7 @@ export function build() {
         let blockPos = events.block.location
         let check = false
         /**
-         * @type {{"landCreate":{"dime": string, "at": number, 'name': string, 'step': number, 'pos': {x: number | false, z: number | false}, 'pos2': {x: number | false, z: number | false}, 'admin': boolean}}}
+         * @type {LandCreateJSON}
          * 
          * Step起始為1
          */
@@ -197,7 +94,7 @@ export function build() {
         if (!check) {
             return;
         }
-        if (json.landCreate.dime == 'over') {
+        if (json.landCreate.dime == 'overworld') {
             cmd(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
         } else if (json.landCreate.dime == 'nether') {
             mc.world.getDimension(mc.MinecraftDimensionTypes.nether).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
@@ -232,7 +129,8 @@ export function build() {
             // button1: 1 button2: 0
             let squ = (Math.abs(json.landCreate.pos.x - blockPos.x) + 1) * (Math.abs(json.landCreate.pos.z - blockPos.z) + 1)
             if (!json.landCreate.admin) {
-                if ((squ + worldlog.getScoreFromMinecraft(player.name, "land_squ").score) > worldlog.getScoreFromMinecraft(player.name, "land_squ_max").score || (worldlog.getScoreFromMinecraft(player.name, 'land_land').score + 1) > worldlog.getScoreFromMinecraft(player.name, 'land_land_max').score) {
+                let check1 = (squ + worldlog.getScoreFromMinecraft(player.name, "land_squ").score) > worldlog.getScoreFromMinecraft(player.name, "land_squ_max").score || (worldlog.getScoreFromMinecraft(player.name, 'land_land').score + 1) > worldlog.getScoreFromMinecraft(player.name, 'land_land_max').score
+                if (check1 || squ > 20000) {
                     player.removeTag(tags)
                     let msg = `§e§l領地系統 §f> §a您正在建造領地 §7-`
                     for (let tag of player.getTags()) {
@@ -240,6 +138,7 @@ export function build() {
                             player.removeTag(tag)
                         }
                     }
+                    if (squ > 20000) return logfor(player.name, `§c§l>> §e因系統限制，領地大小不得大於 §b20000 §e格!`)
                     return logfor(player.name, `§c§l>> §e創建失敗! 領地格數超過上限!`)
                 }
             }
@@ -358,16 +257,21 @@ export function build() {
                     for (let tag of player.getTags()) {
                         if (tag.includes('{"landCreate":{')) {
                             /**
-                            * @type {{"landCreate":{"dime": string, "at": number, 'name': string, 'step': number, 'pos': {x: number | false, z: number | false}, 'pos2': {x: number | false, z: number | false}, 'admin': boolean}}}
-                            * 
-                            */
+                             * @type {LandCreateJSON}
+                             */
                             let json = {}
                             json = JSON.parse(tag)
                             
                             if (json.landCreate.pos) {
+                                let max = worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score - worldlog.getScoreFromMinecraft(player.name, 'land_squ').score
+                                if (max > 20000) max = 20000
                                 let squ = (Math.abs(json.landCreate.pos.x - Math.floor(player.location.x)) + 1) * (Math.abs(json.landCreate.pos.z - Math.floor(player.location.z)) + 1)
+                                let squDisplay = ''
+                                if (squ > max) squDisplay += "§c"
+                                if (squ < max) squDisplay += '§e'
+                                squDisplay += squ
                                 removeSign(msgData.news, player)
-                                let message = `§e§l領地系統 §f> §a您正在建造領地 §7- §b${json.landCreate.name} §f(§e目前格數 §f- §e${squ} §e格§f)`
+                                let message = `§e§l領地系統 §f> §a您正在建造領地 §7- §b${json.landCreate.name} §f(§e目前格數 §f- ${squDisplay}§f/§e${max} §e格§f)`
                                 addSign(message, player, (msgData.maxtick - msgData.tick))
                             }
                         }
@@ -902,13 +806,19 @@ export function build() {
             for (let entity of mc.world.getDimension(dimension).getEntities(query)) {
                 if (!entity.hasTag('exp')) {
                     mc.system.runTimeout(() => {
-                        if (checkNearLand_Pos(entity.location.x, entity.location.z, dimension, 3)) {
+                        let land = checkNearLand_Pos(entity.location.x, entity.location.z, dimension, 3)
+                        if (land && land.permission.tnt == 'true') {
                             mc.world.getDimension(dimension).runCommandAsync(`particle minecraft:huge_explosion_emitter ${entity.location.x} ${entity.location.y} ${entity.location.z}`)
                             for (let entity2 of mc.world.getDimension(dimension).getEntities()) {
                                 if (worldlog.isNear(entity.location, entity2.location, 3)) {
                                     if (entity2.typeId != 'minecraft:tnt' && entity2.typeId != 'minecraft:item') {
-                                        entity2.runCommandAsync(`playSound random.explode @s`)
                                         entity2.runCommandAsync(`damage @s 10`)
+                                    }
+                                }
+                                if (worldlog.isNear(entity.location, entity2.location, 15)) {
+                                    if (entity2.typeId == 'minecraft:player') {
+                                        entity2.runCommandAsync(`playSound random.explode @s`)
+                                        addSign(`§e§l領地系統 §f> §b領地已開啟防爆功能!`, entity2, 45)
                                     }
                                 }
                             }

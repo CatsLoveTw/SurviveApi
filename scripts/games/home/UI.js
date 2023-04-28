@@ -3,8 +3,8 @@ import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 import { checkInLand } from '../land/build.js'
-import { getLandData } from '../land/UI.js'
 import * as playerUI from '../UI/player.js'
+import { Land, getLandData } from '../land/defind.js'
 
 /**
  * 
@@ -31,7 +31,7 @@ export function getHomes(player, dimension) {
 /**
  * 
  * @param {string} home
- * @returns {{landDataCheck: boolean, scoreData: {name: LANDNAME, pos: {x: {1: LANDpos.x, 2: LANDpos.x2},z: {1: LANDpos.z, 2: LANDpos.z2}},UID: LANDUID,player: LANDPLAYRER}, dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean} | undefined}}
+ * @returns {{landDataCheck: boolean, scoreData: HomeScoreData, dime: 'over' | 'nether' | 'end', name: string, pos: {x: string, y: string, z: string}, land: Land | undefined}}
  */
 export function getPublicHomeData(home) {
     let args = home.split('___')
@@ -45,7 +45,7 @@ export function getPublicHomeData(home) {
     let y = e[1]
     let z = e[2]
     /**
-     * @type {{name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string, fly: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string, fly: string}}], public: boolean}}
+     * @type {Land}
      */
     let landData
     let landDataCheck = false
@@ -420,7 +420,15 @@ export function publicUI (player) {
             if (res.selection === 1) {
                 lookForServerPublicHome()
                 function lookForServerPublicHome() {
-                    let homes = worldlog.getScoreboardPlayers('publicHome').disname
+                    let homes2 = worldlog.getScoreboardPlayers('publicHome').disname
+                    let homes = []
+                    if (homes2.length === 0) return logfor(player.name, `§c§l>> §e找不到任何的公共傳送點!`)
+                    for (let home of homes2) {
+                        let data = getPublicHomeData(home)
+                        if (data.dime == getDime) {
+                            homes.push(home)
+                        }
+                    }
                     if (homes.length === 0) return logfor(player.name, `§c§l>> §e找不到任何的公共傳送點!`)
                     let form = new ui.ActionFormData()
                         .title("§e§l伺服器公共傳送點查看")
@@ -532,7 +540,7 @@ export function publicUI (player) {
                         function list (home) {
                         let homeData = getPublicHomeData(home)
                         
-                        let permission = `\n§b§l建築/破壞權限 §f- §b${homeData.land.permission.build}\n§b§l容器權限 §f- §b${homeData.land.permission.container}\n§b§l傳送點設置權限 §f- §b${homeData.land.permission.portal}\n§b飛行權限 §f- §b${homeData.land.permission.fly}`
+                        let permission = `\n§b§l建築/破壞權限 §f- §b${homeData.land.permission.build}\n§b§l容器權限 §f- §b${homeData.land.permission.container}\n§b§l傳送點設置權限 §f- §b${homeData.land.permission.portal}\n§b飛行權限 §f- §b${homeData.land.permission.fly}\n§b防爆功能 §f- §b${homeData.land.permission.tnt}`
                         let description = `§e§l傳送點名稱 §f- §e${homeData.name}\n§a§l擁有者 §f- §a${homeData.land.player}\n§e領地名 §f- §e${homeData.land.name}\n§b領地預設權限 §f- §b${permission}`
                         let form = new ui.ActionFormData()
                             .title(`§e§l伺服器公共傳送點查看 §f- §e${homeData.name}`)

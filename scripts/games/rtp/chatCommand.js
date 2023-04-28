@@ -19,6 +19,7 @@ export const chatCommands = [
             @param {string} message
             */
             function (player, message, error) {
+                if (player.dimension.id != mc.MinecraftDimensionTypes.overworld) return logfor(player.name, `§c§l>> §ertp功能僅支援主世界!`)
                 let rtp_time = worldlog.getScoreFromMinecraft(player.name, 'rtp_time').score
                 if (rtp_time > 0) {
                     return logfor(player.name, `§c§l>> §e您的隨機傳送冷卻還未結束! §f(§e剩餘 §b${rtp_time} §e秒§f)`)

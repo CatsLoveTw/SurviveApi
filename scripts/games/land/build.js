@@ -3,8 +3,7 @@ import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 import * as land from './land.js'
-import { getLandData } from './UI.js'
-
+import { getLandData } from './defind.js'
 
 export function build() {
     function addBoard(ID, Display) {
@@ -135,7 +134,7 @@ export function checkNearLand_Pos(x, z, dimeID, near) {
                 let checkX = Math.abs(i - x)
                 let checkZ = Math.abs(j - z)
                 if (checkX <= near && checkZ <= near) {
-                    return true
+                    return data;
                 }
             }
         }

@@ -2,10 +2,8 @@ import { world, system } from "@minecraft/server"
 import * as mc from "@minecraft/server"
 import * as ui from '@minecraft/server-ui'
 import { cmd, log, logfor } from './lib/GametestFunctions.js'
-import { randomInt, worldlog } from "./lib/function.js"
 import * as chatCommnad from './games/chatCommands/build.js'
 import * as land from './games/land/build.js'
-import { playerUI } from "./games/UI/player.js"
 import * as titleraw from './games/titleraw/build.js'
 import * as tpa from './games/tpa/build.js'
 import * as bank from './games/bank/build.js'
@@ -20,21 +18,11 @@ import * as money_leaderboard from './games/money_leaderboard/build.js'
 import * as test from './games/test/build.js'
 import "./games/ban/build.js"
 import "./system/import.js"
-
-export const version = "BETA V2.2.53"
-export const updateDate = '2023/4/21 (Fri.)'
+// land home
+export const version = "BETA V2.2.6"
+export const updateDate = '2023/4/28 (Fri.)'
 export const updates = {
-    "BETA V2.2.4 | 3.25": [
-        "API正式邁入BETA階段! | 低",
-        "修復領地在特殊情況下無法刪除的問題 | 高",
-        "修復金錢排行榜顯示問題 | 中+",
-        "修復公共 / 普通傳送點無法隨領地移除的問題 | 高",
-        "修復其他維度領地離開偵測異常問題 | 高",
-        "飛行權限更改偵測已新增 | 中",
-        "修復領地權限更改訊息在特殊情況下重複發送問題 | 低+",
-        "新增黑名單系統 | 中+",
-        "銀行系統回歸 | 中+",
-    ],
+    // "版本號 | 加權值": []
     "BETA V2.2.5 | 0.65": [
         "新增掉落物&經驗清除功能 | 中",
         "新增領地管理功能 (管理員選單) | 中",
@@ -57,6 +45,16 @@ export const updates = {
         "更改 -info update 顯示訊息 | 低",
         "新增首次加入訊息 | 低+"
     ],
+    "BETA 2.2.6 | 2.45": [
+        "支持版本V1.19.80+ | 必備",
+        "掉落物移除上限 400 -> 250 個數量 | 中",
+        "新增領地時，已可及時觀看上限格數 | 中",
+        "因系統限制，領地最大暫限20000格 | 極高",
+        "領地防爆功能已可在公共權限內調整，並新增提示 | 中+",
+        "修復可跨維度傳送公共傳送點的問題 | 中+",
+        "掉落物移除BUG已修復 | 極高+",
+        "修復rtp在其他維度傳送時可能遇到的問題 | 中",
+    ]
 }
 export const prefix = '-'
 /**
