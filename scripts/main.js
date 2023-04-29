@@ -19,32 +19,10 @@ import * as test from './games/test/build.js'
 import "./games/ban/build.js"
 import "./system/import.js"
 // land home
-export const version = "BETA V2.2.6"
-export const updateDate = '2023/4/28 (Fri.)'
+export const version = "BETA V2.2.61"
+export const updateDate = '2023/4/29 (Sat.)'
 export const updates = {
     // "版本號 | 加權值": []
-    "BETA V2.2.5 | 0.65": [
-        "新增掉落物&經驗清除功能 | 中",
-        "新增領地管理功能 (管理員選單) | 中",
-        "新增tpa黑名單系統 | 中",
-    ],
-    "BETA 2.2.51 | 1.875": [
-        "修復使用傳送點時顯示問題 | 低+",
-        "修改領地飛行機制 (持續給予權限 -> 進入時給予) | 高",
-        "API進行初步優化，減少執行次數 | 高",
-    ],
-    "BETA 2.2.52 | 0.875": [
-        "修復傳送點因錯誤偵測而遭移除的問題 | 高",
-        "公共送點傳選單新增飛行權限顯示 | 低",
-    ],
-    "BETA 2.2.53 | 0.6": [
-        "現在自訂指令系統大小寫皆可偵測 | 低",
-        "新增物品標籤功能 -setItemTag | 低+",
-        "新增死亡訊息 | 低+",
-        "修復第一次加入時沒有選單的問題 | 中",
-        "更改 -info update 顯示訊息 | 低",
-        "新增首次加入訊息 | 低+"
-    ],
     "BETA 2.2.6 | 2.45": [
         "支持版本V1.19.80+ | 必備",
         "掉落物移除上限 400 -> 250 個數量 | 中",
@@ -54,6 +32,11 @@ export const updates = {
         "修復可跨維度傳送公共傳送點的問題 | 中+",
         "掉落物移除BUG已修復 | 極高+",
         "修復rtp在其他維度傳送時可能遇到的問題 | 中",
+    ],
+    "BETA 2.2.61 | 2.5": [
+        "修復無法新增領地的問題 | 必備",
+        "修復領地刪除時依然可飛行的問題 | 高+",
+        "修復建造領地時，歸還方塊不同問題 | 中+"
     ]
 }
 export const prefix = '-'

@@ -148,6 +148,7 @@ export function UI(player) {
                                             if (tag.startsWith('{"inLand":') && tag.includes(JSON.stringify(land.pos)) && tag.includes(land.UID) && tag.includes(land.name)) {
                                                 pl.removeTag(tag)
                                                 pl.runCommandAsync(`ability @s mayfly false`)
+                                                land.removefly(pl)
                                                 logfor(pl.name, `§3§l>> §e所在領地被刪除!`)
                                             }
                                         }
@@ -891,6 +892,7 @@ export function listLandUI(player) {
                                         if (tag.startsWith('{"inLand":') && tag.includes(JSON.stringify(land.pos)) && tag.includes(land.UID) && tag.includes(land.name)) {
                                             pl.removeTag(tag)
                                             pl.runCommandAsync(`ability @s mayfly false`)
+                                            land.removefly(pl)
                                             logfor(pl.name, `§3§l>> §e所在領地被刪除!`)
                                         }
                                     }

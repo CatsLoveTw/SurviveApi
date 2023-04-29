@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.6-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.61-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.80+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,19 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容 (內容 | 影響程度)
-#### 之前 (BETA 2.2.51 & BETA 2.2.52 & BETA 2.2.53)
-- 修復使用傳送點時顯示問題 | 低+
-- 修改領地飛行機制 (持續給予權限 -> 進入時給予) | 高
-- API進行初步優化，減少執行次數 | 高
-- 修復傳送點因錯誤偵測而遭移除的問題 | 高
-- 公共傳送點選單新增飛行權限顯示 | 低
-- 現在自訂指令系統大小寫皆可偵測 | 低
-- 新增物品標籤功能 **-setItemTag** | 低+
-- 新增死亡訊息 | 低+
-- 修復第一次加入時沒有選單的問題 | 中
-- 更改 -info update 顯示訊息 | 低
-
-#### 現在
+#### 之前 (BETA 2.2.6)
 - 支持版本V1.19.80+ | 必備
 - 掉落物移除上限 400 -> 250 個數量 | 中
 - 新增領地時，已可及時觀看上限格數 | 中
@@ -32,6 +20,11 @@
 - 修復可跨維度傳送公共傳送點的問題 | 中+
 - 掉落物移除BUG已修復 | 極高
 - 修復rtp在其他維度傳送時可能遇到的問題 | 中
+
+#### 現在
+- 修復無法新增領地的問題 | 必備
+- 修復領地刪除時依然可飛行的問題 | 高+
+- 修復建造領地時，歸還方塊不同問題 | 中+
 
 ### 測試中內容
 - 領地系統 (多種維度支援 / 新版架構)
@@ -58,6 +51,7 @@
 - 金錢排行榜系統
 ### 即將更新
 ### 未修復的問題
+- 實測未發現問題 - 選單內容在特殊情況下無法開啟 | 回報者:litebar423
 ### 提醒
 - 本專案所有內容參考於 [官方文本](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/)
 - 本專案可自由下載使用 但請勿**聲稱原作**

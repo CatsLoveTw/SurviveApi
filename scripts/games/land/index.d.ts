@@ -41,7 +41,7 @@ declare interface landUser {
 declare type landDimension = 'overworld' | 'nether' | 'end'
 
 
-declare interface LandCreateJSON {
+declare type LandCreateJSON = {
     "landCreate": {
         "dime": landDimension,
         "at": number,

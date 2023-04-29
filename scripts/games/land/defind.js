@@ -20,7 +20,7 @@ export class Land {
         this.player = player
         this.permission = permission
         this.users = users
-        this.public = Public
+        this.Public = Public
         this.old = old
     }
     /**
@@ -32,7 +32,7 @@ export class Land {
         let pos = this.pos.x[1] + "|" + this.pos.z[1] + "/" + this.pos.x[2] + "|" + this.pos.z[2]
         let UID = this.UID;
         let player = this.player
-        if (this.public) {
+        if (this.Public) {
             player = 'true'
         }
         let permission = ''
@@ -40,7 +40,7 @@ export class Land {
             permission += this.permission[i] + "|"
         }
         permission = permission.slice(0, -1) // 移除最後一個 |
-        if (!this.public) {
+        if (!this.Public) {
             let userList = []
             if (this.users) {
                 let users = this.users
@@ -58,6 +58,67 @@ export class Land {
             return `${name}_,_${pos}_,_${UID}_,_${player}_,_${permission}_,_${userList.join(":/:")}`
         }
         return `${name}_,_${pos}_,_${UID}_,_true_,_${permission}`
+    }
+}
+
+/**
+ * 
+ * @param {string} x1 
+ * @param {string} x2 
+ * @param {string} z1 
+ * @param {string} z2 
+ * @returns {landPosition}
+ */
+export function newLandPosition (x1, x2, z1, z2) {
+    return {
+        x: {
+            1: x1,
+            2: x2
+        },
+        z: {
+            1: z1,
+            2: z2
+        }
+    }
+}
+
+/**
+ * 
+ * @param {string} build 
+ * @param {string} container 
+ * @param {string} portal 
+ * @param {string} fly 
+ * @param {string} tnt 
+ * @returns {landPermission}
+ */
+export function newLandPermission (build, container, portal, fly, tnt) {
+    return {
+        build,
+        container,
+        portal,
+        fly,
+        tnt
+    }
+}
+
+/**
+ * 
+ * @param {string} userName 
+ * @param {string} build 
+ * @param {string} container 
+ * @param {string} portal 
+ * @param {string} fly 
+ * @returns {landUser}
+ */
+export function newLandUser (userName, build, container, portal, fly) {
+    return {
+        username: userName,
+        permission: {
+            build,
+            container,
+            portal,
+            fly
+        }
     }
 }
 
@@ -192,7 +253,7 @@ export class LandCreate {
      * @param {landDimension} dime 領地維度
      * @param {number} at 開始時間 (請使用 Date.getTime()) 
      * @param {string} name 領地名稱 
-     * @param {number} step 建造步驟 
+     * @param {number} step 建造步驟
      * @param {boolean} admin 是否為公共領地
      */
     constructor (dime, at, name, step, admin) {

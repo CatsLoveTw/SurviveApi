@@ -73,11 +73,13 @@ export const chatCommands = [
                         }
                         // plus
                         let dicimal = average - deleteScore
-                        if (dicimal >= 0.5) {
+                        let spread = dicimal
+                        while (spread >= 0.5) {
+                            spread -= 0.5
                             affect += "+"
-                            if (dicimal >= 0.6) {
-                                affect += "§f" + (dicimal - 0.5).toFixed(2)
-                            }
+                        }
+                        if (spread >= 0.01) {
+                            affect += "§f" + (spread).toFixed(2)
                         }
                         affect += "§7 (" + average.toFixed(2) + ")"
                         text += `\n§e§l版本 §7- §e${i.split(" | ")[0]} §7| ${affect}\n`

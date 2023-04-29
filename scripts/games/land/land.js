@@ -3,7 +3,7 @@ import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
-import { getLandData } from './defind.js'
+import { Land, getLandData, newLandPermission, newLandPosition, newLandUser } from './defind.js'
 export const times = 180 // 設定過期時間 (秒)
 
 /**
@@ -18,6 +18,30 @@ export function getAdmin(player) {
     return true
 }
 
+/**
+* 
+* @param {mc.Player} player 
+*/
+export function removefly (player) {
+    player.runCommandAsync('ability @s mayfly false')
+    let y = 0
+    for (let i=-64; i < player.location.y; i++) {
+        try {
+            let x = Math.trunc(player.location.x)
+            let z = Math.trunc(player.location.z)
+            let block = mc.world.getDimension(player.dimension.id).getBlock({x: x, y: i, z: z})
+            if (!block) return;
+            if (block.typeId != 'minecraft:air') {
+                y = i
+            }
+        } catch (e) {}
+    }
+    let playerY = Math.trunc(player.location.y)
+    if (Math.abs(playerY - y) > 3) {
+        player.runCommandAsync(`tp @s ~ ${y+1} ~`)
+        player.runCommandAsync(`effect @s resistance 1 255 true`)
+    }
+}
 
 export function build() {
     /**
@@ -26,31 +50,6 @@ export function build() {
      */
     function addfly (player) {
         player.runCommandAsync('ability @s mayfly true')
-    }
-    
-    /**
-     * 
-     * @param {mc.Player} player 
-     */
-    function removefly (player) {
-        player.runCommandAsync('ability @s mayfly false')
-        let y = 0
-        for (let i=-64; i < player.location.y; i++) {
-            try {
-                let x = Math.trunc(player.location.x)
-                let z = Math.trunc(player.location.z)
-                let block = mc.world.getDimension(player.dimension.id).getBlock({x: x, y: i, z: z})
-                if (!block) return;
-                if (block.typeId != 'minecraft:air') {
-                    y = i
-                }
-            } catch (e) {}
-        }
-        let playerY = Math.trunc(player.location.y)
-        if (Math.abs(playerY - y) > 3) {
-            player.runCommandAsync(`tp @s ~ ${y+1} ~`)
-            player.runCommandAsync(`effect @s resistance 1 255 true`)
-        }
     }
 
     // 偵測是否建造過久 / 玩家在其他維度建造領地隻偵測
@@ -101,7 +100,17 @@ export function build() {
         } else if (json.landCreate.dime == 'end') {
             mc.world.getDimension(mc.MinecraftDimensionTypes.theEnd).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
         }
-        player.runCommandAsync(`give @s ${events.block.typeId}`)
+        /**
+         * @type {mc.EntityInventoryComponent}
+         */
+        let getINV = player.getComponent("inventory")
+        let slot = getINV.container.getSlot(player.selectedSlot)
+        let item = slot.getItem()
+        if (slot.isValid) {
+            item = events.block.getItemStack(1, true)
+        }
+        item.amount = 1
+        player.getComponent("inventory").container.addItem(item)
         if (Number(json.landCreate.step) == 1) {
             logfor(player.name, `§a§l>> §e成功設置第一點! §f(§bx§f:§b${blockPos.x} §7| §bz§f:§b${blockPos.z}§f)`)
             player.removeTag(tags)
@@ -215,12 +224,15 @@ export function build() {
                             IDs.forEach(item => max = item > max ? item : max)
                             ID = max + 1
                         }
+                        let landPosition = newLandPosition(land.pos.x, blockPos.x, land.pos.z, blockPos.z)
+                        let landPermission = newLandPermission('false', 'false', 'false', 'false', 'false')
                         if (!json.landCreate.admin) {
-                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_${player.name}_,_false|false|false|false_,_${player.name}:true|true|true|true`
+                            let landUser = newLandUser(player.name, 'true', 'true', 'true', 'true')
+                            landData = new Land(land.name, landPosition, ID, player.name, landPermission, [landUser], false, false).transfromLand()
                         } else {
-                            landData = `${land.name}_,_${land.pos.x}|${land.pos.z}/${blockPos.x}|${blockPos.z}_,_${ID}_,_true_,_false|false|false|false`
+                            landData = new Land(land.name, landPosition, ID, false, landPermission, false, true, false).transfromLand()
                         }
-                        if (json.landCreate.dime == 'over') {
+                        if (json.landCreate.dime == 'overworld') {
                             cmd(`scoreboard players set "${landData}" lands ${ID}`)
                         }
                         if (json.landCreate.dime == 'nether') {
