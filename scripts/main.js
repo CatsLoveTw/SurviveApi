@@ -18,6 +18,8 @@ import * as money_leaderboard from './games/money_leaderboard/build.js'
 import * as test from './games/test/build.js'
 import "./games/ban/build.js"
 import "./system/import.js"
+import "./system/account/index.js"
+
 // land home
 export const version = "BETA V2.2.61"
 export const updateDate = '2023/4/29 (Sat.)'
@@ -37,6 +39,11 @@ export const updates = {
         "修復無法新增領地的問題 | 必備",
         "修復領地刪除時依然可飛行的問題 | 高+",
         "修復建造領地時，歸還方塊不同問題 | 中+"
+    ],
+    "BETA 2.2.62 | 2": [
+        "修復新增領地時，方塊不會歸還的問題 | 極高",
+        "修復公共領地失效的問題 | 高+",
+        "新增帳號系統 (僅供自己使用) | 低"
     ]
 }
 export const prefix = '-'

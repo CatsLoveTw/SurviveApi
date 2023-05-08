@@ -29,7 +29,7 @@ const titlelog = function(message) {
 
 const log = function(message) {
     let okay_message = message.toString().replaceAll('\"',"''").replaceAll('\\',"/")
-    mc.world.getDimension("overworld").runCommandAsync(`tellraw @a {"rawtext":[{"text":"${okay_message}"}]}`)
+    mc.world.sendMessage(okay_message)
 }
 
 const addSign = function(message, player, tick) {

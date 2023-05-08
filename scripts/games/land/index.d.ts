@@ -17,12 +17,12 @@ declare interface landPosition {
  * fly 飛行權限\
  * tnt 爆炸防禦權限
  */
-declare interface landPermission {
-    build: string,
-    container: string,
-    portal: string,
-    fly: string,
-    tnt: string,
+declare class landPermission {
+    build: string;
+    container: string;
+    portal: string;
+    fly: string;
+    tnt: string;
 }
 
 /**

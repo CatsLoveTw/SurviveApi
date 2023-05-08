@@ -347,6 +347,18 @@ class worldlogs {
         }
         return false
     }
+    
+    /**
+     * 
+     * @param {{id: string, disname: string}[]} scoreboards 
+     */
+    addScoreBoards (scoreboards) {
+        for (let scoreboard of scoreboards) {
+            try {
+                cmd(`scoreboard objectives add ${scoreboard.id} dummy ${scoreboard.disname}`)
+            } catch {}
+        }
+    }
 }
 /**
  * 方便好用的Class - 取得Minecraft各種資料 | 擁有中文註解

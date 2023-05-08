@@ -105,12 +105,12 @@ export function build() {
          */
         let getINV = player.getComponent("inventory")
         let slot = getINV.container.getSlot(player.selectedSlot)
+        // 該變數紀錄物品被放置之前的數據，因此不用調整
         let item = slot.getItem()
-        if (slot.isValid) {
-            item = events.block.getItemStack(1, true)
-        }
-        item.amount = 1
-        player.getComponent("inventory").container.addItem(item)
+        // 測試後發現同時間設定物品會發生問題
+        mc.system.runTimeout(() => {
+            slot.setItem(item)
+        }, 2)
         if (Number(json.landCreate.step) == 1) {
             logfor(player.name, `§a§l>> §e成功設置第一點! §f(§bx§f:§b${blockPos.x} §7| §bz§f:§b${blockPos.z}§f)`)
             player.removeTag(tags)
@@ -343,7 +343,7 @@ export function build() {
                                         getPer.fly = 'true'
                                     }
                                     // 偵測設定權限
-                                    if (!data.public) {
+                                    if (!data.Public) {
                                         for (let user of data.users) {
                                             if (user.username == player.name) {
                                                 getPer.build = user.permission.build
@@ -386,7 +386,7 @@ export function build() {
                                     if (perList.length > 0) {
                                         displayPer = `§e§l擁有的權限§f: §a${perList.join(" §7| §a")}`
                                     }
-                                    if (!data.public) {
+                                    if (!data.Public) {
                                         if (!getAdmin(player)) {
                                             msg = `\n§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地 §f- §e${data.name} ${displayPer}`
                                         } else {
@@ -420,7 +420,7 @@ export function build() {
                 }
             }
         } catch { }
-    }, 2)
+    }, 3)
 
     // 領地權限更改偵測
     mc.system.runInterval(() => {
@@ -504,7 +504,7 @@ export function build() {
                 }
             }
         }
-    }, 5)
+    }, 15)
 
     // 領地公共權限更改偵測
     mc.system.runInterval(() => {
@@ -530,13 +530,8 @@ export function build() {
                         if (landData.UID != getLand.UID) { check = false; };
                         if (landData.player != getLand.player) { check = false; };
                         if ((landData.pos.x[1] != getLand.pos.x[1]) && (landData.pos.x[2] != getLand.pos.x[2]) && (landData.pos.z[1] != getLand.pos.z[1]) && (landData.pos.z[2] != getLand.pos.z[2])) { check = false; };
-                        if (check) {
+                        if (check && getLand.Public) {
                             if (landData.permission != getLand.permission) {
-                                for (let user of getLand.users) {
-                                    if (user.username == player.name) {
-                                        return;
-                                    }
-                                }
                                 if (getLand.permission.build != data.inLand.per.build) {
                                     logfor(player.name, `§3§l>> §e偵測到領地 §b建築/破壞權限 §e更改`)
                                     player.removeTag(tag)
@@ -564,7 +559,7 @@ export function build() {
                                     player.addTag(JSON.stringify(data))
                                     return;
                                 }
-                                if (getLand.permission.build != data.inLand.per.build) {
+                                if (getLand.permission.fly != data.inLand.per.fly) {
                                     logfor(player.name, `§3§l>> §e偵測到您的 §b飛行權限 §e更改`)
                                     player.removeTag(tag)
                                     data.inLand.per.fly = getLand.permission.fly
@@ -583,7 +578,7 @@ export function build() {
                 }
             }
         }
-    }, 5)
+    }, 15)
 
     // 偵測離開領地
     mc.system.runInterval(() => {
@@ -637,7 +632,7 @@ export function build() {
                         } else {
                             for (let tag of player.getTags()) {
                                 let msg = ''
-                                if (!data.public) {
+                                if (!data.Public) {
                                     msg = `§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地`
                                 } else {
                                     msg = `§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name}`
@@ -658,7 +653,7 @@ export function build() {
                         } else {
                             for (let tag of player.getTags()) {
                                 let msg = ''
-                                if (!data.public) {
+                                if (!data.Public) {
                                     msg = `§e§l領地系統 §f> §a您已進入了 §b${data.player} §e的領地`
                                 } else {
                                     msg = `§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name}`
@@ -724,7 +719,7 @@ export function build() {
             getPer.container = 'true'
         }
         // 偵測設定權限
-        if (!landData.public) {
+        if (!landData.Public) {
             for (let user of landData.users) {
                 if (user.username == player.name) {
                     getPer.container = user.permission.container
@@ -756,7 +751,7 @@ export function build() {
             getPer.build = "true"
         }
         // 偵測設定權限
-        if (!data.public) {
+        if (!data.Public) {
             for (let user of data.users) {
                 if (user.username == player.name) {
                     getPer.build = user.permission.build
@@ -788,7 +783,7 @@ export function build() {
             getPer.build = "true"
         }
         // 偵測設定權限
-        if (!data.public) {
+        if (!data.Public) {
             for (let user of data.users) {
                 if (user.username == player.name) {
                     getPer.build = user.permission.build
@@ -830,7 +825,7 @@ export function build() {
                                 if (worldlog.isNear(entity.location, entity2.location, 15)) {
                                     if (entity2.typeId == 'minecraft:player') {
                                         entity2.runCommandAsync(`playSound random.explode @s`)
-                                        addSign(`§e§l領地系統 §f> §b領地已開啟防爆功能!`, entity2, 45)
+                                        addSign(`§e§l領地系統 §f> §b領地已開啟防爆功能!`, entity2, 80)
                                     }
                                 }
                             }
