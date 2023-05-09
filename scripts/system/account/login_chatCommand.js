@@ -8,10 +8,10 @@ export const chatCommands = [
         command: 'login',
         des: '登入帳戶 (特殊)',
         values: [
-            ["<帳號OMID>"],
-            ["<帳號密碼>"]
+            ["<帳號OMID> <帳號密碼>"],
         ],
         adminOnly: false,
+        loginOnly: false,
         run:
             /**
             @param {mc.Player} player

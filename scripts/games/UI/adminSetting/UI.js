@@ -42,7 +42,7 @@ export function UI(player) {
                                     let allPlayers = []
                                     let form = new ui.ActionFormData()
                                         .title("§e§l新增管理員 §f- §e線上玩家")
-                                    for (let player of mc.world.getPlayers()) {
+                                    for (let player of worldlog.getPlayers()) {
                                         if (!player.hasTag('admin')) {
                                             allPlayers.push(player)
                                             form.button(player.name)

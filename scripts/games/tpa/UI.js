@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
-import { isNum } from '../../lib/function';
+import { isNum, worldlog } from '../../lib/function';
 import { checkPoint, log, logfor } from '../../lib/GametestFunctions';
 import { tpaSetting } from '../../defind';
 
@@ -22,7 +22,7 @@ export function UI (player) {
             if (res.canceled || !res) return;
             if (res.selection === 0) {
                 let players = []
-                for (let pl of mc.world.getPlayers()) {
+                for (let pl of worldlog.getPlayers()) {
                     if (pl.name != player.name) {
                         players.push(pl)
                     }

@@ -1,5 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { worldlog } from '../../lib/function'
 
 export const chatCommands = [
     // 設定請求Tag - {"homeShare": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}} 
@@ -13,6 +14,7 @@ export const chatCommands = [
             ['delete']
         ],
         adminOnly: false,
+        loginOnly: true,
         run:
             /**
             @param {mc.Player} player
@@ -40,7 +42,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.homeShared.source) {
                                     getSource = player
                                 }
@@ -97,7 +99,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.homeShared.source) {
                                     getSource = player
                                 }
@@ -152,7 +154,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let sharedName
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.homeShare.source) {
                                     getSource = player
                                 }

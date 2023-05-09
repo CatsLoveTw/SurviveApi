@@ -1,5 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { worldlog } from '../../lib/function'
 
 export const chatCommands = [
     // 設定Tag - {"tpaSetting": {"dontDistrub": boolean, "sec": number}}
@@ -16,6 +17,7 @@ export const chatCommands = [
             ["delete"]
         ],
         adminOnly: false,
+        loginOnly: true,
         run:
             /**
             @param {mc.Player} player
@@ -43,7 +45,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.tpaReqed.source) {
                                     getSource = player
                                 }
@@ -136,7 +138,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.tpaReqed.source) {
                                     getSource = player
                                 }
@@ -193,7 +195,7 @@ export const chatCommands = [
                              * @type {mc.Player}
                              */
                             let reqed
-                            for (let player of mc.world.getPlayers()) {
+                            for (let player of worldlog.getPlayers()) {
                                 if (player.name == json.tpaReq.source) {
                                     getSource = player
                                 }

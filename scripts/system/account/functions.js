@@ -2,11 +2,12 @@ import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function.js'
 import { addSign, cmd, getSign, log, logfor } from '../../lib/GametestFunctions.js'
 import { loginSession } from './classes.js'
+import { removeSign } from '../../lib/GametestFunctions.js'
 
 /**
  * 取得帳戶資訊
  * @param {number} id 玩家帳戶ID 
- * @returns 
+ * @returns 若找不到ID資料則回傳false
  */
 export function getAccountData(id) {
     let accounts = worldlog.getScoreboardPlayers('accounts')
@@ -48,7 +49,7 @@ export function checkLogin(player) {
 export function login(player, omid, password) {
     for (let tag of player.getTags()) {
         if (tag.startsWith('{"loginSession":')) {
-            player.removeTag(tag)
+            return logfor(player.name, '§c§l>> §e請先登出後再切換帳戶!')
         }
     }
     let accounts = worldlog.getScoreboardPlayers('accounts').score
@@ -76,13 +77,10 @@ export function login(player, omid, password) {
 export function newPlayer(player) {
     let signs = getSign(player)
     if (signs.length > 0) {
-        for (let sign of signs) {
-            if (sign.news.startsWith('§c§l請登入帳戶以繼續遊玩本伺服!')) {
-                player.removeTag(JSON.stringify(sign))
-            }
-        }
+        removeSign("§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>", player)
     }
     addSign('§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>', player, 21)
+    player.runCommandAsync(`ability @s mayfly false`)
     player.runCommandAsync(`effect @s weakness 3 255 true`)
     player.runCommandAsync(`effect @s blindness 3 255 true`)
     player.runCommandAsync(`effect @s slowness 3 255 true`)

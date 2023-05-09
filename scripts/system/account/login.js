@@ -15,7 +15,8 @@ import { loginSession } from './classes.js'
 world.events.worldInitialize.subscribe(() => {
     worldlog.addScoreBoards([
         {id: 'accounts', disname: "帳號儲存"},
-        {id: 'accountActive', disname: "帳號系統啟用確認"}
+        {id: 'accountActive', disname: "帳號系統啟用確認"},
+        {id: 'websocketcheck', disname: 'ws連線確認'}
     ])
 })
 
@@ -33,20 +34,22 @@ mc.system.runInterval(() => {
             let check = false
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"loginSession":')) {
+                    function error () {
+                        player.removeTag(tag)
+                        logfor(player.name, `§c§l>> §e您的帳號因未知原因被刪除!`)
+                        player.runCommandAsync(`tp @s 0 300 0`)
+                    }
                     check = true
                     let data = loginSession.transformData(tag)
-                    if (!data) return;
 
                     if (data.id == -1) {
                         newPlayer(player)
                     }
 
-                    if (!getAccountData(data.id) && data.loginSession.id != -1) {
+                    if (!data) {
                         mc.system.runTimeout(() => {
-                            if (!getAccountData(data.id) && data.loginSession.id != -1 && player.hasTag(tag)) {
-                                player.removeTag(tag)
-                                logfor(player.name, `§c§l>> §e您的帳號因未知原因被刪除!`)
-                                player.runCommandAsync(`tp @s 0 300 0`)
+                            if (!data && player.hasTag(tag)) {
+                                error()
                             }
                         }, 15)
                     }
@@ -54,9 +57,7 @@ mc.system.runInterval(() => {
                     if (getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) {
                         mc.system.runTimeout(() => {
                             if ((getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) && player.hasTag(tag)) {
-                                player.removeTag(tag)
-                                logfor(player.name, `§c§l>> §e您的帳號因未知原因被刪除!`)
-                                player.runCommandAsync(`tp @s 0 300 0`)
+                                error()
                             }
                         }, 15)
                     }

@@ -16,7 +16,7 @@ export function build () {
     } catch { }
 
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             if (worldlog.getScoreFromMinecraft(player.name, 'rtp_time').score > 0) {
                 player.runCommandAsync(`scoreboard players remove @s rtp_time 1`)
                 if (worldlog.getScoreFromMinecraft(player.name, 'rtp_time').score - 1 == 0) {

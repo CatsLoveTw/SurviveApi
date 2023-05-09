@@ -2,6 +2,7 @@ import { world } from "@minecraft/server"
 import * as mc from "@minecraft/server"
 import { cmd, log, logfor } from './GametestFunctions.js'
 import { leaderboard } from "./leaderboard.js"
+import { checkAccountActive, checkLogin, newPlayer } from "../system/account/functions.js"
 /**
  * 
  * @param {never} val 
@@ -357,6 +358,31 @@ class worldlogs {
             try {
                 cmd(`scoreboard objectives add ${scoreboard.id} dummy ${scoreboard.disname}`)
             } catch {}
+        }
+    }
+
+    /**
+     * 取得玩家
+     * @param {boolean} includeNotLogin 是否包含未登入玩家 (預設為false)
+     */
+    getPlayers (includeNotLogin = false) {
+        let players = mc.world.getAllPlayers()
+        if (includeNotLogin) {
+            return players
+        }
+
+        if (!includeNotLogin && !checkAccountActive()) {
+            return players
+        }
+
+        if (!includeNotLogin) {
+            let newPlayers = []
+            for (let pl of players) {
+                if (checkLogin(pl)) {
+                    newPlayers.push(pl)
+                }
+            }
+            return newPlayers
         }
     }
 }

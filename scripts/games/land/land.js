@@ -3,7 +3,7 @@ import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
-import { Land, getLandData, newLandPermission, newLandPosition, newLandUser } from './defind.js'
+import { Land, LandCreate, getLandData, newLandPermission, newLandPosition, newLandUser } from './defind.js'
 export const times = 180 // 設定過期時間 (秒)
 
 /**
@@ -52,14 +52,17 @@ export function build() {
         player.runCommandAsync('ability @s mayfly true')
     }
 
-    // 偵測是否建造過久 / 玩家在其他維度建造領地隻偵測
+    // 偵測是否建造過久 / 玩家在其他維度建造領地之偵測
     mc.system.runInterval(() => {
-        let players = mc.world.getPlayers();
+        let players = worldlog.getPlayers();
         for (let player of players) {
             let getTimes = new Date().getTime(); // unixTime 毫秒
             for (let tag of player.getTags()) {
                 // createTag: {"landCreate":{"at": number(unixtime), "name": string, "step": number(步驟進行)}}
                 if (tag.includes('{"landCreate":{')) {
+                    /**
+                     * @type {{landCreate: LandCreate}}
+                     */
                     let data = JSON.parse(tag)
                     // 偵測過期時間 (3分鐘)
                     if ((getTimes - data.landCreate.at) >= (times * 1000)) {
@@ -304,7 +307,7 @@ export function build() {
                 let getAllLand = worldlog.getScoreboardPlayers(landID).disname
                 for (let land of getAllLand) {
                     let data = getLandData(land)
-                    for (let player of mc.world.getPlayers()) {
+                    for (let player of worldlog.getPlayers()) {
                         let check = true
                         for (let tag of player.getTags()) {
                             if (tag.startsWith('{"inLand":')) {
@@ -424,7 +427,7 @@ export function build() {
 
     // 領地權限更改偵測
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"inLand":')) {
                     /**
@@ -508,7 +511,7 @@ export function build() {
 
     // 領地公共權限更改偵測
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"inLand":') && !getAdmin(player)) {
                     /**
@@ -584,7 +587,7 @@ export function build() {
     mc.system.runInterval(() => {
         // §
         try {
-            for (let player of mc.world.getPlayers()) {
+            for (let player of worldlog.getPlayers()) {
                 for (let tag of player.getTags()) {
                     if (tag.startsWith('{"inLand":')) {
                         /**

@@ -11,6 +11,7 @@ export const chatCommands = [
             [{"update": "§e§l更新內容"}],
         ],
         adminOnly: false,
+        loginOnly: false,
         run:
             /**
             @param {mc.Player} player

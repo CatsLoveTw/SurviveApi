@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 import * as chatCommand from './export.js'
+import { checkAccountActive, checkLogin } from '../../system/account/functions.js'
 
 export const chatCommands = [
     {
@@ -12,6 +13,7 @@ export const chatCommands = [
             ["<空>"]
         ],
         adminOnly: false,
+        loginOnly: false,
         run:
             /**
             @param {mc.Player} player
@@ -24,10 +26,14 @@ export const chatCommands = [
                     for (let j in chatCommand) {
                         for (let i in chatCommand[j].chatCommands) {
                             /**
-                             * @type {{command: string, des: string, values: string[][], adminOnly: boolean, run: Function}}
+                             * @type {{command: string, des: string, values: string[][], adminOnly: boolean, loginOnly: boolean, run: Function}}
                              */
                             let command = chatCommand[j].chatCommands[i]
-                            CommandList.push(`§f-§a${command.command} §7- ${command.des}`)
+                            if ((command.loginOnly && checkLogin(player)) || !checkAccountActive() || !command.loginOnly) {
+                                CommandList.push(`§f-§a${command.command} §7- ${command.des}`)
+                            } else {
+                                CommandList.push(`§f-§c${command.command} §7- ${command.des} §f(§c沒有權限§f)`)
+                            }
                         }
                     }
                     logfor(player.name, `§e§l所有的指令 §f- §e共 §b${CommandList.length} §e條\n§e若要更加了解指令內容及範例，可打上 §b-help 指令名稱\n§r${CommandList.join('\n')}`)

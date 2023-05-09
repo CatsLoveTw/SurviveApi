@@ -278,7 +278,7 @@ export function UI(player) {
                                                     let otherPlayers = []
                                                     let form = new ui.ActionFormData()
                                                         .title("§e§l分享傳送點 §f- §e" + getData.home.name)
-                                                    for (let otherPlayer of mc.world.getPlayers()) {
+                                                    for (let otherPlayer of worldlog.getPlayers()) {
                                                         if (otherPlayer != player) {
                                                             form.button(`§e§l${otherPlayer.name}`)
                                                             otherPlayers.push(otherPlayer)

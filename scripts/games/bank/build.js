@@ -14,7 +14,7 @@ export function build () {
         // 轉帳系統tag 給錢: {"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}
         // 收到錢: {"targetTM": {"value": number, "sender": string, "target": string, "startTime": number}}
         // value 轉帳金額 sender 轉帳人 target 收帳者 startTime 開始時間 §
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.includes('{"senderTM":')) {
                     /**
@@ -52,7 +52,7 @@ export function build () {
             let value = args[1]
             let TargetMsg = `§a§l銀行系統 §f> §e注意 §b${args[2]} §e可在30秒內收回轉帳交易!`
             let sendMsg = `§c§l>> §e轉帳交易已被 §b${player.name} §e收回`
-            for (let player of mc.world.getPlayers()) {
+            for (let player of worldlog.getPlayers()) {
                 if (player.name == args[0]) {
                     target = player
                 }

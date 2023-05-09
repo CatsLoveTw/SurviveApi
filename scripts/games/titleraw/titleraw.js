@@ -2,11 +2,12 @@ import * as mc from '@minecraft/server'
 import { world } from '@minecraft/server'
 import { worldlog } from '../../lib/function'
 import { cmd, log, titlefor } from '../../lib/GametestFunctions'
+import { checkAccountActive, checkLogin } from '../../system/account/functions'
 
 export function build () {
     // {"news": msg, tick: 0, maxtick: 20}
     mc.system.runInterval(() => {
-        for (let player of world.getPlayers()) {
+        for (let player of mc.world.getPlayers()) {
             let display = []
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"news"')) {
@@ -71,7 +72,11 @@ export function build () {
             }
             
             let time = `§f${disD} §b日 §f${disH} §b小時 §f${disM} §b分鐘 §f${disS} §b秒`
-            titlefor(player.name, `§l${display.join("")}§g金錢 §7- §e${dismoney} `)
+            if (!checkLogin(player) && checkAccountActive()) {
+                titlefor(player.name, `§l${display.join("")}`)
+            } else {
+                titlefor(player.name, `§l${display.join("")}§g金錢 §7- §e${dismoney} `)
+            }
         }
     }, 1)
 }

@@ -9,6 +9,7 @@ export const chatCommands = [
         des: '取得選單系統 (請確認背包是否已滿)',
         values: [],
         adminOnly: false,
+        loginOnly: true,
         run:
             /**
             @param {mc.Player} player

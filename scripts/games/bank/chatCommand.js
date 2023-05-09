@@ -1,5 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { worldlog } from '../../lib/function'
 
 
 // 轉帳系統tag 給錢: {"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}
@@ -14,6 +15,7 @@ export const chatCommands = [
             ["back"],
         ],
         adminOnly: false,
+        loginOnly: true,
         run:
             /**
             @param {mc.Player} player
@@ -31,7 +33,7 @@ export const chatCommands = [
                          * @type {{"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}}
                          */
                         let json = JSON.parse(tag)
-                        for (let pl of mc.world.getPlayers()) {
+                        for (let pl of worldlog.getPlayers()) {
                             if (pl.name == json.senderTM.target) {
                                 let getMoney = json.senderTM.value
                                 let SenderMsg = `§a§l銀行系統 §f> §e您可以在30秒內無條件收回該轉帳 輸入-tm back`

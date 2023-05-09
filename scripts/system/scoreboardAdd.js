@@ -2,6 +2,7 @@ import { world, system } from '@minecraft/server'
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../lib/GametestFunctions'
 import { tpaSetting } from '../defind'
+import { worldlog } from '../lib/function'
 
 
 
@@ -50,7 +51,7 @@ const scoreboards = {
 }
 system.runInterval(() => {
     let score = {}
-    for (let player of world.getPlayers()) {
+    for (let player of worldlog.getPlayers()) {
         for (let board in scoreboards) {
             if (scoreboards[board] == 0) { 
                 player.runCommandAsync(`scoreboard players add @s "${board}" ${scoreboards[board]}`)

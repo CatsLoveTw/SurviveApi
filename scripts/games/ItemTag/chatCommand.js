@@ -12,6 +12,7 @@ export const chatCommands = [
             ["<空>"]
         ],
         adminOnly: false,
+        loginOnly: true,
         run:
             /**
             @param {mc.Player} player

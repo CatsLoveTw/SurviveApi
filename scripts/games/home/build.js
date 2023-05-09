@@ -25,7 +25,7 @@ export function build() {
     // 偵測領地&公共/普通傳送點刪除
     mc.system.runInterval(() => {
         let dimensions = ["lands", "lands_nether", "lands_end"]
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 let check = false
                 for (let index in dimensions) {
@@ -74,7 +74,7 @@ export function build() {
 
     // 檢查請求/被請求到期 §
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -103,7 +103,7 @@ export function build() {
     }, 1)
     // 偵測對方下線
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -111,7 +111,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getPlayers()) {
+                    for (let player of worldlog.getPlayers()) {
                         if (player.name == json.homeShare.sharedName) {
                             check = true
                         }
@@ -134,7 +134,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getPlayers()) {
+                    for (let player of worldlog.getPlayers()) {
                         if (player.name == json.homeShared.source) {
                             check = true
                         }
@@ -157,7 +157,7 @@ export function build() {
 
     // 偵測下線玩家又上線的tag清除
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             for (let tag of player.getTags()) {
                 if (tag.startsWith('{"homeShare":')) {
                     /**
@@ -165,7 +165,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getPlayers()) {
+                    for (let player of worldlog.getPlayers()) {
                         if (player.name == json.homeShare.sharedName) {
                             for (let tag of player.getTags()) {
                                 let json2 = {
@@ -194,7 +194,7 @@ export function build() {
                      */
                     let json = JSON.parse(tag)
                     let check = false
-                    for (let player of mc.world.getPlayers()) {
+                    for (let player of worldlog.getPlayers()) {
                         if (player.name == json.homeShared.source) {
                             for (let tag of player.getTags()) {
                                 let json2 = {

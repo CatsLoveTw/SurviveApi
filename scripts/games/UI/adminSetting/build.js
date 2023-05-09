@@ -17,7 +17,7 @@ export function build () {
     } catch { }
 
     mc.system.runInterval(() => {
-        for (let player of mc.world.getPlayers()) {
+        for (let player of worldlog.getPlayers()) {
             try {
                 if (worldlog.getScoreFromMinecraft(player.name, 'permission').score == 2 && player.hasTag("admin")) {
                     player.runCommandAsync(`ability @s mayfly true`)
@@ -26,7 +26,7 @@ export function build () {
         }
         let getDeletesPlayer = worldlog.getScoreboardPlayers('adminDelete').disname
         for (let deletePlayer of getDeletesPlayer) {
-            for (let player of mc.world.getPlayers()) {
+            for (let player of worldlog.getPlayers()) {
                 if (deletePlayer == player.name) {
                     player.removeTag(`admin`)
                     cmd(`scoreboard players reset "${deletePlayer}" adminDelete`)

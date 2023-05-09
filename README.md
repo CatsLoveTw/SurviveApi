@@ -1,5 +1,5 @@
 # SurviveApi
-![version](https://img.shields.io/badge/Version-BETA--2.2.62-blue)
+![version](https://img.shields.io/badge/Version-BETA--2.2.63-blue)
 ![APIversion](https://img.shields.io/badge/API--Supported--Version-Bedrock--1.19.80+-brightgreen)
 ![CreatedTime](https://img.shields.io/badge/Created--Time-2023--2%2F25-orange)
 
@@ -11,7 +11,7 @@
 加入discord以獲得更多資訊/回報BUG - [點我](https://discord.gg/cyx5GCgu2B)
 
 ### 更新內容 (內容 | 影響程度)
-#### 之前 (BETA 2.2.6 && BETA 2.2.61)
+#### 之前 (BETA 2.2.6 && BETA 2.2.61~2.2.62)
 - 支持版本V1.19.80+ | 必備
 - 掉落物移除上限 400 -> 250 個數量 | 中
 - 新增領地時，已可及時觀看上限格數 | 中
@@ -23,11 +23,12 @@
 - 修復無法新增領地的問題 | 必備
 - 修復領地刪除時依然可飛行的問題 | 高+
 - 修復建造領地時，歸還方塊不同問題 | 中+
-
-#### 現在
 - 修復新增領地時，方塊不會歸還的問題 | 極高
 - 修復公共領地失效的問題 | 高+
 - 新增帳號系統 (僅供自己使用) | 低
+
+#### 現在
+- 帳號系統小更新 | 低
 
 ### 測試中內容
 - 領地系統 (多種維度支援 / 新版架構)

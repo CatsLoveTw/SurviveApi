@@ -19,7 +19,7 @@ export function UI(player) {
     }
     let players = []
     let playerNames = []
-    for (let pl of mc.world.getPlayers()) {
+    for (let pl of worldlog.getPlayers()) {
         if (pl.name != player.name) {
             players.push(pl)
             playerNames.push(pl.name)

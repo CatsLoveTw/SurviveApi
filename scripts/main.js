@@ -19,10 +19,11 @@ import * as test from './games/test/build.js'
 import "./games/ban/build.js"
 import "./system/import.js"
 import "./system/account/index.js"
+import { worldlog } from "./lib/function.js"
 
 // land home
-export const version = "BETA V2.2.61"
-export const updateDate = '2023/4/29 (Sat.)'
+export const version = "BETA V2.2.63"
+export const updateDate = '2023/5/9 (Tue.)'
 export const updates = {
     // "版本號 | 加權值": []
     "BETA 2.2.6 | 2.45": [
@@ -44,6 +45,9 @@ export const updates = {
         "修復新增領地時，方塊不會歸還的問題 | 極高",
         "修復公共領地失效的問題 | 高+",
         "新增帳號系統 (僅供自己使用) | 低"
+    ],
+    "BETA 2.2.63 | 0": [
+        "帳號系統小更新 | 低"
     ]
 }
 export const prefix = '-'
@@ -85,7 +89,7 @@ export const dieMessages = [
 try {
 // 發送訊息 (actionbar) { "news": msg, tick: 0, maxtick: 60 }
 
-for (let player of world.getPlayers()) {
+for (let player of worldlog.getPlayers(true)) {
     for (let tag of player.getTags()) {
         if (tag.startsWith('{"news":')) {
             player.removeTag(tag)
