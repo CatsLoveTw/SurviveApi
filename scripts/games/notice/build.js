@@ -25,7 +25,7 @@ export function build() {
         }
     }, 200)
 
-    mc.world.events.playerJoin.subscribe(events => {
+    mc.world.afterEvents.playerJoin.subscribe(events => {
         let { playerName } = events
         mc.system.runTimeout(() => {
             for (let notice of worldlog.getScoreboardPlayers('notice').disname) {

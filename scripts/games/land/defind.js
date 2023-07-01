@@ -263,7 +263,11 @@ export class LandCreate {
         this.step = step
         this.admin = admin
     }
-    transfromToTag () {
+    /**
+     * 
+     * @returns {LandCreateJSON}
+     */
+    toJSON () {
         let json = {
             "landCreate": {
                 "dime": this.dime,
@@ -273,7 +277,7 @@ export class LandCreate {
                 "admin": this.admin
             }
         }
-        return JSON.stringify(json)
+        return json
     }
 }
 

@@ -1,0 +1,59 @@
+動態 actionbar 訊息:actionbar_messages, string: JSON.str(Object),JSON.str(Object),...
+Object: {
+    news: string,
+    tick: number | 0,
+    maxtick: number
+}
+
+
+死亡/傳送返回: backLocation, string: JSON.str(Object)
+Object: {
+    back: {
+        x: number,
+        y: number,
+        z: number,
+        dimension: string
+    }
+}
+
+
+傳送點: homes, string: JSON.str(Object),JSON.str(Object),...
+Object: HomeData
+
+傳送點分享/被分享: homeShare / homeShared, string: JSON.str(Object)
+homeShare Object: {
+    "homeShare": {
+        "source": string,
+        "sharedName": string,
+        "duration": number,
+        "startTime": number,
+        "homeData": HomeData
+    }
+}
+
+
+領地建造: landCreating, string: JSON.str(Object)
+Object: LandCreateJSON
+
+
+進入領地: inLandData, string; JSON.str(Object)
+Object: {
+    dime: 'over' | 'nether' | 'end',
+    land: Land,
+    per: landUserPermission
+}
+
+
+tpa邀請/被邀請: tpaRequire / tpaRequired, string: JSON.str(Object)
+tpaRequire Object: {
+    "tpaReq": tpaRequire
+}
+
+tpaRequired Object: {
+    "tpaReqed": tpaRequire
+}
+
+
+
+tpa設定: tpaSetting, string: JSON.str(Object)
+Object: tpaSetting

@@ -1,9 +1,10 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { getRandomIntInclusive, worldlog } from '../../lib/function.js'
-import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor, addSign } from '../../lib/GametestFunctions.js'
 import * as land from './land.js'
 import { Land, LandCreate, getAdminLands, getLandData, getPlayerLands } from './defind.js'
+import { playerDB } from '../../config.js'
 
 // 這個檔案的代碼沒有做到很好的維護環境，等有空再慢慢改吧><...
 // 在這個檔案內 unix為1970/1/1至今的毫秒數
@@ -76,6 +77,7 @@ export function UI(player) {
                     .title("§a§l新增領地")
                     .textField(`§e§l輸入領地名稱`, `§e§l名稱`)
                 form.show(player).then(res => {
+                    const db = playerDB.table(player.id)
                     for (let tag of player.getTags()) {
                         if (tag.includes('{"landCreate":{')) {
                             let data = JSON.parse(tag)
@@ -102,10 +104,11 @@ export function UI(player) {
                     if (dime == 'end') {
                         setDime = 'end'
                     }
-                    let tag = new LandCreate(setDime, new Date().getTime(), name, 1, false).transfromToTag()
+                    let creatingJSON = new LandCreate(setDime, new Date().getTime(), name, 1, false).toJSON()
                     let msg = `§e§l領地系統 §f> §a您正在建造領地 §7- §b${name}`
-                    player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: land.times * 20 }))
-                    player.addTag(tag)
+
+                    addSign(msg, player, land.times * 20)
+                    db.setData("landCreating", creatingJSON)
                     logfor(player.name, `§a§l>> §e放置隨意方塊在地面即可設置領地範圍 §f(§6建議使用泥土§f)`);
                 })
             }
@@ -573,6 +576,7 @@ export function adminUI(player, dime) {
             .title("§a§l新增領地")
             .textField(`§e§l輸入領地名稱`, `§e§l名稱`)
         form.show(player).then(res => {
+            const db = playerDB.table(player.id)
             for (let tag of player.getTags()) {
                 if (tag.includes('{"landCreate":{')) {
                     let data = JSON.parse(tag)
@@ -600,8 +604,8 @@ export function adminUI(player, dime) {
             if (dime == 'end') {
                 setDime = 'end'
             }
-            let tag = new LandCreate(setDime, new Date().getTime(), name, 1, true).transfromToTag()
-            player.addTag(tag)
+            let creatingJSON = new LandCreate(setDime, new Date().getTime(), name, 1, true).toJSON()
+            db.setData("landCreating", creatingJSON)
             logfor(player.name, `§a§l>> §e放置隨意方塊在地面即可設置領地範圍 §f(§6建議使用泥土§f)`);
         })
     }

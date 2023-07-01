@@ -1,17 +1,14 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
-
+import { prefix } from '../../config.js'
 import * as chatCommands from './export.js'
 import { checkAccountActive, checkLogin } from '../../system/account/functions.js'
 
-/**
- * 
- * @param {string} prefix 
- */
-export function build(prefix) {
+
+export function build() {
     // 
-    mc.world.events.beforeChat.subscribe(events => {
+    mc.world.beforeEvents.chatSend.subscribe(events => {
         const { sender: player, message } = events;
         if (message.startsWith(prefix)) {
             events.cancel = true

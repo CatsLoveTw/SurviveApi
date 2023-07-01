@@ -45,6 +45,7 @@ export const chatCommands = [
                                 for (let tag of player.getTags()) {
                                     if (tag.includes(SenderMsg)) {
                                         player.removeTag(tag)
+                                        
                                     }
                                 }
                                 for (let tag of pl.getTags()) {

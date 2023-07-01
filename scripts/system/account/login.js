@@ -12,7 +12,7 @@ import { loginSession } from './classes.js'
 // omid:${result.omid}|||name:${result.name}|||password${result.password}"
 // 大廳 0 -60 0 遊客區域 0 100 0
 
-world.events.worldInitialize.subscribe(() => {
+world.afterEvents.worldInitialize.subscribe(() => {
     worldlog.addScoreBoards([
         {id: 'accounts', disname: "帳號儲存"},
         {id: 'accountActive', disname: "帳號系統啟用確認"},
@@ -20,7 +20,7 @@ world.events.worldInitialize.subscribe(() => {
     ])
 })
 
-world.events.playerJoin.subscribe(event => {
+world.afterEvents.playerJoin.subscribe(event => {
     if (checkAccountActive()) {
         let playerName = event.playerName
         cmd(`tp "${playerName}" 0 100 0`)

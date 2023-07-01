@@ -54,30 +54,36 @@ export function UI(player) {
                     return logfor(player.name, `§c§l>> §e參數輸入錯誤!`)
                 }
 
-                // let Senderjson = {
-                //     "senderTM": {
-                //         "value": Number(sendMoney),
-                //         "sender": player.name,
-                //         "target": selePlayer.name,
-                //         "startTime": new Date().getTime()
-                //     }
-                // }
-                // let Targetjson = {
-                //     "targetTM": {
-                //         "value": Number(sendMoney),
-                //         "sender": player.name,
-                //         "target": selePlayer.name,
-                //         "startTime": new Date().getTime()
-                //     }
-                // }
-                // let SenderMsg = `§a§l銀行系統 §f> §e您可以在30秒內無條件收回該轉帳 輸入-tm back`
-                // let TargetMsg = `§a§l銀行系統 §f> §e注意 §b${player.name} §e可在30秒內收回轉帳交易!`
+                /**
+                 * @deprecated 已暫停使用
+                 */
+                function refund () {
+                    // let Senderjson = {
+                    //     "senderTM": {
+                    //         "value": Number(sendMoney),
+                    //         "sender": player.name,
+                    //         "target": selePlayer.name,
+                    //         "startTime": new Date().getTime()
+                    //     }
+                    // }
+                    // let Targetjson = {
+                    //     "targetTM": {
+                    //         "value": Number(sendMoney),
+                    //         "sender": player.name,
+                    //         "target": selePlayer.name,
+                    //         "startTime": new Date().getTime()
+                    //     }
+                    // }
+                    // let SenderMsg = `§a§l銀行系統 §f> §e您可以在30秒內無條件收回該轉帳 輸入-tm back`
+                    // let TargetMsg = `§a§l銀行系統 §f> §e注意 §b${player.name} §e可在30秒內收回轉帳交易!`
+                    // player.addTag(JSON.stringify({ "news": SenderMsg, tick: 0, maxtick: 30 * 20 }))
+                    // selePlayer.addTag(JSON.stringify({ "news": TargetMsg, tick: 0, maxtick: 30 * 20 }))
+                    // player.addTag(JSON.stringify(Senderjson))
+                    // selePlayer.addTag(JSON.stringify(Targetjson))
+                }
                 logfor(player.name, `§a§l>> §e您已轉給 §b${selePlayer.name} §e的 §6${sendMoney} §e元!`)
                 logfor(selePlayer.name, `§a§l>> §e您已收到 §b${player.name} §e的 §6${sendMoney} §e元!`)
-                // player.addTag(JSON.stringify({ "news": SenderMsg, tick: 0, maxtick: 30 * 20 }))
-                // selePlayer.addTag(JSON.stringify({ "news": TargetMsg, tick: 0, maxtick: 30 * 20 }))
-                // player.addTag(JSON.stringify(Senderjson))
-                // selePlayer.addTag(JSON.stringify(Targetjson))
+                
                 player.runCommandAsync(`scoreboard players remove @s money ${sendMoney}`)
                 selePlayer.runCommandAsync(`scoreboard players add @s money ${sendMoney}`)
             })

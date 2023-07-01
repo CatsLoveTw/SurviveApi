@@ -1,7 +1,7 @@
 import { system, world } from "@minecraft/server"
 import * as mc from '@minecraft/server'
 import { worldlog } from "../lib/function"
-import { cmd, log, logfor } from "../lib/GametestFunctions"
+import { addSign, cmd, log, logfor } from "../lib/GametestFunctions"
 import { checkAccountActive, checkLogin } from "./account/functions"
 
 system.runInterval(() => {
@@ -18,8 +18,7 @@ system.runInterval(() => {
                     let getSquMax = worldlog.getScoreFromMinecraft(player.name, 'land_squ_max').score
                     player.runCommandAsync(`scoreboard players add @s land_squ_max 60`)
                     let msg = `§g§l線上獎勵 §f> §a您的領地上限擴大了60格! §f(§e現為 §b${Number(getSquMax) + 60} §e格§f)`
-                    let json = { "news": msg, tick: 0, maxtick: 120 }
-                    player.addTag(JSON.stringify(json))
+                    addSign(msg, player, 120)
                 }
             }
             while (M >= 60) {

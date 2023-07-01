@@ -1,28 +1,31 @@
 import * as mc from '@minecraft/server'
 import { world } from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { cmd, log, titlefor } from '../../lib/GametestFunctions'
-import { checkAccountActive, checkLogin } from '../../system/account/functions'
+import { addSign, cmd, log, removeSign, titlefor } from '../../lib/GametestFunctions'
+import { checkAccountActive, checkLogin } from '../../system/account/functions';
+import { playerDB } from '../../config';
 
 export function build () {
     // {"news": msg, tick: 0, maxtick: 20}
     mc.system.runInterval(() => {
         for (let player of mc.world.getPlayers()) {
+            // 處理動態消息
             let display = []
-            for (let tag of player.getTags()) {
-                if (tag.startsWith('{"news"')) {
-                    if (JSON.parse(tag).tick == JSON.parse(tag).maxtick) {
-                        player.removeTag(tag)
+            let db = playerDB.table(player.id)
+            let allDynamicMessage = db.getData("dynamic_message")
+            if (allDynamicMessage && allDynamicMessage.value.length > 0) {
+                for (let message of allDynamicMessage.value) {
+                    if (message.tick >= message.maxtick) {
+                        removeSign(message.news, player)
                     } else {
-                        player.removeTag(tag)
-                        let data = JSON.parse(tag)
-                        data.tick = data.tick+1
-                        data = JSON.stringify(data)
-                        player.addTag(data)
-                        display.push(`§l§f${((JSON.parse(data).maxtick - JSON.parse(data).tick) / 20).toFixed(1)}s §7| ` + JSON.parse(data).news + "\n")
+                        removeSign(message.news, player)
+                        addSign(message.news, player, message.maxtick, message.tick + 1)
+                        display.push(`§l§f${((message.maxtick - message.tick) / 20).toFixed(1)}s §7| ` + message.news + "\n")
                     }
                 }
             }
+
+
             let D = worldlog.getScoreFromMinecraft(player.name, "timeD").score
             let H = worldlog.getScoreFromMinecraft(player.name, "timeH").score
             let M = worldlog.getScoreFromMinecraft(player.name, "timeM").score
@@ -78,5 +81,5 @@ export function build () {
                 titlefor(player.name, `§l${display.join("")}§g金錢 §7- §e${dismoney} `)
             }
         }
-    }, 1)
+    }, 10)
 }

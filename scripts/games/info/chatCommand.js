@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, getSearchTextLength, log, logfor } from '../../lib/GametestFunctions'
-import * as updatedata from '../../main.js'
+import { version, updateDate, updates } from '../../config.js'
 
 export const chatCommands = [
     {
@@ -21,15 +21,15 @@ export const chatCommands = [
                 let args = message.split(" ")
                 if (args[1] != 'version' && args[1] != 'update') return error();
                 if (args[1] == 'version') {
-                    logfor(player.name, `§3§l>> §e目前版本§f:§e${updatedata.version} §f(§e${updatedata.updateDate}§f) §7| §e創作者 §7- §eCat1238756 §f(§bOM§f:§bcatmeowmeowmeow§f)`)
+                    logfor(player.name, `§3§l>> §e目前版本§f:§e${version} §f(§e${updateDate}§f) §7| §e創作者 §7- §eCat1238756 §f(§bOM§f:§bcatmeowmeowmeow§f)`)
                 } else if (args[1] == 'update') {
                     let text = '§l§b更新內容 §7| §b影響程度§f'
-                    for (let i in updatedata.updates) {
+                    for (let i in updates) {
                         let all = 0
                         let score = 0
-                        for (let j in updatedata.updates[i]) {
+                        for (let j in updates[i]) {
                             all++
-                            let update = updatedata.updates[i][j]
+                            let update = updates[i][j]
                             let args = update.split(" | ")
                             let affect = args[1]
                             if (affect.startsWith('低')) {
@@ -84,8 +84,8 @@ export const chatCommands = [
                         }
                         affect += "§7 (" + average.toFixed(2) + ")"
                         text += `\n§e§l版本 §7- §e${i.split(" | ")[0]} §7| ${affect}\n`
-                        for (let j in updatedata.updates[i]) {
-                            let update = updatedata.updates[i][j]
+                        for (let j in updates[i]) {
+                            let update = updates[i][j]
                             let args = update.split(" | ")
                             let context = args[0]
                             let affect = args[1]

@@ -1,6 +1,10 @@
+/// <reference path="./index.d.ts" />
+
 import * as mc from '@minecraft/server'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { cmd, log, logfor, removeSign } from '../../lib/GametestFunctions'
 import { worldlog } from '../../lib/function'
+import { playerDB } from '../../config'
+import { addHome } from './defind'
 
 export const chatCommands = [
     // 設定請求Tag - {"homeShare": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}} 
@@ -25,13 +29,15 @@ export const chatCommands = [
                 if (args[1] != 'accept' && args[1] != 'deny' && args[1] != 'delete') {
                     return error()
                 }
+                
+                const db = playerDB.table(player.id)
                 let check = false
                 for (let tag of player.getTags()) {
                     // 接受
                     if (args[1] == 'accept') {
                         if (tag.startsWith('{"homeShared":')) {
                             /**
-                             * @type {{"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}}
+                             * @type {HomeShared}
                              */
                             let json = JSON.parse(tag)
                             /**
@@ -54,20 +60,17 @@ export const chatCommands = [
                                 player.removeTag(tag)
                                 return logfor(player.name, `§c§l>> §e找不到玩家，分享失敗!`)
                             }
-                            player.addTag(JSON.stringify(json.homeShared.homeData))
+
+                            let homes = db.getData("homes")
+                            
+                            homes.value.push(json.homeShared.homeData)
+                            db.setData("homes", homes.value, homes.score)
+
                             let deleteMsgSource = `§e您已向 §b${json.homeShared.sharedName} §e發送分享請求，等待回復...`
                             let deleteMsgReqed = `§b${json.homeShared.source} §e想要分享傳送點給你 §f- §e${json.homeShared.homeData.home.name}`
                             // 刪除訊息
-                            for (let tag of player.getTags()) {
-                                if (tag.includes(deleteMsgReqed)) {
-                                    player.removeTag(tag)
-                                }
-                            }
-                            for (let tag of getSource.getTags()) {
-                                if (tag.includes(deleteMsgSource)) {
-                                    getSource.removeTag(tag)
-                                }
-                            }
+                            removeSign(deleteMsgReqed, player)
+                            removeSign(deleteMsgSource, getSource)
                             // 刪除請求
                             player.removeTag(tag)
                             let removeJSON = {
@@ -80,7 +83,8 @@ export const chatCommands = [
                                 }
                             }
                             getSource.removeTag(JSON.stringify(removeJSON))
-                            player.addTag(JSON.stringify(json.homeShared.homeData))
+                            playerDB.table(getSource.id).setData("homeShared")
+                            addHome(player, json.homeShared.homeData)
                             logfor(player.name, `§a§l>> §e接受成功!`)
                             logfor(getSource.name, `§a§l>> §e請求已被對方接受!`)
                             check = true
@@ -88,7 +92,7 @@ export const chatCommands = [
                     } else if (args[1] == 'deny') {
                         if (tag.startsWith('{"homeShared":')) {
                             /**
-                             * @type {{"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}}}
+                             * @type {{"homeShared": {"source": string, "sharedName": string, "duration": number, "startTime": number, "homeData": HomeData}}}
                              */
                             let json = JSON.parse(tag)
                             /**

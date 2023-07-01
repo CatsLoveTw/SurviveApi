@@ -1,3 +1,5 @@
+import { Land } from "./defind";
+
 declare interface landPosition {
     x: {
         1: string,
@@ -30,12 +32,14 @@ declare class landPermission {
  */
 declare interface landUser {
     username: string,
-    permission: {
-        build: string,
-        container: string,
-        portal: string,
-        fly: string
-    }
+    permission: landUserPermission
+}
+
+declare interface landUserPermission {
+    build: string,
+    container: string,
+    portal: string,
+    fly: string
 }
 
 declare type landDimension = 'overworld' | 'nether' | 'end'
@@ -49,4 +53,24 @@ declare type LandCreateJSON = {
         "step": number,
         "admin": boolean
     }
+}
+
+declare type InLand = {
+    inLand: {
+        dime: "over" | "nether" | "end",
+        land: Land,
+        per: landUserPermission
+    }
+}
+
+
+declare class LandData {
+    name: string
+    pos: landPosition
+    UID: string
+    player: string | false
+    permission: landPermission
+    users: false | landUser[]
+    Public: boolean
+    old: boolean
 }

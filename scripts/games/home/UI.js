@@ -1,10 +1,12 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand } from '../land/build.js'
 import * as playerUI from '../UI/player.js'
 import { Land, getLandData } from '../land/defind.js'
+import { Home, addHome } from './defind.js'
+import { playerDB } from '../../config.js'
 
 /**
  * 
@@ -137,6 +139,8 @@ export function findPlayerPublicHome(player, dime) {
 export function UI(player) {
     // {"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}
     // dime = over | nether | end
+    
+    const db = playerDB.table(player.id)
     let text = ''
     let homes = ''
     let dime = 'over'
@@ -189,19 +193,15 @@ export function UI(player) {
                                 .show(player).then(res => {
                                     if (res.canceled) return;
                                     let name = res.formValues[0]
-                                    let homeJSON = {
-                                        "home": {
-                                            "name": name,
-                                            "pos": {
-                                                "x": player.location.x,
-                                                "y": player.location.y,
-                                                "z": player.location.z
-                                            },
-                                            land: land,
-                                            dime: dime
-                                        }
+
+                                    let homePos = {
+                                        x: player.location.x,
+                                        y: player.location.y,
+                                        z: player.location.z
                                     }
-                                    player.addTag(JSON.stringify(homeJSON))
+
+                                    let homeJSON = new Home(name, homePos, land, dime).toJSON()
+                                    addHome(player, homeJSON)
                                     logfor(player.name, `§a§l>> §e新增成功!`)
                                 })
                         }
@@ -258,6 +258,7 @@ export function UI(player) {
                                                             player.removeTag(postag)
                                                         }
                                                     }
+
                                                     let json = {
                                                         "back": {
                                                             "x": player.location.x,
@@ -266,7 +267,8 @@ export function UI(player) {
                                                             "dimension": player.dimension.id,
                                                         }
                                                     }
-                                                    player.addTag(JSON.stringify(json))
+                                                    db.setData("backLocation", json)
+
                                                     player.runCommandAsync(`tp @s ${seleHome.pos.x} ${seleHome.pos.y} ${seleHome.pos.z}`)
                                                     logfor(player.name, `§a§l>> §e傳送成功!`)
                                                 }
@@ -317,13 +319,12 @@ export function UI(player) {
                                                                 "homeData": getData
                                                             }
                                                         }
-                                                        let shareMessageSend = { "news": sourceMessage, tick: 0, maxtick: 30 * 20 }
-                                                        let sharedMessageSend = { "news": sharedMessage, tick: 0, maxtick: 30 * 20 }
 
-                                                        player.addTag(JSON.stringify(shareJSON))
-                                                        player.addTag(JSON.stringify(shareMessageSend))
-                                                        other.addTag(JSON.stringify(sharedJSON))
-                                                        other.addTag(JSON.stringify(sharedMessageSend))
+                                                        db.setData("homeShare", shareJSON, 0);
+                                                        playerDB.table(other.id).setData("homeShared", sharedJSON, 0)
+                                                        addSign(sourceMessage, player, 30 * 20)
+                                                        addSign(sharedMessage, other, 30 * 20)
+                                                        
                                                         logfor(player.name, `§a§l>> §e分享請求發送成功，等待回應... §f(§e也可輸入 §b-sharehome delete §e刪除請求§f)`)
                                                         logfor(other.name, `§3§l>> §b${player.name} §e想要分享傳送點給你，輸入 §a-sharehome accept 同意 §c-sharehome deny 拒絕...`)
                                                     })
@@ -351,6 +352,7 @@ export function UI(player) {
 export function publicUI (player) {
     // 記分板 publicHome 型式:dime___name___x|y|z___land:name_,_posx|posz/posx2|posz2_,_player_,_UID
     // dime = 'over' | 'nether' | 'end'
+    const db = playerDB.table(player.id)
     let getDime = 'over'
     let list = ''
     if (player.dimension.id.toLowerCase() == mc.MinecraftDimensionTypes.nether) {
@@ -555,9 +557,7 @@ export function publicUI (player) {
                                             player.removeTag(postag)
                                         }
                                     }
-                                    let x = homeData.pos.x
-                                    let y = homeData.pos.y
-                                    let z = homeData.pos.z
+                                    
                                     let json = {
                                         "back": {
                                             "x": player.location.x,
@@ -566,7 +566,11 @@ export function publicUI (player) {
                                             "dimension": player.dimension.id,
                                         }
                                     }
-                                    player.addTag(JSON.stringify(json))
+                                    db.setData("backLocation", json)
+
+                                    let x = homeData.pos.x
+                                    let y = homeData.pos.y
+                                    let z = homeData.pos.z
                                     player.runCommandAsync(`tp @s ${x} ${y} ${z}`)
                                     logfor(player.name, `§a§l>> §e傳送成功!`)
                                 }
@@ -686,9 +690,7 @@ export function publicUI (player) {
                                                 player.removeTag(postag)
                                             }
                                         }
-                                        let x = homeData.pos.x
-                                        let y = homeData.pos.y
-                                        let z = homeData.pos.z
+                                        
                                         let json = {
                                             "back": {
                                                 "x": player.location.x,
@@ -697,7 +699,11 @@ export function publicUI (player) {
                                                 "dimension": player.dimension.id,
                                             }
                                         }
-                                        player.addTag(JSON.stringify(json))
+                                        db.setData("backLocation", json)
+
+                                        let x = homeData.pos.x
+                                        let y = homeData.pos.y
+                                        let z = homeData.pos.z
                                         player.runCommandAsync(`tp @s ${x} ${y} ${z}`)
                                         logfor(player.name, `§a§l>> §e傳送成功!`)
                                     }

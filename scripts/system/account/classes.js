@@ -1,3 +1,5 @@
+/// <reference path="./index.d.ts" />
+
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function';
 import { getAccountData } from './functions';
@@ -19,6 +21,7 @@ export class loginSession {
 
     /**
      * 將class內容轉換為TAG
+     * @deprecated 已停止使用，請使用 {@linkcode loginSession.toJSON()}
      */
     transformTag() {
         let json = {
@@ -29,6 +32,21 @@ export class loginSession {
             }
         }
         return JSON.stringify(json)
+    }
+
+    /**
+     * 將class轉換為物件
+     * @returns {LoginSessionJSON}
+     */
+    toJSON() {
+        let json = {
+            "loginSession": {
+                id: this.id,
+                name: this.name,
+                omid: this.omid
+            }
+        }
+        return json
     }
 
     /**

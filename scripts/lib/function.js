@@ -33,211 +33,19 @@ function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); // 最大是包含的 最小也是
-  }
-
-/**
- * 
- * @param {any} player 玩家ID 
- * @param {any} scoreName 記分板ID
- * @returns {number}
- * @提醒 這個函數可能會引發錯誤
- */
-function getScore (player, scoreName) {
-    // cmd(`scoreboard players add "${player}" ${scoreName} 0`)
-    return worldlog.getScoreFromMinecraft(player, scoreName).score
 }
 
-// class worldScoreBoard {
-//     constructor() {
-//     }
-//     add
-// }
-
 /**
- * 世界記分板資料庫系統
+ * 等待
+ * @param {number} tick 
+ * @returns {Promise<true>}
  */
-
-class worldDB {
-    // 內容 - key:,value: 
-    /**
-     * 
-     * @param {string} DBID 輸入資料庫ID
-     * @param {string} TableID 輸入TableID (未來更新)
-     */
-    constructor (DBID, TableID) {
-        this.id = DBID
-        this.TableID = TableID
-    }
-    /**
-     * 新增資料庫
-     * @returns {Promise<mc.ScoreboardObjective>}
-     */
-    async addDB () {
-        await cmd(`scoreboard objectives add "DB:${this.id}" dummy`)
-        let allBoards = mc.world.scoreboard.getObjectives()
-        for (let board of allBoards) {
-            if (board.id == `DB:${this.id}`) {
-                return board
-            }
-        }
-    }
-    /**
-     * 刪除資料庫
-     */
-    removeDB () {
-        cmd(`scoreboard objectives remove "DB:${this.id}" dummy`)
-    }
-    /**
-     * 確認資料庫是否存在
-     */
-    checkDB () {
-        let allBoards = mc.world.scoreboard.getObjectives()
-        for (let board of allBoards) {
-            if (board.id == `DB:${this.id}`) {
-                return true
-            }
-        }
-        return false
-    }
-    /**
-     * 取得資料庫記分板
-     */
-    getDB () {
-        let allBoards = mc.world.scoreboard.getObjectives()
-        for (let board of allBoards) {
-            if (board.id == `DB:${this.id}`) {
-                return board
-            }
-        }
-        return this.addDB()
-    }
-
-    /**
-     * 確認資料是否存在
-     * @param {string} key
-     */
-    async checkData (key) {
-        if (!this.checkDB()) {
-            this.addDB()
-            return {value: "", check: false}
-        }
-
-        let db = await this.getDB()
-        let datas = db.getParticipants()
-        for (let data of datas) {
-            let Datakey = data.displayName.replace("key:", '').split(",value:")[0]
-            let DataValue = data.displayName.split(",value:")[1]
-            if (Datakey == key) {
-                return {value: DataValue, check: true}
-            }
-        }
-        return {value: "", check: false}
-    }
-
-    /**
-     * 設定資料
-     * @param {string} key 鍵 (搜尋值用)
-     * @param {any[] | string | number | boolean} value 值
-     */
-    async setData (key, value) {
-        if (!this.checkDB()) {
-            await this.addDB()
-        }
-        let data = await this.checkData(key)
-        if (data.check == true) {
-            cmd(`scoreboard players reset "key:${key},value:${data.value}" DB:${this.id}`)
-            if (Array.isArray(value)) {
-                cmd(`scoreboard players set "key:${key},value:${value.join("___")}" DB:${this.id} 0`)
-            } else {
-                cmd(`scoreboard players set "key:${key},value:${value}" DB:${this.id} 0`)
-            }
-        } else {
-            if (Array.isArray(value)) {
-                cmd(`scoreboard players set "key:${key},value:${value.join("___")}" DB:${this.id} 0`)
-            } else {
-                cmd(`scoreboard players set "key:${key},value:${value}" DB:${this.id} 0`)
-            }
-        }
-    }
-    /**
-     * 刪除資料
-     * @param {string} key 鍵
-     */
-    async removeData (key) {
-        let data = await this.checkData(key)
-        if (data.check) {
-            cmd(`scoreboard players remove "key:${key},value:${data.value}" DB:${this.id}`)
-        }
-    }
-    /**
-     * 取得資料值
-     * @param {string} key 
-     * @returns {Promise<false | {key: string;values: string[];isArray: true;} | {key: string;values: string;isArray: false;}>}
-     */
-    async getData (key) {
-        let data = await this.checkData(key)
-        if (!data.check) return false
-        let values = data.value
-        if (data.value.indexOf('___') != -1) {
-            return {key: key, values: values.split("___"), isArray: true}
-        }
-        return {key: key, values: values, isArray: false}
-    }
-
-
-    /**
-     * 
-     * @returns {{key: string;values: string[];isArray: true;} | {key: string;values: string;isArray: false;}}
-     */
-    async getAllData () {
-        let datas = []
-        let db = await this.getDB()
-        for (let data of db.getParticipants()) {
-            let key = data.displayName.replace("key:", '').split(",value:")[0]
-            let a = await this.getData(key)
-            datas.push(a)
-        }
-        return datas
-    }
-}
-
-class tagJSON {
-    /**
-     * 
-     * @param {mc.Player} player 輸入玩家
-     */
-    constructor (player) {
-        this.player = player
-    }
-
-    /**
-     * @returns {string[]}
-     */
-    get() {
-        let tags = []
-        for (let tag of this.player.getTags()) {
-            if (tag.startsWith('{"')) {
-                tags.push(tag)
-            }
-        }
-        return tags
-    }
-    
-    /**
-     * 
-     * @param {JSON} tag 輸入 JSON
-     */
-    add(tag) {
-        this.player.addTag(JSON.stringify(tag))
-    }
-
-    /**
-     * 
-     * @param {JSON} tag 輸入 JSON 
-     */
-    remove(tag) {
-        return this.player.removeTag(JSON.stringify(tag))
-    }
+export function sleep (tick) {
+    return new Promise((resolve, reject) => {
+        mc.system.runTimeout(() => {
+            resolve(true)
+        }, tick)
+    })
 }
 
 
@@ -251,11 +59,13 @@ class worldlogs {
     /**
      * @param {string | number} nameID 要搜尋的名稱
      * @param {string | number} scoreobjID 要搜尋的記分板
-     * @return {number} 分數
+     * @return {null | number} 分數
      * @提醒 這個資料可能會有錯誤!
      */
-    getscore (nameID, scoreobjID) {
-        return getScore(nameID, scoreobjID)
+    getScore (nameID, scoreobjID) {
+        let data = this.getScoreFromMinecraft(nameID, scoreobjID)
+        if (!data) return null;
+        return data.score
     }
     /**
      * @param {string | number} scoreboardID 記分板ID
@@ -393,4 +203,4 @@ class worldlogs {
  */
 const worldlog = new worldlogs()
 
-export { isNum, randomInt, getScore, worldlog, worldDB, getRandomIntInclusive }
+export { isNum, randomInt, worldlog, getRandomIntInclusive }

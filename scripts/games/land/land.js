@@ -4,6 +4,7 @@ import { worldlog } from '../../lib/function.js'
 import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
 import { Land, LandCreate, getLandData, newLandPermission, newLandPosition, newLandUser } from './defind.js'
+import { playerDB } from '../../config.js'
 export const times = 180 // 設定過期時間 (秒)
 
 /**
@@ -75,10 +76,11 @@ export function build() {
     }, 1)
 
     // 建造偵測
-    mc.world.events.blockPlace.subscribe(events => {
-        let player = events.player
+    mc.world.afterEvents.blockPlace.subscribe(events => {
+        const player = events.player, db = playerDB.table(player.id)
         let blockPos = events.block.location
         let check = false
+
         /**
          * @type {LandCreateJSON}
          * 
@@ -134,7 +136,8 @@ export function build() {
                     "admin": json.landCreate.admin
                 }
             }
-            return player.addTag(JSON.stringify(Json))
+
+            return db.setData("landCreating", Json, 0)
         }
 
         if (Number(json.landCreate.step == 2)) {
@@ -324,6 +327,7 @@ export function build() {
                             }
                         }
                         if (check) {
+                            const db = playerDB.table(player.id)
                             let playerPos = player.location
                             let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
                             let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
@@ -367,7 +371,7 @@ export function build() {
 
                                     for (let tag of player.getTags()) {
                                         let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                                        if (tag.includes(`${msg}`)) {
+                                        if (tag.includes(msg)) {
                                             player.removeTag(tag)
                                         }
                                     }
@@ -402,7 +406,9 @@ export function build() {
                                             msg = `\n§e§l領地系統 §f> §a您已進入了 §6公共領地 §f- §e${data.name} ${displayPer}`
                                         }
                                     }
-                                    player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 40 }))
+                                    addSign(msg, player, 40)
+
+
                                     let json = {
                                         inLand: {
                                             "dime": landDime,
@@ -415,7 +421,7 @@ export function build() {
                                             }
                                         }
                                     }
-                                    player.addTag(JSON.stringify(json))
+                                    db.setData("inLandData", json)
                                 }
                             }
                         }
@@ -434,6 +440,7 @@ export function build() {
                      * @type {{inLand: {dime: string, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string}}}}
                      */
                     let data = JSON.parse(tag)
+                    const db = playerDB.table(player.id)
                     let lands = worldlog.getScoreboardPlayers('lands')
                     if (data.inLand.dime == 'nether') {
                         lands = worldlog.getScoreboardPlayers('lands_nether')
@@ -464,7 +471,7 @@ export function build() {
                                         logfor(player.name, `§3§l>> §e偵測到您的 §b建築/破壞 §e更改`)
                                         player.removeTag(tag)
                                         data.inLand.per.build = `${user.permission.build}`
-                                        player.addTag(JSON.stringify(data))
+                                        db.setData("inLandData", data)
                                         if (data.inLand.per.build == "false") {
                                             player.runCommandAsync(`gamemode a @s`)
                                         }
@@ -477,21 +484,21 @@ export function build() {
                                         logfor(player.name, `§3§l>> §e偵測到您的 §b容器操作權限 §e更改`)
                                         player.removeTag(tag)
                                         data.inLand.per.container = `${user.permission.container}`
-                                        player.addTag(JSON.stringify(data))
+                                        db.setData("inLandData", data)
                                         return;
                                     }
                                     if (`${user.permission.portal}` != data.inLand.per.portal) {
                                         logfor(player.name, `§3§l>> §e偵測到您的 §b傳送點設置權限 §e更改`)
                                         player.removeTag(tag)
                                         data.inLand.per.portal = `${user.permission.portal}`
-                                        player.addTag(JSON.stringify(data))
+                                        db.setData("inLandData", data)
                                         return;
                                     }
                                     if (`${user.permission.fly}` != data.inLand.per.fly) {
                                         logfor(player.name, `§3§l>> §e偵測到您的 §b飛行權限 §e更改`)
                                         player.removeTag(tag)
                                         data.inLand.per.fly = `${user.permission.fly}`
-                                        player.addTag(JSON.stringify(data))
+                                        db.setData("inLandData", data)
                                         if (data.inLand.per.fly == "false") {
                                             removefly(player)
                                         }
@@ -518,6 +525,7 @@ export function build() {
                      * @type {{inLand: {dime: string, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string}}}}
                      */
                     let data = JSON.parse(tag)
+                    const db = playerDB.table(player.id)
                     let lands = worldlog.getScoreboardPlayers('lands')
                     if (data.inLand.dime == 'nether') {
                         lands = worldlog.getScoreboardPlayers('lands_nether')
@@ -539,7 +547,7 @@ export function build() {
                                     logfor(player.name, `§3§l>> §e偵測到領地 §b建築/破壞權限 §e更改`)
                                     player.removeTag(tag)
                                     data.inLand.per.build = getLand.permission.build
-                                    player.addTag(JSON.stringify(data))
+                                    db.setData("inLandData", data)
                                     if (data.inLand.per.build == "false") {
                                         removefly(player)
                                     }
@@ -552,21 +560,21 @@ export function build() {
                                     logfor(player.name, `§3§l>> §e偵測到領地 §b容器操作權限 §e更改`)
                                     player.removeTag(tag)
                                     data.inLand.per.container = getLand.permission.container
-                                    player.addTag(JSON.stringify(data))
+                                    db.setData("inLandData", data)
                                     return;
                                 }
                                 if (getLand.permission.portal != data.inLand.per.portal) {
                                     logfor(player.name, `§3§l>> §e偵測到領地 §b傳送點設置權限 §e更改`)
                                     player.removeTag(tag)
                                     data.inLand.per.portal = getLand.permission.portal
-                                    player.addTag(JSON.stringify(data))
+                                    db.setData("inLandData", data)
                                     return;
                                 }
                                 if (getLand.permission.fly != data.inLand.per.fly) {
                                     logfor(player.name, `§3§l>> §e偵測到您的 §b飛行權限 §e更改`)
                                     player.removeTag(tag)
                                     data.inLand.per.fly = getLand.permission.fly
-                                    player.addTag(JSON.stringify(data))
+                                    db.setData("inLandData", data)
                                     if (data.inLand.per.fly == "false") {
                                         removefly(player)
                                     }
@@ -624,7 +632,7 @@ export function build() {
                                 }
                             }
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            addSign(msg, player, 60)
                             player.removeTag(tag)
                             if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
@@ -645,7 +653,7 @@ export function build() {
                                 }
                             }
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            addSign(msg, player, 60)
                             player.removeTag(tag)
                             if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
@@ -666,7 +674,7 @@ export function build() {
                                 }
                             }
                             let msg = `§e§l領地系統 §f> §c您已經離開領地!`
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            addSign(msg, player, 60)
                             player.removeTag(tag)
                             if (!getAdmin(player)) {
                                 player.runCommandAsync("gamemode s")
@@ -680,7 +688,7 @@ export function build() {
     }, 2)
 
     // 偵測交互
-    mc.world.events.beforeItemUseOn.subscribe(events => {
+    mc.world.beforeEvents.itemUseOn.subscribe(events => {
         const { source: player, blockFace } = events
         for (let tag of player.getTags()) {
             if (tag.startsWith('{"inLand":')) {
@@ -697,7 +705,7 @@ export function build() {
                                 player.removeTag(tag)
                             }
                         }
-                        player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                        addSign(msg, player, 60)
                     }
                 }
             }
@@ -708,7 +716,7 @@ export function build() {
     // 偵測在領地外使用/破壞領地內之容器
 
     // 使用
-    mc.world.events.beforeItemUseOn.subscribe(events => {
+    mc.world.beforeEvents.itemUseOn.subscribe(events => {
         const { source: player } = events
         let getBlock = player.getBlockFromViewDirection()
         let landData = checkInLand_Pos(getBlock.location.x, getBlock.location.z, player.dimension.id)
@@ -738,13 +746,13 @@ export function build() {
                     player.removeTag(tag)
                 }
             }
-            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+            addSign(msg, player, 60)
 
         }
     })
 
     // 放置
-    mc.world.events.blockPlace.subscribe(events => {
+    mc.world.afterEvents.blockPlace.subscribe(events => {
         let { block, player, dimension } = events
         let data = checkInLand_Pos(block.location.x, block.location.z, player.dimension.id)
         if (!data) return;
@@ -771,12 +779,12 @@ export function build() {
                     player.removeTag(tag)
                 }
             }
-            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+            addSign(msg, player, 60)
         }
     })
 
     // 破壞
-    mc.world.events.blockBreak.subscribe(events => {
+    mc.world.afterEvents.blockBreak.subscribe(events => {
         let { block, player, dimension, brokenBlockPermutation } = events
         let data = checkInLand_Pos(block.location.x, block.location.z, player.dimension.id)
         if (!data) return;
@@ -802,7 +810,7 @@ export function build() {
                     player.removeTag(tag)
                 }
             }
-            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+            addSign(msg, player, 60)
         }
     })
 

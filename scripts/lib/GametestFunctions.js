@@ -1,30 +1,42 @@
 import * as mc from "@minecraft/server";
+import { playerDB } from "../config";
+import { isNum } from "./function";
 
 const cmd = function(command) {
-    return mc.world.getDimension("overworld").runCommandAsync(command)
+    return mc.world.getDimension("overworld").runCommand(command)
 };
 
 const cmd_Dimension = (command, dimension) => {
-    return mc.world.getDimension(dimension).runCommandAsync(command)
+    return mc.world.getDimension(dimension).runCommand(command)
 }
   
-const logfor = function(playername,message) {
-    let okay_message = message.toString().replaceAll('\"',"''").replaceAll('\\',"/")
-    mc.world.getDimension("overworld").runCommandAsync(`tellraw "${playername}" {"rawtext":[{"text":"${okay_message}"}]}`)
+/**
+ * 傳送一則訊息給玩家
+ * @param {Minecraft.Player | string} player 玩家
+ * @param {string} message 訊息
+ */
+export function logfor(player, message) {
+    try {
+        if (typeof player != "string") {
+            player = player.name;
+        }
+        let okay_message = message.toString().replaceAll('\"', "''").replaceAll('\\', "/")
+        if (player.includes("@")) {
+            Minecraft.world.getDimension("overworld").runCommand(`tellraw ${player} {"rawtext":[{"text":"${okay_message}"}]}`)
+        } else {
+            Minecraft.world.getDimension("overworld").runCommand(`tellraw "${player}" {"rawtext":[{"text":"${okay_message}"}]}`)
+        }
+    } catch { }
 };
-const logforTarget = function(Target,message) {
-    let okay_message = message.toString().replaceAll('\"',"''").replaceAll('\\',"/")
-    mc.world.getDimension("overworld").runCommandAsync(`tellraw ${Target} {"rawtext":[{"text":"${okay_message}"}]}`)
-}
 
 const titlefor = function(playername,message) {
     let okay_message = message
-    mc.world.getDimension("overworld").runCommandAsync(`titleraw "${playername}" actionbar {"rawtext":[{"text":"${okay_message}"}]}`)
+    mc.world.getDimension("overworld").runCommand(`titleraw "${playername}" actionbar {"rawtext":[{"text":"${okay_message}"}]}`)
 }
 
 const titlelog = function(message) {
     let okay_message = message
-    mc.world.getDimension("overworld").runCommandAsync(`titleraw @a actionbar {"rawtext":[{"text":"${okay_message}"}]}`)
+    mc.world.getDimension("overworld").runCommand(`titleraw @a actionbar {"rawtext":[{"text":"${okay_message}"}]}`)
 }
 
 const log = function(message) {
@@ -32,29 +44,83 @@ const log = function(message) {
     mc.world.sendMessage(okay_message)
 }
 
-const addSign = function(message, player, tick) {
-    player.addTag(JSON.stringify({ "news": message, tick: 0, maxtick: tick }))
+/**
+ * 強制踢出玩家
+ * @param {mc.Player} player 
+ */
+export function kickPlayer2(player) {
+    player.triggerEvent("kick");
 }
 
-const removeSign = function(message, player) {
-    for (let tag of player.getTags()) {
-        if (tag.startsWith('{"news":')) {
-            let msg = JSON.parse(tag)
-            if (msg.news == message) {
-                player.removeTag(tag)
+/**
+ * 踢出玩家
+ * @param {mc.Player} player 
+ */
+ export function kickPlayer(player) {
+    cmd(`kick ${player.name}`);
+}
+
+/**
+ * 新增動態Actionbar
+ * @param {string} message 
+ * @param {mc.Player} player 
+ * @param {number} tick 
+ */
+const addSign = function(message, player, tick, nowTick = 0) {
+    if (isNum(message)) message = message.toString();
+    let db = playerDB.table(player.id);
+    let allMessage = db.getData('dynamic_message')
+    if (!allMessage || allMessage.value.length == 0) db.setData("dynamic_message", [{ news: message, tick: nowTick, maxtick: tick }], 0)
+    if (allMessage.value.length > 0) {
+        allMessage.value.push({ news: message, tick: nowTick, maxtick: tick })
+        db.setData("dynamic_message", allMessage.value, allMessage.score)
+    }
+}
+
+/**
+ * 刪除動態Actionbar
+ * @param {string} deleteMessage 
+ * @param {mc.Player} player 
+ * @param {boolean | null} includes 預設為`true`
+ * @returns 是否成功刪除
+ */
+const removeSign = function(deleteMessage, player, includes = true) {
+    let db = playerDB.table(player.id);
+
+    let allMessage = db.getData("dynamic_message")
+
+    if (!allMessage) return false;
+
+    for (let mess of allMessage.value) {
+        if (!includes) {
+            if (mess.news == deleteMessage) {
+                allMessage.value.splice(allMessage.value.indexOf(mess), 1)
+                // log(JSON.stringify(allMessage.value))
+                db.setData("dynamic_message", allMessage.value, 0)
+                // log(JSON.stringify(db.getData("dynamic_message")))
+                return true
+            }
+        } else {
+            if (mess.news.includes(deleteMessage)) {
+                allMessage.value.splice(allMessage.value.indexOf(mess), 1)
+                // log(JSON.stringify(allMessage.value))
+                db.setData("dynamic_message", allMessage.value, 0)
+                // log(JSON.stringify(db.getData("dynamic_message")))
+                return true
             }
         }
     }
+    
+    return false
 }
 
+/**
+ * 取得動態Actionbar
+ * @param {mc.Player} player 
+ */
 const getSign = function(player) {
-    let all = []
-    for (let tag of player.getTags()) {
-        if (tag.startsWith('{"news":')) {
-            all.push(tag)
-        }
-    }
-    return all
+    let db = playerDB.table(player.id)
+    return db.getData("dynamic_message")
 }
 
 /**
@@ -97,4 +163,4 @@ export function getSearchTextLength (text, searchText) {
     return len
 }
 
-export {cmd, cmd_Dimension, logfor, logforTarget, log, titlefor, titlelog, addSign, removeSign, getSign}
+export {cmd, cmd_Dimension, log, titlefor, titlelog, addSign, removeSign, getSign}

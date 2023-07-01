@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { getRandomIntInclusive, worldlog } from '../../lib/function.js'
 import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
+import { playerDB } from '../../config.js'
 
 const rtpTime = 30
 
@@ -26,8 +27,9 @@ export const chatCommands = [
                     return logfor(player.name, `§c§l>> §e您的隨機傳送冷卻還未結束! §f(§e剩餘 §b${rtp_time} §e秒§f)`)
                 }
                 
-                let x = getRandomIntInclusive(-100000, 100000)
-                let z = getRandomIntInclusive(-100000, 100000)
+                let x = getRandomIntInclusive(-100000, 100000), z = getRandomIntInclusive(-100000, 100000)
+
+                const db = playerDB.table(player.id)
                 let json = {
                     "back": {
                         "x": player.location.x,
@@ -36,10 +38,12 @@ export const chatCommands = [
                         "dimension": player.dimension.id,
                     }
                 }
-                player.addTag(JSON.stringify(json))
+                db.setData("backLocation", json)
+
                 player.runCommandAsync(`effect @s blindness 5 255 true`)
                 player.runCommandAsync(`effect @s resistance 15 255 true`)
                 player.runCommandAsync(`effect @s slowness 5 255 true`)
+                
                 player.runCommandAsync(`tp ${x} 350 ${z}`).then(() => {
                     logfor(player.name, `§a§l>> §e傳送成功!`)
                     player.runCommandAsync(`scoreboard players set @s rtp_time ${rtpTime}`)

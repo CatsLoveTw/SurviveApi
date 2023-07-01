@@ -1,8 +1,9 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { isNum, worldlog } from '../../lib/function';
-import { checkPoint, log, logfor } from '../../lib/GametestFunctions';
-import { tpaSetting } from '../../defind';
+import { addSign, checkPoint, log, logfor } from '../../lib/GametestFunctions';
+import { tpaSetting } from './defind';
+import { playerDB } from '../../config';
 
 /**
  * 
@@ -13,6 +14,7 @@ export function UI (player) {
     // 設定請求Tag - {"tpaReq": {"source": string, "reqName": string, "tpa": number, 'message': string, "duration": number, "startTime": number}} 
     // 設定被請求Tag - {"tpaReqed": {"source": string, "reqName": string, "tpa": number, 'message': string, "duration": number, "startTime": number}}
     // source 請求玩家名稱 reqName 被請求玩家名稱 tpa - 0 請求玩家傳送至被請求玩家 / 1 被請求玩家傳送至請求玩家 duration 持續時間 startTime 開始時間 (unixTime - 毫秒)
+    const db = playerDB.table(player.id)
     let form = new ui.ActionFormData()
         .title("§e§l玩家互傳功能")
         .button('§e§l互傳系統')
@@ -91,8 +93,7 @@ export function UI (player) {
                             }
                             let tpaMsg = tpaMsgs[tpaID]
                             let Req = {
-                                "tpaReq": 
-                                {
+                                "tpaReq": {
                                     "source": player.name,
                                     "reqName": selePlayer.name,
                                     "tpa": tpaID,
@@ -111,12 +112,17 @@ export function UI (player) {
                                     "startTime": new Date().getTime()
                                 }
                             } 
-                            selePlayer.addTag(JSON.stringify(Reqed))
-                            player.addTag(JSON.stringify(Req))
+                            
+                            const seleDB = playerDB.table(selePlayer.id), db = playerDB.table(player.id)
+                            db.setData("tpaRequire", Req)
+                            seleDB.setData("tpaRequired", Reqed)
+
                             let msg = `§a§lTpa請求 §f> §e您已向 §b${selePlayer.name} §e發送請求，等待回復...`
-                            player.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            addSign(msg, player, 60)
+
                             msg = `§a§lTpa邀請 §f> §b${player.name} §e${tpaMsg}，輸入 §a-tpa accept 同意 §c-tpa deny 拒絕...`
-                            selePlayer.addTag(JSON.stringify({ "news": msg, tick: 0, maxtick: 60 }))
+                            addSign(msg, selePlayer, 60)
+
                             logfor(player.name, `§a§l>> §e請求發送成功，等待回應... (您也可以輸入-tpa delete 撤回請求) §f(§b對方§f: ${selePlayer.name} §b持續時間§f: ${duration}s§f)`)
                             logfor(selePlayer.name, `§e§l>> §b${player.name} §e發送了tpa請求，${tpaMsg}，可輸入 §a-tpa accept 接受 §c-tpa deny 拒絕 §f(§b訊息§f: §b${message}§f)`)
                         })
@@ -150,8 +156,8 @@ export function UI (player) {
                             }
                             sec = Number(sec)
                             player.removeTag(settingTag)
-                            let newTag = new tpaSetting(sec, dontDistrub, tpaSetting_.banlist, false).transformToTag()
-                            player.addTag(newTag)
+                            let newTag = new tpaSetting(sec, dontDistrub, tpaSetting_.banlist, false).toJSON()
+                            db.setData("tpaSetting", newTag)
                             logfor(player.name, `§a§l>> §e設定成功!`)
                             return UI(player)
                         })
@@ -178,7 +184,9 @@ export function UI (player) {
                                 if (name == player.name) return logfor(player.name, `§c§l>> §e不可黑名單自己!`)
                                 player.removeTag(settingTag)
                                 data.banlist.push(name)
-                                player.addTag(new tpaSetting(data.sec, data.Distrub, data.banlist, false).transformToTag());
+
+                                let setting = new tpaSetting(data.sec, data.Distrub, data.banlist, false).toJSON()
+                                db.setData("tpaSetting", setting)
                                 return logfor(player.name, `§a§l>> §e新增成功!`)
                             }
                             
@@ -250,7 +258,9 @@ export function UI (player) {
                                 let selePlayer = banlist[res.selection]
                                 banlist.splice(banlist.indexOf(selePlayer), 1)
                                 player.removeTag(settingTag)
-                                player.addTag(new tpaSetting(data.sec, data.Distrub, banlist, false).transformToTag())
+
+                                let setting = new tpaSetting(data.sec, data.Distrub, banlist, false).toJSON()
+                                db.setData("tpaSetting", setting)
                                 return logfor(player.name, `§a§l>> §e刪除成功!`) 
                             })
                         }

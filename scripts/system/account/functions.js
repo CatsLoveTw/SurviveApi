@@ -3,6 +3,7 @@ import { worldlog } from '../../lib/function.js'
 import { addSign, cmd, getSign, log, logfor } from '../../lib/GametestFunctions.js'
 import { loginSession } from './classes.js'
 import { removeSign } from '../../lib/GametestFunctions.js'
+import { playerDB } from '../../config.js'
 
 /**
  * 取得帳戶資訊
@@ -52,13 +53,14 @@ export function login(player, omid, password) {
             return logfor(player.name, '§c§l>> §e請先登出後再切換帳戶!')
         }
     }
+    const db = playerDB.table(player.id)
     let accounts = worldlog.getScoreboardPlayers('accounts').score
     for (let id of accounts) {
         let data = getAccountData(id)
         if (data.omid == omid) {
             if (data.password == password) {
-                let session = new loginSession(id, data.name, omid, password).transformTag()
-                player.addTag(session)
+                let session = new loginSession(id, data.name, omid, password).toJSON()
+                db.setData("loginSession", session)
                 logfor(player.name, `§a§l>> §e歡迎回來 §b${data.name}§e!`)
                 let pos = mc.world.getDefaultSpawnPosition()
                 player.runCommandAsync(`tp @s ${pos.x} ${pos.y} ${pos.z}`)
