@@ -1,12 +1,12 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
-import { log, cmd } from '../../lib/GametestFunctions.js'
+import { log, cmd, cmd_async } from '../../lib/GametestFunctions.js'
 import * as builds from './titleraw.js'
 
 
 export function build () {
     function addBoard (ID, Display) {
-        cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+        cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
         "timeD": "天數",

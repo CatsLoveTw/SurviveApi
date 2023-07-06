@@ -352,8 +352,8 @@ export function adminUI(player) {
                                                         let form = new ui.MessageFormData()
                                                             .title("§e§l刪除種類確認")
                                                             .body("§c§l請注意，種類刪除會連帶到該種類之商品，是否刪除?")
-                                                            .button1("§a§l刪除")
-                                                            .button2("§c§l取消")
+                                                            .button2("§a§l刪除")
+                                                            .button1("§c§l取消")
                                                             .show(player).then(res => {
                                                                 if (res.canceled) return
                                                                 if (res.selection == 1) {

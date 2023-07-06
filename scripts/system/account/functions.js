@@ -19,7 +19,6 @@ export function getAccountData(id) {
             let omid = args[0].replace("omid:", "")
             let name = args[1].replace("name:", "")
             let password = args[2].replace('password', "")
-
             return new loginSession(id, name, omid, password)
         }
     }
@@ -31,11 +30,11 @@ export function getAccountData(id) {
 * @param {mc.Player} player 要檢查之玩家
 * @returns 
 */
-export function checkLogin(player) {
-    for (let tag of player.getTags()) {
-        if (tag.startsWith('{"loginSession":')) {
-            return loginSession.transformData(tag)
-        }
+export function checkLogin(player, debug = false) {
+    const LoginExist = playerDB.table(player.id).getData("loginSession");
+    if (LoginExist && typeof LoginExist.value == "object") {
+        const result = loginSession.transformData(LoginExist.value)
+        return result
     }
     return false
 }
@@ -48,23 +47,26 @@ export function checkLogin(player) {
  * @returns 
  */
 export function login(player, omid, password) {
-    for (let tag of player.getTags()) {
-        if (tag.startsWith('{"loginSession":')) {
-            return logfor(player.name, '§c§l>> §e請先登出後再切換帳戶!')
-        }
-    }
     const db = playerDB.table(player.id)
+    if (checkLogin(player)) {
+        return logfor(player.name, '§c§l>> §e請先登出後再切換帳戶!')
+    }
     let accounts = worldlog.getScoreboardPlayers('accounts').score
     for (let id of accounts) {
+        /**
+         * @type {loginSession}
+         */
         let data = getAccountData(id)
-        if (data.omid == omid) {
-            if (data.password == password) {
-                let session = new loginSession(id, data.name, omid, password).toJSON()
-                db.setData("loginSession", session)
-                logfor(player.name, `§a§l>> §e歡迎回來 §b${data.name}§e!`)
-                let pos = mc.world.getDefaultSpawnPosition()
-                player.runCommandAsync(`tp @s ${pos.x} ${pos.y} ${pos.z}`)
-                player.runCommandAsync(`effect @s clear`)
+        if (data.omid === omid) {
+            if (data.password === password) {
+                mc.system.runTimeout(() => {
+                    let session = new loginSession(id, data.name, omid, password).toJSON()
+                    db.setData("loginSession", session)
+                    logfor(player.name, `§a§l>> §e歡迎回來 §b${data.name}§e!`)
+                    let pos = mc.world.getDefaultSpawnPosition()
+                    player.runCommandAsync(`tp @s ${pos.x} ${pos.y} ${pos.z}`)
+                    player.runCommandAsync(`effect @s clear`)
+                }, 2)
                 return;
             }
         }
@@ -77,16 +79,13 @@ export function login(player, omid, password) {
  * @param {mc.Player} player 
  */
 export function newPlayer(player) {
-    let signs = getSign(player)
-    if (signs.length > 0) {
-        removeSign("§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>", player)
-    }
-    addSign('§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>', player, 21)
+    removeSign("§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>", player)
+    addSign('§c§l請登入帳戶以繼續遊玩本伺服! -login <omid> <password>', player, 20)
     player.runCommandAsync(`ability @s mayfly false`)
-    player.runCommandAsync(`effect @s weakness 3 255 true`)
-    player.runCommandAsync(`effect @s blindness 3 255 true`)
-    player.runCommandAsync(`effect @s slowness 3 255 true`)
-    player.runCommandAsync(`effect @s invisibility 3 255 true`)
+    // player.runCommandAsync(`effect @s weakness 3 255 true`)
+    // player.runCommandAsync(`effect @s blindness 3 255 true`)
+    // player.runCommandAsync(`effect @s slowness 3 255 true`)
+    // player.runCommandAsync(`effect @s invisibility 3 255 true`)
 } 
 
 /**

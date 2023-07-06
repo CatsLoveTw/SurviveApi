@@ -55,22 +55,55 @@ declare type LandCreateJSON = {
     }
 }
 
+declare type InLand_Position = {
+    x: {
+        1: number,
+        2: number
+    },
+    z: {
+        1: number,
+        2: number
+    }
+}
+
+declare type InLand_landPermission = {
+    build: boolean,
+    container: boolean,
+    portal: boolean,
+    fly: boolean,
+    tnt: boolean
+}
+
+declare type InLand_landUserPermission = {
+    build: boolean,
+    container: boolean,
+    portal: boolean,
+    fly: boolean
+}
+
+declare type InLand_landUser = {
+    username: string,
+    permission: InLand_landUserPermission
+}
+
+declare type InLand_Land = {
+    name: string,
+    pos: InLand_Position,
+    UID: number,
+    player: string | falsem,
+    permission: InLand_landPermission,
+    users: false | InLand_landUser[],
+    Public: boolean,
+    old: boolean
+}
+
 declare type InLand = {
     inLand: {
         dime: "over" | "nether" | "end",
-        land: Land,
-        per: landUserPermission
+        land: InLand_Land,
+        per: InLand_landPermission
     }
 }
 
 
-declare class LandData {
-    name: string
-    pos: landPosition
-    UID: string
-    player: string | false
-    permission: landPermission
-    users: false | landUser[]
-    Public: boolean
-    old: boolean
-}
+declare type LandData = InLand_Land

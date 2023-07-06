@@ -38,16 +38,16 @@ export const chatCommands = [
                         "dimension": player.dimension.id,
                     }
                 }
+                player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到上個位置!"}]}`)
                 db.setData("backLocation", json)
 
                 player.runCommandAsync(`effect @s blindness 5 255 true`)
                 player.runCommandAsync(`effect @s resistance 15 255 true`)
                 player.runCommandAsync(`effect @s slowness 5 255 true`)
-                
-                player.runCommandAsync(`tp ${x} 350 ${z}`).then(() => {
-                    logfor(player.name, `§a§l>> §e傳送成功!`)
-                    player.runCommandAsync(`scoreboard players set @s rtp_time ${rtpTime}`)
-                })
+
+                player.runCommandAsync(`tp ${x} 350 ${z}`)
+                logfor(player.name, `§a§l>> §e傳送成功!`)
+                player.runCommandAsync(`scoreboard players set @s rtp_time ${rtpTime}`)
             }
     }
 ]

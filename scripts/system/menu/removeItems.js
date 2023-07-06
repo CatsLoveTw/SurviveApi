@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { cmd } from '../../lib/GametestFunctions'
+import { cmd, cmd_async } from '../../lib/GametestFunctions'
 
 // 掉落物/經驗清除
 
@@ -13,10 +13,10 @@ mc.system.runInterval(async () => {
     clearTick++
     let getItems = 0
     try {
-        getItems += (await cmd(`execute as @e[type=item] run testfor @s`)).successCount
+        getItems += (await cmd_async(`execute as @e[type=item] run testfor @s`)).successCount
     } catch {}
     try {
-        getItems += (await cmd(`execute as @e[type=xp_orb] run testfor @s`)).successCount
+        getItems += (await cmd_async(`execute as @e[type=xp_orb] run testfor @s`)).successCount
     } catch {}
     if (getItems < setMax) {
         const score = worldlog.getScoreboardPlayers("menu").disname
@@ -99,10 +99,10 @@ mc.system.runInterval(async () => {
                 clearSec = 0
                 let item = 0
                 try {
-                    item += (await cmd(`execute as @e[type=item] run kill @s`)).successCount
+                    item += (await cmd_async(`execute as @e[type=item] run kill @s`)).successCount
                 } catch {}
                 try {
-                    item += (await cmd(`execute as @e[type=xp_orb] run kill @s`)).successCount
+                    item += (await cmd_async(`execute as @e[type=xp_orb] run kill @s`)).successCount
                 } catch {}
                 try {
                     mc.world.sendMessage(`§3§l>> §e本次清除了 §b${item} §e個掉落物/經驗!`)

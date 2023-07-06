@@ -1,12 +1,12 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { cmd, cmd_async, log, logfor } from '../../lib/GametestFunctions'
 import { getNoticeData } from './UI'
 
 
 export function build() {
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+        cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
         "notice": "伺服器公告紀錄"
@@ -21,7 +21,7 @@ export function build() {
     mc.system.runInterval(() => {
         if (worldlog.getScoreboardPlayers('notice').disname.length === 0) {
             // 設定預設公告
-            cmd(`scoreboard players set "title:伺服器規範.___.message:§f歡迎來到該伺服器，請遵守以下規則§f:§b請勿刷頻及散布不實言論，這是聊天室基本之禮儀。" notice 0`)
+            cmd_async(`scoreboard players set "title:伺服器規範.___.message:§f歡迎來到該伺服器，請遵守以下規則§f:§b請勿刷頻及散布不實言論，這是聊天室基本之禮儀。" notice 0`)
         }
     }, 200)
 
@@ -32,7 +32,7 @@ export function build() {
                 let data = getNoticeData(notice)
                 let title = data.title
                 let message = data.message
-                cmd(`tellraw "${playerName}" {"rawtext":[{"text":"§f§l---§e伺服器公告§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
+                cmd_async(`tellraw "${playerName}" {"rawtext":[{"text":"§f§l---§e伺服器公告§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
             }
         }, 100)
     })

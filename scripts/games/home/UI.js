@@ -1,33 +1,23 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd, logfor, addSign } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor, addSign, cmd_async } from '../../lib/GametestFunctions.js'
 import { checkInLand } from '../land/build.js'
 import * as playerUI from '../UI/player.js'
 import { Land, getLandData } from '../land/defind.js'
-import { Home, addHome } from './defind.js'
+import { Home, addHome, removeHome } from './defind.js'
 import { playerDB } from '../../config.js'
 
 /**
  * 
  * @param {mc.Player} player 
  * @param {"over" | "nether" | "end"} dimension
- * @returns {string[]}
  */
 export function getHomes(player, dimension) {
-    let tags = []
-    for (let tag of player.getTags()) {
-        if (tag.startsWith('{"home":')) {
-            /**
-             * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-             */
-            let data = JSON.parse(tag)
-            if (data.home.dime == dimension) {
-                tags.push(tag)
-            }
-        }
-    }
-    return tags
+    const db = playerDB.table(player.id)
+    const homes = db.getData('homes')
+    if (!homes) return [];
+    return homes.value
 }
 
 /**
@@ -175,15 +165,10 @@ export function UI(player) {
                             let land = checkInLand(player)
                             if (!land) return logfor(player.name, `§c§l>> §e必須在領地內才可新增!`)
                             // 取得權限
-                            for (let tag of player.getTags()) {
-                                if (tag.startsWith('{"inLand":')) {
-                                    /**
-                                     * @type {{inLand: {land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string, portal: string}}}}
-                                     */
-                                    let landData = JSON.parse(tag)
-                                    if (landData.inLand.per.portal == "false") {
-                                        return logfor(player.name, `§c§l>> §e您沒有權限在該領地創建傳送點!`)
-                                    }
+                            const InLandExist = db.getData("inLandData");
+                            if (InLandExist && typeof InLandExist.value == "object") {
+                                if (!InLandExist.value.inLand.per.portal) {
+                                    return logfor(player.name, `§c§l>> §e您沒有權限在該領地創建傳送點!`)
                                 }
                             }
 
@@ -213,10 +198,7 @@ export function UI(player) {
                                 let form = new ui.ActionFormData()
                                     .title("§e§l傳送點")
                                 for (let home of homes) {
-                                    /**
-                                     * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-                                     */
-                                    let getData = JSON.parse(home)
+                                    let getData = home
                                     let seleHome = getData.home
                                     let x = Math.trunc(seleHome.pos.x)
                                     let y = Math.trunc(seleHome.pos.y)
@@ -232,13 +214,10 @@ export function UI(player) {
                                     form2()
                                     function form2() {
                                         /**
-                                         * @type {string}
+                                         * @type {HomeData}
                                          */
                                         let home = homes[res.selection]
-                                        /**
-                                         * @type {{"home": {"name": string, "pos": {"x": number, "y": number, "z": number}, land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,portal: string}, users: false | [{username: string,permission: {build: string, container: string, portal: string}}], public: boolean}, dime: "over" | "nether" | "end"}}}
-                                         */
-                                        let getData = JSON.parse(home)
+                                        let getData = home
                                         let seleHome = getData.home
                                         let x = Math.trunc(seleHome.pos.x)
                                         let y = Math.trunc(seleHome.pos.y)
@@ -253,12 +232,6 @@ export function UI(player) {
                                             .show(player).then(res => {
                                                 if (res.canceled) return;
                                                 if (res.selection === 0) {
-                                                    for (let postag of player.getTags()) {
-                                                        if (postag.startsWith('{"back":')) {
-                                                            player.removeTag(postag)
-                                                        }
-                                                    }
-
                                                     let json = {
                                                         "back": {
                                                             "x": player.location.x,
@@ -267,14 +240,19 @@ export function UI(player) {
                                                             "dimension": player.dimension.id,
                                                         }
                                                     }
+                                                    player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到上個位置!"}]}`)
                                                     db.setData("backLocation", json)
 
                                                     player.runCommandAsync(`tp @s ${seleHome.pos.x} ${seleHome.pos.y} ${seleHome.pos.z}`)
                                                     logfor(player.name, `§a§l>> §e傳送成功!`)
                                                 }
                                                 if (res.selection === 1) {
-                                                    player.removeTag(home)
-                                                    logfor(player.name, `§a§l>> §e刪除成功!`)
+                                                    let deleteResult = removeHome(player, home)
+                                                    if (deleteResult) {
+                                                        logfor(player.name, `§a§l>> §e刪除成功!`)
+                                                    } else {
+                                                        logfor(player.name, `§c§l>> §e刪除失敗，請稍後再試!`)
+                                                    }
                                                 }
                                                 if (res.selection === 2) {
                                                     let otherPlayers = []
@@ -375,23 +353,19 @@ export function publicUI (player) {
                 let land = checkInLand(player)
                 if (!land) return logfor(player.name, `§c§l>> §e必須在領地內才可新增!`)
                 // 取得權限
-                for (let tag of player.getTags()) {
-                    if (tag.startsWith('{"inLand":')) {
-                        /**
-                         * @type {{inLand: {land: {name: string, pos: {x: {1: string, 2: string},z: {1: string, 2: string},},UID: string,player: string | false,permission: {build: string,container: string,action: string}, users: false | [{username: string,permission: {build: string, container: string, action: string}}], public: boolean}, per: {build: string, container: string, portal: string}}}}
-                         */
-                        let landData = JSON.parse(tag)
-                        if (landData.inLand.land.player != player.name) {
-                            return logfor(player.name, `§c§l>> §e您必須在自己的領地內設置!`)
-                        } 
-                        for (let home of worldlog.getScoreboardPlayers('publicHome').disname) {
-                            let data = getPublicHomeData(home)
-                            if (data.land.name == landData.inLand.land.name && data.land.UID == landData.inLand.land.UID && data.land.player == landData.inLand.land.player) {
-                                let dataPOS = data.land.pos
-                                let landDataPOS = landData.inLand.land.pos
-                                if (dataPOS.x[1] == landDataPOS.x[1] && dataPOS.x[2] == landDataPOS.x[2] && dataPOS.z[1] == landDataPOS.z[1] && dataPOS.z[2] == landDataPOS.z[2])
+                const InLandExist = db.getData("inLandData");
+                if (InLandExist && typeof InLandExist.value == "object") {
+                    let landData = InLandExist.value
+                    if (landData.inLand.land.player != player.name) {
+                        return logfor(player.name, `§c§l>> §e您必須在自己的領地內設置!`)
+                    }
+                    for (let home of worldlog.getScoreboardPlayers('publicHome').disname) {
+                        let data = getPublicHomeData(home)
+                        if (data.land.name == landData.inLand.land.name && data.land.UID == landData.inLand.land.UID && data.land.player == landData.inLand.land.player) {
+                            let dataPOS = data.land.pos
+                            let landDataPOS = landData.inLand.land.pos
+                            if (dataPOS.x[1] == landDataPOS.x[1] && dataPOS.x[2] == landDataPOS.x[2] && dataPOS.z[1] == landDataPOS.z[1] && dataPOS.z[2] == landDataPOS.z[2])
                                 return logfor(player.name, `§c§l>> §e一個領地只能設置 §b1 §e個公共傳送點!`)
-                            }
                         }
                     }
                 }
@@ -552,12 +526,6 @@ export function publicUI (player) {
                             .show(player).then(res => {
                                 if (res.canceled || res.selection === 1) return lookForServerPublicHome();
                                 if (res.selection === 0) {
-                                    for (let postag of player.getTags()) {
-                                        if (postag.startsWith('{"back":')) {
-                                            player.removeTag(postag)
-                                        }
-                                    }
-                                    
                                     let json = {
                                         "back": {
                                             "x": player.location.x,
@@ -566,6 +534,7 @@ export function publicUI (player) {
                                             "dimension": player.dimension.id,
                                         }
                                     }
+                                    player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到上個位置!"}]}`)
                                     db.setData("backLocation", json)
 
                                     let x = homeData.pos.x
@@ -685,12 +654,6 @@ export function publicUI (player) {
                                 .show(player).then(res => {
                                     if (res.canceled || res.selection === 2) return lookForPersonalHome();
                                     if (res.selection === 0) {
-                                        for (let postag of player.getTags()) {
-                                            if (postag.startsWith('{"back":')) {
-                                                player.removeTag(postag)
-                                            }
-                                        }
-                                        
                                         let json = {
                                             "back": {
                                                 "x": player.location.x,
@@ -699,6 +662,7 @@ export function publicUI (player) {
                                                 "dimension": player.dimension.id,
                                             }
                                         }
+                                        player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§3§l>> §e您可以透過 §b-back §e回到上個位置!"}]}`)
                                         db.setData("backLocation", json)
 
                                         let x = homeData.pos.x
@@ -708,9 +672,8 @@ export function publicUI (player) {
                                         logfor(player.name, `§a§l>> §e傳送成功!`)
                                     }
                                     if (res.selection === 1) {
-                                        cmd(`scoreboard players reset "${home}" publicHome`).then(() => {
-                                            return logfor(player.name, `§a§l>> §e刪除成功!`)
-                                        })
+                                        cmd_async(`scoreboard players reset "${home}" publicHome`)
+                                        return logfor(player.name, `§a§l>> §e刪除成功!`)
                                     }
                                 })
                         }

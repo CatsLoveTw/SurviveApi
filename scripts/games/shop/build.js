@@ -1,11 +1,11 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { cmd, cmd_async, log, logfor } from '../../lib/GametestFunctions'
 
 
 export function build () {
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add ${ID} dummy "${Display}"`)
+        cmd_async(`scoreboard objectives add ${ID} dummy "${Display}"`)
     }
     const boards = {
         "shopSet": "商品自訂義",

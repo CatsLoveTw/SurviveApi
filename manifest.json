@@ -1,8 +1,8 @@
 {
 	"format_version": 2,
 	"header": {
-		"name": "§e§l生存伺服器包 V2.2.7-Build1 §c此版本無法使用，請安裝正式版",
-		"description": "By cat ",
+		"name": "§e§l生存伺服器包 V2.2.7",
+		"description": "By cat | 支援:V1.20.0",
 		"min_engine_version": [
 			1,
 			19,

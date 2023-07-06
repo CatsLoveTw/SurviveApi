@@ -1,15 +1,16 @@
-import { worldlog } from "../../lib/function"
+import { convertBoolean } from "../../lib/GametestFunctions"
+import { isNum, worldlog } from "../../lib/function"
 import * as mc from '@minecraft/server'
 
 export class Land {
     /**
      * 
      * @param {string} name 領地名稱
-     * @param {landPosition} pos 領地座標
-     * @param {string} UID 領地ID
+     * @param {import("./index").InLand_Position} pos 領地座標
+     * @param {number} UID 領地ID
      * @param {string | false} player 領地擁有者 
-     * @param {landPermission} permission 領地公共權限
-     * @param {false | landUser[]} users 領地私人權限 (若是公共領地請填 false)
+     * @param {import("./index").InLand_landPermission} permission 領地公共權限
+     * @param {false | import("./index").InLand_landUser[]} users 領地私人權限 (若是公共領地請填 false)
      * @param {boolean} Public 是否為公共領地
      * @param {boolean} old 領地是否為舊版或是否有錯誤
      */
@@ -63,11 +64,11 @@ export class Land {
 
 /**
  * 
- * @param {string} x1 
- * @param {string} x2 
- * @param {string} z1 
- * @param {string} z2 
- * @returns {landPosition}
+ * @param {number} x1 
+ * @param {number} x2 
+ * @param {number} z1 
+ * @param {number} z2 
+ * @returns {import("./index").InLand_Position}
  */
 export function newLandPosition (x1, x2, z1, z2) {
     return {
@@ -89,7 +90,7 @@ export function newLandPosition (x1, x2, z1, z2) {
  * @param {string} portal 
  * @param {string} fly 
  * @param {string} tnt 
- * @returns {landPermission}
+ * @returns {import("./index").landPermission}
  */
 export function newLandPermission (build, container, portal, fly, tnt) {
     return {
@@ -104,11 +105,11 @@ export function newLandPermission (build, container, portal, fly, tnt) {
 /**
  * 
  * @param {string} userName 
- * @param {string} build 
- * @param {string} container 
- * @param {string} portal 
- * @param {string} fly 
- * @returns {landUser}
+ * @param {boolean} build 
+ * @param {boolean} container 
+ * @param {boolean} portal 
+ * @param {boolean} fly 
+ * @returns {import("./index").InLand_landUser}
  */
 export function newLandUser (userName, build, container, portal, fly) {
     return {
@@ -138,7 +139,7 @@ export function getLandData(land) {
 
     // 處理私人權限
     /**
-    * @type {landUser[]}
+    * @type {import("./index").InLand_landUser}
     */
     let usersList = []
     let old = false
@@ -153,10 +154,10 @@ export function getLandData(land) {
                 old = true
             }
             let userPermissions = {
-                build: per[0],
-                container: per[1],
-                portal: per[2],
-                fly: fly,
+                build: convertBoolean(per[0]),
+                container: convertBoolean(per[1]),
+                portal: convertBoolean(per[2]),
+                fly: convertBoolean(fly),
             }
             usersList.push({ username: username, permission: userPermissions })
         }
@@ -175,32 +176,35 @@ export function getLandData(land) {
     }
     let position = {
         x: {
-            1: x,
-            2: x2
+            1: Number(x),
+            2: Number(x2)
         },
         z: {
-            1: z,
-            2: z2
+            1: Number(z),
+            2: Number(z2)
         }
     }
     let permission = {
-        build: permissions[0],
-        container: permissions[1],
-        portal: permissions[2],
-        fly: fly,
-        tnt: tnt
+        build: convertBoolean(permissions[0]),
+        container: convertBoolean(permissions[1]),
+        portal: convertBoolean(permissions[2]),
+        fly: convertBoolean(fly),
+        tnt: convertBoolean(tnt)
     }
+    
+    const landName = args[0]
+    const UID = Number(args[2]), player = args[3]
     if (args[3] != "true") {
-        return new Land(args[0], position, args[2], args[3], permission, usersList, false, old)
+        return new Land(landName, position, UID, args[3], permission, usersList, false, old)
     } else {
-        return new Land(args[0], position, args[2], false, permission, false, true, old)
+        return new Land(landName, position, UID, false, permission, false, true, old)
     }
 }
 
 /**
  * 取得玩家所擁有的領地
  * @param {mc.Player} player 玩家
- * @param {landDimension} dimension 維度
+ * @param {import("./index").landDimension} dimension 維度
  */
 export function getPlayerLands(player, dimension) {
     let lands = worldlog.getScoreboardPlayers("lands").disname
@@ -222,7 +226,7 @@ export function getPlayerLands(player, dimension) {
 
 /**
  * 取得公共領地
- * @param {landDimension} dime
+ * @param {import("./index").landDimension} dime
  */
 export function getAdminLands(dime) {
     let landID = 'lands'
@@ -250,7 +254,7 @@ export function getAdminLands(dime) {
 export class LandCreate {
     /**
      * 
-     * @param {landDimension} dime 領地維度
+     * @param {import("./index").landDimension} dime 領地維度
      * @param {number} at 開始時間 (請使用 Date.getTime()) 
      * @param {string} name 領地名稱 
      * @param {number} step 建造步驟
@@ -284,11 +288,9 @@ export class LandCreate {
 /**
  * 
  * @param {string} tag 
+ * @deprecated 已暫停使用
  */
-export function getLandCreateDataFromTag (tag) {
-    /**
-     * @type {LandCreateJSON}
-     */
+function getLandCreateDataFromTag (tag) {
     let data = JSON.parse(tag)
     let data2 = data.landCreate
     return new LandCreate(data2.dime, data2.at, data2.name, data2.step, data2.admin)

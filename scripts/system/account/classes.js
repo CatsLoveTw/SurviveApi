@@ -52,8 +52,9 @@ export class loginSession {
     /**
      * 將tag轉換為Data
      * @param {string} tag 
+     * @deprecated tagJSON已被淘汰，請使用 {@linkcode loginSession.transformData}
      */
-    static transformData (tag) {
+    static transformDataFromTag (tag) {
         if (tag.startsWith('{"loginSession":')) {
             let data = JSON.parse(tag)
 
@@ -63,5 +64,16 @@ export class loginSession {
             return getAccountData(data.loginSession.id)
         }
         return false
+    }
+
+    /**
+     * 將JSON轉換為LoginSession
+     * @param {LoginSessionJSON} json 
+     */
+    static transformData (json) {
+        if (typeof json != "object") return false;
+        if (!json.loginSession) return false;
+        if (json.loginSession.id == -1) return new loginSession(-1, '', '', '')
+        return getAccountData(json.loginSession.id)
     }
 }

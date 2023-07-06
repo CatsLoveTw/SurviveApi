@@ -1,13 +1,13 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { log, logfor, cmd, removeSign } from '../../lib/GametestFunctions'
+import { log, logfor, cmd, removeSign, cmd_async } from '../../lib/GametestFunctions'
 import { getPublicHomeData } from './UI'
 import { getLandData } from '../land/defind'
 import { playerDB } from '../../config'
 
 export function build() {
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+        cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
         "publicHome": "公共傳送點"
@@ -61,8 +61,8 @@ export function build() {
         for (let publicHome of publicHomes) {
             if (!getPublicHomeData(publicHome).landDataCheck) {
                 let homeData = getPublicHomeData(publicHome)
-                logfor(homeData.scoreData.player, `§c§l>> §e偵測到公共傳送點被刪除! §f| §e公共傳送點名 §f- §b${homeData.name} §7| §e領地名 §f- §b${homeData.scoreData.name}`)
                 cmd(`scoreboard players reset "${publicHome}" publicHome`)
+                logfor(homeData.scoreData.player, `§c§l>> §e偵測到公共傳送點被刪除! §f| §e公共傳送點名 §f- §b${homeData.name} §7| §e領地名 §f- §b${homeData.scoreData.name}`)
             }
         }
     }, 40)

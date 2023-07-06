@@ -1,5 +1,6 @@
 import * as mc from '@minecraft/server'
 import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { playerDB } from '../../config'
 
 export const chatCommands = [
     // backTag = {"back": {"x": number, "y": number, "z": number, "dimension": string | undefined}}
@@ -30,32 +31,25 @@ export const chatCommands = [
             @param {string} message
             */
             function (player, message, error) {
-                for (let tag of player.getTags()) {
-                    if (tag.startsWith('{"back":')) {
-                        /**
-                         * @type {{"back": {"x": number, "y": number, "z": number, "dimension": string | undefined}}}
-                         */
-                        let json = JSON.parse(tag)
-                        if (json.back.dimension) {
-                            if (player.dimension.id == json.back.dimension) {
-                                player.runCommandAsync(`tp @s ${json.back.x} ${json.back.y} ${json.back.z}`)
-                            } else {
-                                function listDimension (dimension) {
-                                    if (dimension == mc.MinecraftDimensionTypes.overworld) return '§a§l主世界'
-                                    if (dimension == mc.MinecraftDimensionTypes.nether) return '§c§l地獄'
-                                    if (dimension == mc.MinecraftDimensionTypes.theEnd) return '§b§l終界'
-                                }
-                                logfor(player.name, `§c§l>> §e無法傳送! §f(§e目標維度§f:${listDimension(json.back.dimension)} §7| §e所在維度§f:${listDimension(player.dimension.id)}§f)`)
-                                return;
-                            }
-                        } else {
-                            player.runCommandAsync(`tp @s ${json.back.x} ${json.back.y} ${json.back.z}`)
-                        }
-                        logfor(player.name, `§a§l>> §e傳送成功!`)
-                        return;
+                const db = playerDB.table(player.id), Back = db.getData("backLocation")
+                if (Back && typeof Back.value == "object") {
+                    let json = Back.value
+                    const Location = {
+                        x: json.back.x,
+                        y: json.back.y,
+                        z: json.back.z
                     }
+                    if (json.back.dimension) {
+                        const Dimension = mc.world.getDimension(json.back.dimension)
+                        player.teleport(Location, {dimension: Dimension})
+                    } else {
+                        player.teleport(Location)
+                    }
+                    logfor(player.name, `§a§l>> §e傳送成功!`)
+                    return;
+                } else {
+                    return logfor(player.name, `§c§l>> §e找不到可傳送的位置，請稍後再試!`)
                 }
-                return logfor(player.name, `§c§l>> §e找不到可傳送的位置，請稍後再試!`)
             }
     }
 ]

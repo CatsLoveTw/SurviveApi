@@ -23,6 +23,11 @@ export const defaultValue = [
                 key: "dynamic_message",
                 value: [],
                 score: 0
+            },
+            {
+                key: "homes",
+                value: [],
+                score: 0
             }
         ]
     }

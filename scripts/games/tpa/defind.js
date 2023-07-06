@@ -1,11 +1,13 @@
 /// <reference path="./index.d.ts" />
 
+import { isNum } from "../../lib/function"
+
 export class tpaSetting {
     /**
      * 若沒有數值，可以選擇不填入。
      * @param {number} sec tpa時長 
      * @param {boolean} Distrub 請勿打擾
-     * @param {string[]} banlist 黑名單玩家ID(唯一識別ID)列表
+     * @param {string[]} banlist 黑名單玩家名稱列表
      * @param {boolean} old 確認標籤是否為舊版 (無黑名單功能)
      */
     constructor (sec, Distrub, banlist, old) {
@@ -65,8 +67,18 @@ export class tpaSetting {
             banlist = json.tpaSetting.banlist
         }
         
-        const sec = json.tpaSetting.sec, distrub = json.tpaSetting.dontDistrub
-        return new tpaSetting(sec, distrub, banlist, old)
+        function transformBoolean (text) {
+            if (text == "true") return true;
+            return false;
+        }
+
+        let newBanList = []
+        for (let value of banlist) {
+            if (isNum(value)) newBanList.push(String(value))
+            else newBanList.push(value)
+        }
+        const sec = json.tpaSetting.sec, distrub = transformBoolean(json.tpaSetting.dontDistrub)
+        return new tpaSetting(sec, distrub, newBanList, old)
     }
     /**
      * 

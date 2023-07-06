@@ -24,7 +24,10 @@ export function build() {
                         return logfor(player.name, `§e§l>> §c指令語法錯誤，請參閱 -help ${command}`)
                     }
                     try {
-                        return getCommand.run(player, message, error)
+                        mc.system.runTimeout(() => {
+                            getCommand.run(player, message, error)
+                        }, 1)
+                        return;
                     } catch (e) { log(e) }
                 }
                 if (getCommand.command && getCommand.adminOnly) {
@@ -33,7 +36,10 @@ export function build() {
                             return logfor(player.name, `§e§l>> §c指令語法錯誤，請參閱 -help ${command}`)
                         }
                         try {
-                            return getCommand.run(player, message, error)
+                            mc.system.runTimeout(() => {
+                                getCommand.run(player, message, error)
+                            }, 1)
+                            return;
                         } catch (e) { log(e) }
                     } else {
                         return logfor(player.name, `§3§l>> §c找不到該指令`)

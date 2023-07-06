@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server"
 import * as mc from "@minecraft/server"
-import { cmd, log, logfor } from './GametestFunctions.js'
+import { cmd, cmd_async, log, logfor } from './GametestFunctions.js'
 import { leaderboard } from "./leaderboard.js"
 import { checkAccountActive, checkLogin, newPlayer } from "../system/account/functions.js"
 /**
@@ -166,7 +166,7 @@ class worldlogs {
     addScoreBoards (scoreboards) {
         for (let scoreboard of scoreboards) {
             try {
-                cmd(`scoreboard objectives add ${scoreboard.id} dummy ${scoreboard.disname}`)
+                cmd_async(`scoreboard objectives add ${scoreboard.id} dummy ${scoreboard.disname}`)
             } catch {}
         }
     }

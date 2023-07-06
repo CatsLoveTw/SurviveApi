@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function.js'
-import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
+import { log, cmd, logfor, cmd_async } from '../../lib/GametestFunctions.js'
 import { banList, transformScoreboard } from './build.js'
 
 export function adminUI (player) {

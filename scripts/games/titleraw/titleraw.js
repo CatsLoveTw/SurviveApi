@@ -5,7 +5,7 @@ import { addSign, cmd, log, removeSign, titlefor } from '../../lib/GametestFunct
 import { checkAccountActive, checkLogin } from '../../system/account/functions';
 import { playerDB } from '../../config';
 
-export function build () {
+export function build() {
     // {"news": msg, tick: 0, maxtick: 20}
     mc.system.runInterval(() => {
         for (let player of mc.world.getPlayers()) {
@@ -15,12 +15,13 @@ export function build () {
             let allDynamicMessage = db.getData("dynamic_message")
             if (allDynamicMessage && allDynamicMessage.value.length > 0) {
                 for (let message of allDynamicMessage.value) {
+                    const news = typeof message.news == "string" ? message.news : String(message.news);
                     if (message.tick >= message.maxtick) {
-                        removeSign(message.news, player)
+                        removeSign(news, player)
                     } else {
-                        removeSign(message.news, player)
-                        addSign(message.news, player, message.maxtick, message.tick + 1)
-                        display.push(`§l§f${((message.maxtick - message.tick) / 20).toFixed(1)}s §7| ` + message.news + "\n")
+                        removeSign(news, player)
+                        addSign(news, player, message.maxtick, message.tick + 1)
+                        display.push(`§l§f${((message.maxtick - message.tick) / 20).toFixed(1)}s §7| ` + news + "\n")
                     }
                 }
             }
@@ -39,7 +40,7 @@ export function build () {
             }
             if (M < 10 && M != 0) {
                 disM = "0" + M
-            } 
+            }
             if (S < 10 && S != 0) {
                 disS = "0" + S
             }
@@ -71,9 +72,9 @@ export function build () {
                         dismoney = dismoney.split('.')[0] + get.slice(2, 3)
                     }
                 }
-                
+
             }
-            
+
             let time = `§f${disD} §b日 §f${disH} §b小時 §f${disM} §b分鐘 §f${disS} §b秒`
             if (!checkLogin(player) && checkAccountActive()) {
                 titlefor(player.name, `§l${display.join("")}`)
@@ -81,5 +82,5 @@ export function build () {
                 titlefor(player.name, `§l${display.join("")}§g金錢 §7- §e${dismoney} `)
             }
         }
-    }, 10)
+    }, 1)
 }

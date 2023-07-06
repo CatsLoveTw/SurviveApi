@@ -12,11 +12,12 @@ export function UI(player) {
     // 轉帳系統tag 給錢: {"senderTM": {"value": number, "sender": string, "target": string, "startTime": number}}
     // 收到錢: {"targetTM": {"value": number, "sender": string, "target": string, "startTime": number}}
     // value 轉帳金額 sender 轉帳人 target 收帳者 startTime 開始時間
-    for (let tag of player.getTags()) {
-        if (tag.includes('{"senderTm":') || tag.includes('{"targetTM":')) {
-            return logfor(player.name, `§c§l>> §e請等待上筆無條件退款結束!`)
-        }
-    }
+    
+    // for (let tag of player.getTags()) {
+    //     if (tag.includes('{"senderTm":') || tag.includes('{"targetTM":')) {
+    //         return logfor(player.name, `§c§l>> §e請等待上筆無條件退款結束!`)
+    //     }
+    // }
     let players = []
     let playerNames = []
     for (let pl of worldlog.getPlayers()) {

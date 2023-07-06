@@ -1,4 +1,5 @@
 import * as database from "./lib/db/WorldDB"
+export * from "./config_DB"
 
 /**
  * @readonly
@@ -10,40 +11,24 @@ export const prefix = "-";
  * @readonly
  * @description API版本
  */
-export const version = "BETA V2.2.63"
+export const version = "BETA V2.2.7"
 /**
  * @readonly
  * @description API更新時間
  */
-export const updateDate = '2023/5/9 (Tue.)'
+export const updateDate = '2023/7/6 (Thurs.)'
 /**
  * @readonly
  * @description API更新內容
  */
 export const updates = {
     // "版本號 | 加權值": []
-    "BETA 2.2.6 | 2.45": [
-        "支持版本V1.19.80+ | 必備",
-        "掉落物移除上限 400 -> 250 個數量 | 中",
-        "新增領地時，已可及時觀看上限格數 | 中",
-        "因系統限制，領地最大暫限20000格 | 極高",
-        "領地防爆功能已可在公共權限內調整，並新增提示 | 中+",
-        "修復可跨維度傳送公共傳送點的問題 | 中+",
-        "掉落物移除BUG已修復 | 極高+",
-        "修復rtp在其他維度傳送時可能遇到的問題 | 中",
+    "BETA 2.2.7-build1 | 0": [
+        "嘗試將玩家資料儲存 tag -> 記分板 (未完成) | 中+"
     ],
-    "BETA 2.2.61 | 2.5": [
-        "修復無法新增領地的問題 | 必備",
-        "修復領地刪除時依然可飛行的問題 | 高+",
-        "修復建造領地時，歸還方塊不同問題 | 中+"
-    ],
-    "BETA 2.2.62 | 2": [
-        "修復新增領地時，方塊不會歸還的問題 | 極高",
-        "修復公共領地失效的問題 | 高+",
-        "新增帳號系統 (僅供自己使用) | 低"
-    ],
-    "BETA 2.2.63 | 0": [
-        "帳號系統小更新 | 低"
+    "BETA 2.2.7 | 2": [
+        "支持版本V1.20.0+ | 必備",
+        "資料儲存轉移至記分板 | 極高"
     ]
 }
 

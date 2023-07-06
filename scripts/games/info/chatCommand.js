@@ -21,7 +21,7 @@ export const chatCommands = [
                 let args = message.split(" ")
                 if (args[1] != 'version' && args[1] != 'update') return error();
                 if (args[1] == 'version') {
-                    logfor(player.name, `§3§l>> §e目前版本§f:§e${version} §f(§e${updateDate}§f) §7| §e創作者 §7- §eCat1238756 §f(§bOM§f:§bcatmeowmeowmeow§f)`)
+                    logfor(player.name, `§3§l>> §e目前版本§f:§e${version} §f(§e${updateDate}§f)\n§7|||| §e創作者 §7- §eCat1238756 §b(§bOM§f:§bcatmeowmeowmeow §7/ §bDiscord§f:§bCat1238756#9196)`)
                 } else if (args[1] == 'update') {
                     let text = '§l§b更新內容 §7| §b影響程度§f'
                     for (let i in updates) {

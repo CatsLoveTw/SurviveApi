@@ -5,6 +5,7 @@ import { addSign, cmd, getSign, log, logfor } from '../../lib/GametestFunctions.
 import { worldlog } from '../../lib/function.js'
 import { checkAccountActive, getAccountData, newPlayer } from './functions.js'
 import { loginSession } from './classes.js'
+import { playerDB } from '../../config.js'
 
 // §
 // loginSessionTag =>
@@ -32,35 +33,34 @@ mc.system.runInterval(() => {
         for (let player of world.getAllPlayers()) {
             // 帳戶偵測/登入/帳號刪除
             let check = false
-            for (let tag of player.getTags()) {
-                if (tag.startsWith('{"loginSession":')) {
-                    function error () {
-                        player.removeTag(tag)
-                        logfor(player.name, `§c§l>> §e您的帳號因未知原因被刪除!`)
-                        player.runCommandAsync(`tp @s 0 300 0`)
-                    }
-                    check = true
-                    let data = loginSession.transformData(tag)
+            const db = playerDB.table(player.id), LoginSession = db.getData("loginSession")
+            if (LoginSession && typeof LoginSession.value == "object") {
+                function error() {
+                    db.removeData("loginSession")
+                    logfor(player.name, `§c§l>> §e您的帳號因未知原因被刪除!`)
+                    player.runCommandAsync(`tp @s 0 300 0`)
+                }
+                check = true
+                let data = loginSession.transformData(LoginSession.value)
 
-                    if (data.id == -1) {
-                        newPlayer(player)
-                    }
+                if (!data) {
+                    mc.system.runTimeout(() => {
+                        if (!data && player.hasTag(tag)) {
+                            error()
+                        }
+                    }, 15)
+                }
 
-                    if (!data) {
-                        mc.system.runTimeout(() => {
-                            if (!data && player.hasTag(tag)) {
-                                error()
-                            }
-                        }, 15)
-                    }
+                if (data.id == -1) {
+                    newPlayer(player)
+                }
 
-                    if (getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) {
-                        mc.system.runTimeout(() => {
-                            if ((getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) && player.hasTag(tag)) {
-                                error()
-                            }
-                        }, 15)
-                    }
+                if (getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) {
+                    mc.system.runTimeout(() => {
+                        if ((getAccountData(data.id).omid != data.omid || getAccountData(data.id).name != data.name) && player.hasTag(tag)) {
+                            error()
+                        }
+                    }, 15)
                 }
             }
             if (!check) {
@@ -68,4 +68,4 @@ mc.system.runInterval(() => {
             }
         }
     }
-}, 1)
+}, 2)

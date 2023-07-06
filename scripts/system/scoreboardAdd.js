@@ -1,6 +1,6 @@
 import { world, system } from '@minecraft/server'
 import * as mc from '@minecraft/server'
-import { cmd, log, logfor } from '../lib/GametestFunctions'
+import { cmd, cmd_async, log, logfor } from '../lib/GametestFunctions'
 import { tpaSetting } from '../games/tpa/defind'
 import { worldlog } from '../lib/function'
 import { playerDB } from '../config'
@@ -63,12 +63,8 @@ system.runInterval(() => {
             if (!player.hasTag('newPlayer')) {
                 const db = playerDB.table(player.id)
                 log(`§b§l>> §e歡迎 ${player.name} 加入SCC大家庭~`)
+                
                 // tpa設定
-                for (let tag of player.getTags()) {
-                    if (tag.includes("tpaSetting")) {
-                        player.removeTag(tag)
-                    }
-                }
                 let tpaSet = new tpaSetting(60, false, [], false)
                 db.setData("tpaSetting", tpaSet.toJSON())
 
@@ -96,6 +92,6 @@ const boards = {
 
 for (let board in boards) {
     try {
-        cmd(`scoreboard objectives add "${board}" dummy "${boards[board]}"`)
+        cmd_async(`scoreboard objectives add "${board}" dummy "${boards[board]}"`)
     } catch {}
 }

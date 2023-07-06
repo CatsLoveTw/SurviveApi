@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
-import { log, logfor, cmd } from '../../lib/GametestFunctions'
+import { log, logfor, cmd, cmd_async } from '../../lib/GametestFunctions'
 
 
 export class banList {
@@ -32,7 +32,7 @@ export function transformScoreboard(text) {
 
 
 function addBoard(ID, Display) {
-    cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+    cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
 }
 const boards = {
     "banlist": "黑名單玩家"

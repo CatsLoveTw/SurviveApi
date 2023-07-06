@@ -1,12 +1,12 @@
 import * as mc from '@minecraft/server'
 import { getRandomIntInclusive, worldlog } from '../../lib/function'
-import { log, logfor, cmd } from '../../lib/GametestFunctions'
+import { log, logfor, cmd, cmd_async } from '../../lib/GametestFunctions'
 import { dieMessages, playerDB } from '../../config'
 
 export function build() {
-    cmd(`gamerule showdeathmessages false`)
+    cmd_async(`gamerule showdeathmessages false`)
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+        cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
         "death": "死亡次數"
@@ -22,7 +22,6 @@ export function build() {
         if (player.typeId == 'minecraft:player') {
             const db = playerDB.table(player.id)
             player.runCommandAsync(`scoreboard players add @s death 1`)
-            db.removeData("backLocation")
             let json = {
                 "back": {
                     "x": player.location.x,

@@ -1,7 +1,7 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
 import { worldlog } from '../../lib/function'
-import { cmd, log, logfor } from '../../lib/GametestFunctions'
+import { cmd, cmd_async, log, logfor } from '../../lib/GametestFunctions'
 
 
 
@@ -58,7 +58,7 @@ export function adminUI (player) {
                 let title = res.formValues[0].trim()
                 let message = res.formValues[1].trim()
                 if (title == '' || message == '') return logfor(player.name, `§c§l>> §e標題或內容不可為空!`)
-                cmd(`scoreboard players set "title:${title}.___.message:${message}" notice 0`)
+                cmd_async(`scoreboard players set "title:${title}.___.message:${message}" notice 0`)
                 for (let player of worldlog.getPlayers()) {
                     player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"§f§l---§e伺服器公告新增§f---\n§e標題 §7- §f${title}\n§e內容 §7- §f${message}"}]}`)
                 }

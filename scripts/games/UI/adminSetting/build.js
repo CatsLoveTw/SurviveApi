@@ -1,10 +1,10 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../../lib/function'
-import { cmd, log } from '../../../lib/GametestFunctions'
+import { cmd, cmd_async, log } from '../../../lib/GametestFunctions'
 
 export function build () {
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add ${ID} dummy "${Display}"`)
+        cmd_async(`scoreboard objectives add ${ID} dummy "${Display}"`)
     }
     const boards = {
         "permission": "權限管理",
@@ -29,7 +29,7 @@ export function build () {
             for (let player of worldlog.getPlayers()) {
                 if (deletePlayer == player.name) {
                     player.removeTag(`admin`)
-                    cmd(`scoreboard players reset "${deletePlayer}" adminDelete`)
+                    cmd_async(`scoreboard players reset "${deletePlayer}" adminDelete`)
                     logfor(player.name, `§c§l>> §e您的管理員權限已被刪除。`)
                 }
             }

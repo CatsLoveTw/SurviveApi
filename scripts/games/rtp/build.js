@@ -4,7 +4,7 @@ import { cmd, log } from '../../lib/GametestFunctions'
 
 export function build () {
     function addBoard(ID, Display) {
-        cmd(`scoreboard objectives add "${ID}" dummy ${Display}`)
+        cmd_async(`scoreboard objectives add "${ID}" dummy ${Display}`)
     }
     const boards = {
         "rtp_time": "rtp冷卻時間"

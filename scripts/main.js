@@ -1,7 +1,6 @@
 import { world, system } from "@minecraft/server"
 import * as mc from "@minecraft/server"
-import * as ui from '@minecraft/server-ui'
-import { cmd, log, logfor } from './lib/GametestFunctions.js'
+import { log } from './lib/GametestFunctions.js'
 import * as chatCommnad from './games/chatCommands/build.js'
 import * as land from './games/land/build.js'
 import * as titleraw from './games/titleraw/build.js'
