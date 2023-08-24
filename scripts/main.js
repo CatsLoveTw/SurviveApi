@@ -15,6 +15,7 @@ import * as adminSetting from './games/UI/adminSetting/build.js'
 import * as shop from './games/shop/build.js'
 import * as money_leaderboard from './games/money_leaderboard/build.js'
 import * as test from './games/test/build.js'
+import "./games/containerLocked/build.js"
 import "./games/ban/build.js"
 import "./system/import.js"
 import "./system/account/index.js"
@@ -23,29 +24,25 @@ import "./system/account/index.js"
 
 
 
-try {
 
-system.events.beforeWatchdogTerminate.subscribe(event => {
+system.beforeEvents.watchdogTerminate.subscribe(event => {
     event.cancel = true
 })
 
 // system.runInterval() 類似於tickEvent
 
 // build
-try {
-    chatCommnad.build()
-    land.build()
-    titleraw.build()
-    tpa.build()
-    bank.build()
-    home.build()
-    menu.build()
-    rtp.build()
-    death.build()
-    notice.build()
-    adminSetting.build()
-    shop.build()
-    money_leaderboard.build()
-    test.build()
-} catch (e) {log("buildError" + e)}
-} catch (e) {log(e)}
+chatCommnad.build()
+land.build()
+titleraw.build()
+tpa.build()
+bank.build()
+home.build()
+menu.build()
+rtp.build()
+death.build()
+notice.build()
+adminSetting.build()
+shop.build()
+money_leaderboard.build()
+test.build()

@@ -35,7 +35,7 @@ export const functions = {
             let tableData = []
             for (let data of allData) {
                 const name = data.displayName, table = name.split("|||")[0], key = name.split("|||")[1].split(":::")[0], value = name.split(":::")[1];
-                const score = data.getScore(mc.world.scoreboard.getObjective(dbName));
+                const score = mc.world.scoreboard.getObjective(dbName).getScore(data)
 
                 if (table != tableName) continue;
                 tableData.push({
@@ -294,7 +294,6 @@ export class WorldDB_Table {
         key = key.toLowerCase();
         const tableData = functions.getTableData(this.dbName, this.tableName);
         if (!tableData) return null;
-
         let filter = tableData.filter(value => value.key == key)
         if (filter.length == 0) {
             for (const value of defaultValue) {
@@ -343,7 +342,6 @@ export class WorldDB_Table {
      * @param {number} score 顯示於記分板上的分數 預設`0`
      */
     setData(key, value, score = 0) {
-        try {
         key = key.toLowerCase()
         value = (typeof value == "string" && value.indexOf("\n") != -1) ? value.replace(/\n/g, "/n") : value 
         if (typeof value == "object" && !Array.isArray(value)) value = functions.objectToString(value); // 判斷是否為物件類型
@@ -353,7 +351,7 @@ export class WorldDB_Table {
         for (let par of scoreboard.getParticipants()) {
             let name = par.displayName;
             if (name.startsWith(`${this.tableName}|||${key}:::`)) {
-                par.removeFromObjective(scoreboard)
+                cmd(`scoreboard players reset "${name}" ${this.dbName}`)
             }
         }
 
@@ -366,7 +364,6 @@ export class WorldDB_Table {
             const list = `${this.tableName}|||${key}:::${value}`;
             cmd(`scoreboard players set "${list}" ${this.dbName} ${score}`);
         }
-    } catch (e) {log(e)}
     }
 
     /**

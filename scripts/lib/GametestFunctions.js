@@ -81,7 +81,7 @@ const addSign = function(message, player, tick, nowTick = 0, debug = false) {
     message = transformToString(message)
     let db = playerDB.table(player.id);
     let allMessage = db.getData('dynamic_message')
-    if (!allMessage || allMessage.value.length == 0) db.setData("dynamic_message", [{ news: message, tick: nowTick, maxtick: tick }], 0)
+    if (!allMessage || allMessage.value.length == 0) return db.setData("dynamic_message", [{ news: message, tick: nowTick, maxtick: tick }], 0)
     if (allMessage.value.length > 0) {
         allMessage.value.push({ news: message, tick: nowTick, maxtick: tick })
         db.setData("dynamic_message", allMessage.value, allMessage.score)

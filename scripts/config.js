@@ -11,25 +11,23 @@ export const prefix = "-";
  * @readonly
  * @description API版本
  */
-export const version = "BETA V2.2.7"
+export const version = "BETA V2.2.8-build1"
 /**
  * @readonly
  * @description API更新時間
  */
-export const updateDate = '2023/7/6 (Thurs.)'
+export const updateDate = '2023/8/24 (Thurs.)'
 /**
  * @readonly
  * @description API更新內容
  */
 export const updates = {
     // "版本號 | 加權值": []
-    "BETA 2.2.7-build1 | 0": [
-        "嘗試將玩家資料儲存 tag -> 記分板 (未完成) | 中+"
+    "BETA 2.2.8-build1 | 0": [
+        "支援版本V1.20.1 | 必備",
+        "新增容器鎖定功能 (目前僅支援1x1的箱子鎖定) | 中",
+        "修復部分Bug | 高"
     ],
-    "BETA 2.2.7 | 2": [
-        "支持版本V1.20.0+ | 必備",
-        "資料儲存轉移至記分板 | 極高"
-    ]
 }
 
 

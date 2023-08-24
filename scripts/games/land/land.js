@@ -242,7 +242,9 @@ export function build() {
     // 建造顯示
     mc.system.runInterval(() => {
         for (let player of mc.world.getAllPlayers()) {
-            for (let msg of getSign(player).value) {
+            const Signs = getSign(player)
+            if (!Signs) continue;
+            for (let msg of Signs.value) {
                 let msgData = msg
                 if (msgData.news.startsWith("§e§l領地系統 §f> §a您正在建造領地 §7- ")) {
                     const db = playerDB.table(player.id), LandCreatingExist = db.getData("landCreating");
@@ -597,9 +599,11 @@ export function build() {
             if (!landData.inLand.per.container && !getAdmin(player)) {
                 if (!landData.inLand.per.build) {
                     events.cancel = true
-                    let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
-                    removeSign(msg, player)
-                    addSign(msg, player, 60)
+                    mc.system.runTimeout(() => {
+                        let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
+                        removeSign(msg, player)
+                        addSign(msg, player, 60)
+                    }, 1)
                 }
             }
         }
@@ -610,8 +614,8 @@ export function build() {
 
     // 使用
     mc.world.beforeEvents.itemUseOn.subscribe(events => {
-        const { source: player } = events
-        let getBlock = player.getBlockFromViewDirection()
+        const { source: player, block } = events
+        let getBlock = block
         let landData = checkInLand_Pos(getBlock.location.x, getBlock.location.z, player.dimension.id)
         if (!landData) return;
         let getPer = { "container": false, "build": false }
@@ -633,10 +637,11 @@ export function build() {
         }
         if (!getPer.container && !getPer.build && !getAdmin(player)) {
             events.cancel = true
-            let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
-            removeSign(msg, player)
-            addSign(msg, player, 60)
-
+            mc.system.runTimeout(() => {
+                let msg = `§e§l領地系統 §f> §c您沒有權限使用該方塊!`
+                removeSign(msg, player)
+                addSign(msg, player, 60)
+            }, 1)
         }
     })
 
@@ -659,7 +664,7 @@ export function build() {
             }
         }
 
-        if (getPer.build == 'false' && !getAdmin(player)) {
+        if (!getPer.build && !getAdmin(player)) {
             player.runCommandAsync(`setblock ${block.location.x} ${block.location.y} ${block.location.z} air`)
             player.runCommandAsync(`give @s ${block.typeId}`)
             let msg = `§e§l領地系統 §f> §c您沒有權限放置該方塊!`
