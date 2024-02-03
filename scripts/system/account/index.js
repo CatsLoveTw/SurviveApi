@@ -1,5 +1,6 @@
 import { cmd, log } from '../../lib/GametestFunctions.js'
 import { worldlog } from '../../lib/function.js'
+import Event from '../eventBuild.js'
 import './login.js'
 import * as mc from '@minecraft/server'
 

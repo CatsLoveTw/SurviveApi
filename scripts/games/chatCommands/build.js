@@ -4,11 +4,11 @@ import { log, cmd, logfor } from '../../lib/GametestFunctions.js'
 import { prefix } from '../../config.js'
 import * as chatCommands from './export.js'
 import { checkAccountActive, checkLogin } from '../../system/account/functions.js'
+import Event from '../../system/eventBuild.js'
 
 
 export function build() {
-    // 
-    mc.world.beforeEvents.chatSend.subscribe(events => {
+    Event.on("beforeChatSend", events => {
         const { sender: player, message } = events;
         if (message.startsWith(prefix)) {
             events.cancel = true

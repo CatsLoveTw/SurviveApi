@@ -90,7 +90,7 @@ declare type InLand_Land = {
     name: string,
     pos: InLand_Position,
     UID: number,
-    player: string | falsem,
+    player: string | false,
     permission: InLand_landPermission,
     users: false | InLand_landUser[],
     Public: boolean,

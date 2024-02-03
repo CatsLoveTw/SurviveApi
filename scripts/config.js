@@ -11,12 +11,12 @@ export const prefix = "-";
  * @readonly
  * @description API版本
  */
-export const version = "BETA V2.2.8-build1"
+export const version = "BETA V2.2.8"
 /**
  * @readonly
  * @description API更新時間
  */
-export const updateDate = '2023/8/24 (Thurs.)'
+export const updateDate = '2024/2/3 (Sat.)'
 /**
  * @readonly
  * @description API更新內容
@@ -28,6 +28,13 @@ export const updates = {
         "新增容器鎖定功能 (目前僅支援1x1的箱子鎖定) | 中",
         "修復部分Bug | 高"
     ],
+    "BETA 2.2.8 | 0.3": [
+        "支援版本V1.20.51 | 必備",
+        "修復容器鎖定時空手仍可開啟的問題 | 高",
+        "容器鎖定支援2x1大箱子 | 中+",
+        "修復無法獲取羅盤 / 無法提款的問題 | 高",
+        "修復領地在修改玩家權限後需再次修改時報錯的問題 | 中"
+    ]
 }
 
 

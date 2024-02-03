@@ -102,7 +102,7 @@ export function playerUI (player) {
                                 if (currenc.count - count == 0) {
                                     inv.container.setItem(currenc.slot)
                                 } else {
-                                    let item = new mc.ItemStack(mc.MinecraftItemTypes.paper, currenc.count - count)
+                                    let item = new mc.ItemStack("minecraft:paper", currenc.count - count)
                                     item.nameTag = `§e§l現金 ${currenc.value} $`
                                     item.setLore(currenc.transformLore())
                                     inv.container.setItem(currenc.slot, item)
@@ -153,7 +153,7 @@ export function playerUI (player) {
                         let outMoney = Number(money) * Number(count)
                         if (outMoney > nowMoney) return logfor(player.name, `§c§l>> §e金額過大!`)
                         let currenc = new currency(Number(money), slot, Number(count))
-                        let item = new mc.ItemStack(mc.MinecraftItemTypes.paper, Number(count))
+                        let item = new mc.ItemStack("minecraft:paper", Number(count))
                         item.nameTag = `§e§l現金 ${currenc.value} $`
                         item.setLore(currenc.transformLore())
                         inv.container.setItem(currenc.slot, item)

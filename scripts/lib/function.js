@@ -123,6 +123,7 @@ class worldlogs {
     /**
      * @param {mc.Entity | mc.Player} entityClass
      * @returns {string} 玩家分數
+     * @deprecated 
      */
     getEntityScore (entityClass, scoreName) {
         let result = entityClass.runCommand(`scoreboard players add @s ${scoreName} 0`).statusMessage

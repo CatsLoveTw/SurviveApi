@@ -1,10 +1,11 @@
 import * as mc from '@minecraft/server'
 import * as ui from '@minecraft/server-ui'
-import { worldlog } from '../../lib/function.js'
+import { sleep, worldlog } from '../../lib/function.js'
 import { log, cmd, logfor, cmd_Dimension, getSign, removeSign, addSign, cmd_async } from '../../lib/GametestFunctions.js'
 import { checkInLand, checkInLand_Pos, checkNearLand_Pos } from './build.js'
 import { Land, LandCreate, getLandData, newLandPermission, newLandPosition, newLandUser } from './defind.js'
 import { playerDB } from '../../config.js'
+import Event from '../../system/eventBuild.js'
 export const times = 180 // 設定過期時間 (秒)
 
 /**
@@ -72,7 +73,7 @@ export function build() {
     }, 1)
 
     // 建造偵測
-    mc.world.afterEvents.blockPlace.subscribe(events => {
+    Event.on("beforePlayerPlaceBlock", async events => {
         const player = events.player, db = playerDB.table(player.id)
         let blockPos = events.block.location
 
@@ -83,28 +84,9 @@ export function build() {
          * Step起始為1
          */
         let json = db.getData("landCreating").value
-        if (json.landCreate.dime == 'overworld') {
-            cmd_async(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
-        } else if (json.landCreate.dime == 'nether') {
-            mc.world.getDimension(mc.MinecraftDimensionTypes.nether).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
-        } else if (json.landCreate.dime == 'end') {
-            mc.world.getDimension(mc.MinecraftDimensionTypes.theEnd).runCommandAsync(`setblock ${blockPos.x} ${blockPos.y} ${blockPos.z} air`)
-        }
+        events.cancel = true
 
-
-        /**
-         * @type {mc.EntityInventoryComponent}
-         */
-        let getINV = player.getComponent("inventory")
-        let slot = getINV.container.getSlot(player.selectedSlot)
-        // 該變數紀錄物品被放置之前的數據，因此不用調整
-        let item = slot.getItem()
-        // 測試後發現同時間設定物品會發生問題
-        mc.system.runTimeout(() => {
-            slot.setItem(item)
-        }, 2)
-        // 恢復物品
-
+        await sleep(1)
         if (Number(json.landCreate.step) == 1) {
             logfor(player.name, `§a§l>> §e成功設置第一點! §f(§bx§f:§b${blockPos.x} §7| §bz§f:§b${blockPos.z}§f)`)
             db.removeData("landCreating")
@@ -376,7 +358,7 @@ export function build() {
                                     let json = {
                                         inLand: {
                                             "dime": landDime,
-                                            "land": data,
+                                            "land": data.update(),
                                             "per": {
                                                 build: getPer.build,
                                                 container: getPer.container,
@@ -591,8 +573,8 @@ export function build() {
     }, 2)
 
     // 偵測交互
-    mc.world.beforeEvents.itemUseOn.subscribe(events => {
-        const { source: player, blockFace } = events
+    Event.on("beforePlayerInteractWithBlock", events => {
+        const { player } = events
         const db = playerDB.table(player.id), InLandExist = db.getData("inLandData")
         if (InLandExist && typeof InLandExist.value == "object") {
             let landData = InLandExist.value
@@ -613,8 +595,8 @@ export function build() {
     // 偵測在領地外使用/破壞領地內之容器
 
     // 使用
-    mc.world.beforeEvents.itemUseOn.subscribe(events => {
-        const { source: player, block } = events
+    Event.on("beforePlayerInteractWithBlock", events => {
+        const { player, block } = events
         let getBlock = block
         let landData = checkInLand_Pos(getBlock.location.x, getBlock.location.z, player.dimension.id)
         if (!landData) return;
@@ -646,7 +628,7 @@ export function build() {
     })
 
     // 放置
-    mc.world.afterEvents.blockPlace.subscribe(events => {
+    Event.on("beforePlayerPlaceBlock", events => {
         let { block, player, dimension } = events
         let data = checkInLand_Pos(block.location.x, block.location.z, player.dimension.id)
         if (!data) return;
@@ -674,7 +656,7 @@ export function build() {
     })
 
     // 破壞
-    mc.world.afterEvents.blockBreak.subscribe(events => {
+    Event.on("beforePlayerBreakBlock", events => {
         let { block, player, dimension, brokenBlockPermutation } = events
         let data = checkInLand_Pos(block.location.x, block.location.z, player.dimension.id)
         if (!data) return;

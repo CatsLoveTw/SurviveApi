@@ -352,6 +352,7 @@ export function UI(player) {
                                                             } else if (res.selection === 2) {
                                                                 permissionChange()
                                                                 function permissionChange() {
+                                                                    land = land.update();
                                                                     if (!land.users) return;
                                                                     let players = []
                                                                     let form = new ui.ActionFormData()
@@ -364,12 +365,6 @@ export function UI(player) {
                                                                         return logfor(player.name, '§c§l>> §e沒有玩家可以修改!')
                                                                     }
                                                                     form.show(player).then(res => {
-                                                                        function changeBoolean(text) {
-                                                                            if (text == "true") {
-                                                                                return true
-                                                                            }
-                                                                            return false
-                                                                        }
                                                                         if (res.canceled) return Personal();
                                                                         let selePlayer = players[res.selection]
                                                                         let form = new ui.ModalFormData()

@@ -1,6 +1,7 @@
 import * as mc from "@minecraft/server";
 import { defaultValue, playerDB } from "../../config";
 import { WorldDB } from "../../lib/db/WorldDB";
+import Event from "../eventBuild";
 
 mc.system.runInterval(() => {
     for (let player of mc.world.getAllPlayers()) {

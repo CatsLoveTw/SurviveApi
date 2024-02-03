@@ -6,6 +6,7 @@ import { worldlog } from '../../lib/function.js'
 import { checkAccountActive, getAccountData, newPlayer } from './functions.js'
 import { loginSession } from './classes.js'
 import { playerDB } from '../../config.js'
+import Event from '../eventBuild.js'
 
 // §
 // loginSessionTag =>
@@ -13,7 +14,7 @@ import { playerDB } from '../../config.js'
 // omid:${result.omid}|||name:${result.name}|||password${result.password}"
 // 大廳 0 -60 0 遊客區域 0 100 0
 
-world.afterEvents.worldInitialize.subscribe(() => {
+Event.on("afterWorldInitialize", () => {
     worldlog.addScoreBoards([
         {id: 'accounts', disname: "帳號儲存"},
         {id: 'accountActive', disname: "帳號系統啟用確認"},
@@ -21,7 +22,7 @@ world.afterEvents.worldInitialize.subscribe(() => {
     ])
 })
 
-world.afterEvents.playerJoin.subscribe(event => {
+Event.on("afterPlayerJoin", event => {
     if (checkAccountActive()) {
         let playerName = event.playerName
         cmd(`tp "${playerName}" 0 100 0`)

@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import { worldlog } from '../../lib/function'
 import { cmd, cmd_async, log, logfor } from '../../lib/GametestFunctions'
 import { getNoticeData } from './UI'
+import Event from '../../system/eventBuild'
 
 
 export function build() {
@@ -25,7 +26,7 @@ export function build() {
         }
     }, 200)
 
-    mc.world.afterEvents.playerJoin.subscribe(events => {
+    Event.on("afterPlayerJoin", events => {
         let { playerName } = events
         mc.system.runTimeout(() => {
             for (let notice of worldlog.getScoreboardPlayers('notice').disname) {

@@ -13,8 +13,9 @@ export class Land {
      * @param {false | import("./index").InLand_landUser[]} users 領地私人權限 (若是公共領地請填 false)
      * @param {boolean} Public 是否為公共領地
      * @param {boolean} old 領地是否為舊版或是否有錯誤
+     * @param {'overworld' | 'nether' | 'end' | null} dimension 領地所在緯度
      */
-    constructor (name, pos, UID, player, permission, users, Public, old) {
+    constructor (name, pos, UID, player, permission, users, Public, old, dimension) {
         this.name = name
         this.pos = pos
         this.UID = UID
@@ -23,6 +24,7 @@ export class Land {
         this.users = users
         this.Public = Public
         this.old = old
+        this.dimension = dimension
     }
     /**
      * 
@@ -59,6 +61,27 @@ export class Land {
             return `${name}_,_${pos}_,_${UID}_,_${player}_,_${permission}_,_${userList.join(":/:")}`
         }
         return `${name}_,_${pos}_,_${UID}_,_true_,_${permission}`
+    }
+
+
+    /**
+     * 更新領地資料 (或可用此取得領地緯度資料)
+     */
+    update() {
+        let dimensions = ["overworld", "nether", "end"]
+        
+        for (let dimension of dimensions) {
+            let lands = getAllLand(dimension)
+
+            for (let land of lands) {
+                if (land.Public != this.Public) continue;
+                if (land.UID != this.UID) continue;
+                if (land.name != this.name) continue;
+                return land
+            }
+        }
+        
+        return this
     }
 }
 
@@ -126,8 +149,9 @@ export function newLandUser (userName, build, container, portal, fly) {
 /**
  * 
  * @param {string} land 
+ * @param {import("./index").landDimension} dimension
  */
-export function getLandData(land) {
+export function getLandData(land, dimension = null) {
     let args = land.split("_,_")
 
     let postion = args[1].split("/")
@@ -195,9 +219,9 @@ export function getLandData(land) {
     const landName = args[0]
     const UID = Number(args[2]), player = args[3]
     if (args[3] != "true") {
-        return new Land(landName, position, UID, args[3], permission, usersList, false, old)
+        return new Land(landName, position, UID, args[3], permission, usersList, false, old, dimension)
     } else {
-        return new Land(landName, position, UID, false, permission, false, true, old)
+        return new Land(landName, position, UID, false, permission, false, true, old, dimension)
     }
 }
 
@@ -216,12 +240,35 @@ export function getPlayerLands(player, dimension) {
     }
     let playerLand = []
     for (let land of lands) {
-        let landDT = getLandData(land)
+        let landDT = getLandData(land, dimension)
         if (landDT.player == player.name) {
             playerLand.push(landDT)
         }
     }
     return playerLand
+}
+
+/**
+ * 取得特定緯度的領地
+ * @param {import("./index").landDimension} dimension 
+ * @returns 
+ */
+export function getAllLand (dimension) {
+    let lands = worldlog.getScoreboardPlayers("lands").disname
+    if (dimension == 'nether') {
+        lands = worldlog.getScoreboardPlayers("lands_nether").disname
+    }
+    if (dimension == 'end') {
+        lands = worldlog.getScoreboardPlayers('lands_end').disname
+    }
+
+
+    let newLands = []
+    for (let i in lands) {
+        newLands.push(getLandData(lands[i], dimension, true))
+    }
+
+    return newLands
 }
 
 /**
@@ -239,7 +286,7 @@ export function getAdminLands(dime) {
     let lands = worldlog.getScoreboardPlayers(landID).disname
     let playerLand = []
     for (let land of lands) {
-        let landDT = getLandData(land)
+        let landDT = getLandData(land).update()
         if (!landDT.player) {
             playerLand.push(landDT)
         }
@@ -269,7 +316,7 @@ export class LandCreate {
     }
     /**
      * 
-     * @returns {LandCreateJSON}
+     * @returns {import("./index").LandCreateJSON}
      */
     toJSON () {
         let json = {

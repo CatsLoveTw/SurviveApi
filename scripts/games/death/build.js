@@ -2,6 +2,7 @@ import * as mc from '@minecraft/server'
 import { getRandomIntInclusive, worldlog } from '../../lib/function'
 import { log, logfor, cmd, cmd_async } from '../../lib/GametestFunctions'
 import { dieMessages, playerDB } from '../../config'
+import Event from '../../system/eventBuild'
 
 export function build() {
     cmd_async(`gamerule showdeathmessages false`)
@@ -17,7 +18,7 @@ export function build() {
         }
     } catch { }
 
-    mc.world.afterEvents.entityDie.subscribe((events) => {
+    Event.on("afterEntityDie", (events) => {
         let player = events.deadEntity;
         try {
             if (player.typeId == 'minecraft:player') {

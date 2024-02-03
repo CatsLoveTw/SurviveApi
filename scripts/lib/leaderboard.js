@@ -8,6 +8,14 @@ import { isNum, randomInt, worldlog } from '../lib/function.js'
 function getScore (player, scoreName) {
     return worldlog.getScoreFromMinecraft(player, scoreName).score
 }
+
+/**
+ * 
+ * @param {string} scoreObjid 
+ * @param {number} rank 
+ * @param {boolean} deleteZero 
+ * @returns 
+ */
 export function leaderboard (scoreObjid, rank, deleteZero) {
     let scoreboard = world.scoreboard.getObjective(scoreObjid)
 
@@ -16,7 +24,7 @@ export function leaderboard (scoreObjid, rank, deleteZero) {
     let scores = []
     let names = []
     for (let participant of scoreboard.getParticipants()) {
-        let score = participant.getScore(scoreboard)
+        let score = scoreboard.getScore(participant)
         let displayName = participant.displayName
         names.push(displayName)
         scores.push(score)

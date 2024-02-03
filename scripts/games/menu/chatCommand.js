@@ -37,7 +37,7 @@ export const chatCommands = [
                 }
                 if (count == 36) return logfor(player.name, `§c§l>> §e背包已滿，請稍後嘗試!`)
 
-                let newItem = new mc.ItemStack(mc.MinecraftItemTypes.compass, 1)
+                let newItem = new mc.ItemStack("minecraft:compass", 1)
                 newItem.nameTag = `§e§l選單系統`
                 newItem.setLore(["§e§l右鍵/長按螢幕開啟選單"])
                 inv.container.setItem(Slot, newItem)

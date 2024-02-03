@@ -24,6 +24,7 @@ export async function playerUI (player) {
         .button("§e§l銀行系統", 'textures/ui/MCoin.png')
         .button("§e§l管理員選單", 'textures/ui/permissions_op_crown.png')
     const res = await form.show(player)
+    
     if (res.canceled) return;
     if (res.selection === 0) {
         land.UI(player)

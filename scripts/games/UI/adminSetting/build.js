@@ -1,6 +1,7 @@
 import * as mc from '@minecraft/server'
 import { worldlog } from '../../../lib/function'
 import { cmd, cmd_async, log } from '../../../lib/GametestFunctions'
+import Event from '../../../system/eventBuild'
 
 export function build () {
     function addBoard(ID, Display) {

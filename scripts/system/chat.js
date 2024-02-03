@@ -2,8 +2,9 @@ import { world } from '@minecraft/server'
 import * as mc from '@minecraft/server'
 import { prefix } from '../config';
 import { checkAccountActive, checkLogin } from './account/functions';
+import Event from './eventBuild';
 
-world.beforeEvents.chatSend.subscribe(events => {
+Event.on("beforeChatSend", events => {
     let player = events.sender;
     let message = events.message;
     let displayDimension = '§a§l主世界'

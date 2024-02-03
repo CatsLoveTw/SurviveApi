@@ -26,7 +26,7 @@ export function build() {
         }
     } catch { }
     land.build()
-
+    
     mc.system.runInterval(() => {
         for (let player of mc.world.getAllPlayers()) {
             let squ = worldlog.getScoreFromMinecraft(player.name, 'land_squ_save')
@@ -59,7 +59,7 @@ export function checkInLand(player) {
     }
     let landSelection = ['lands', 'lands_nether', 'lands_end']
     for (let land of worldlog.getScoreboardPlayers(landSelection[index]).disname) {
-        let data = getLandData(land)
+        let data = getLandData(land).update()
         let playerPos = player.location
         let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
         let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
@@ -90,7 +90,7 @@ export function checkInLand_Pos(x, z, dimeID) {
     }
     let landSelection = ['lands', 'lands_nether', 'lands_end']
     for (let land of worldlog.getScoreboardPlayers(landSelection[index]).disname) {
-        let data = getLandData(land)
+        let data = getLandData(land).update()
         let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
         let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
         let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))
@@ -124,7 +124,7 @@ export function checkNearLand_Pos(x, z, dimeID, near) {
     }
     let landSelection = ['lands', 'lands_nether', 'lands_end']
     for (let land of worldlog.getScoreboardPlayers(landSelection[index]).disname) {
-        let data = getLandData(land)
+        let data = getLandData(land).update()
         let x1 = Math.max(Number(data.pos.x[1]), Number(data.pos.x[2]))
         let x2 = Math.min(Number(data.pos.x[1]), Number(data.pos.x[2]))
         let z1 = Math.max(Number(data.pos.z[1]), Number(data.pos.z[2]))

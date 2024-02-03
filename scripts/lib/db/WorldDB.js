@@ -72,6 +72,8 @@ export const functions = {
                 return true
             } else if (value == "false") {
                 return false
+            } else if (value == "null") {
+                return null;
             } else {
                 return value;
             }
@@ -174,8 +176,7 @@ export const functions = {
      * @param {{}} obj
      * @returns {false | string} `false` 代表無法轉換，可能是內容不為物件
      */
-    objectToString(obj) {
-        try {
+    objectToString(obj, debug = false) {
         if (typeof obj != "object") return false;
 
         let last = "{"
@@ -187,13 +188,17 @@ export const functions = {
             now++
 
             // 是否為物件、陣列
+            
             let value
-            if (typeof obj[key] == "object" && !Array.isArray(obj[key])) {
-                value = this.objectToString(obj[key])
+            if (typeof obj[key] == "object" && obj[key] != null && !Array.isArray(obj[key])) {
+                value = this.objectToString(obj[key], debug)
             } else if (Array.isArray(obj[key])) {
                 value = this.arrayToString(obj[key])
             } else value = obj[key];
 
+            
+            
+            value = (value == null) ? "null" : value
             value = (typeof value == "string" && value.indexOf("\n") != -1) ? value.replace(/\n/g, "/n") : value
             last += `${key}: ${value}`
             if (now != keyLength) last += ", "; // 若不是最後一項key，將用", "分隔每個key
@@ -201,7 +206,6 @@ export const functions = {
 
         last += "}"
         return last;
-    } catch (e) {log(e)}
     },
 
     /**
@@ -209,7 +213,6 @@ export const functions = {
      * @param {any[]} value 
      */
     arrayToString(value) {
-        try {
         if (!Array.isArray(value)) return false;
         if (value.length == 0) return "[]"
         let last = "["
@@ -226,6 +229,7 @@ export const functions = {
                 val = this.arrayToString(data)
             } else val = data;
 
+            val = (val == null) ? "null" : val
             val = (typeof val == "string" && val.indexOf("\n") != -1) ? val.replace(/\n/g, "/n") : val
             last += `${val}`
             if (nowLength != length) last += " , "; // 若不是最後一項key，將用", "分隔每個key
@@ -233,7 +237,6 @@ export const functions = {
 
         last += "]"
         return last
-    } catch (e) {log(e)}
     }
 }
 
@@ -341,11 +344,12 @@ export class WorldDB_Table {
      * @param {string | number | {} | any[]} value
      * @param {number} score 顯示於記分板上的分數 預設`0`
      */
-    setData(key, value, score = 0) {
+    setData(key, value, score = 0, debug = false) {
         key = key.toLowerCase()
         value = (typeof value == "string" && value.indexOf("\n") != -1) ? value.replace(/\n/g, "/n") : value 
-        if (typeof value == "object" && !Array.isArray(value)) value = functions.objectToString(value); // 判斷是否為物件類型
+        if (typeof value == "object" && !Array.isArray(value)) value = functions.objectToString(value, debug); // 判斷是否為物件類型
 
+        
         // 刪除原先的內容
         let scoreboard = mc.world.scoreboard.getObjective(this.dbName);
         for (let par of scoreboard.getParticipants()) {

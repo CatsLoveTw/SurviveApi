@@ -1,8 +1,8 @@
 {
 	"format_version": 2,
 	"header": {
-		"name": "§e§l生存伺服器包 V2.2.8-build1",
-		"description": "By cat | 支援:V1.20.1+",
+		"name": "§e§l生存伺服器包 V2.2.8",
+		"description": "By cat | 支援:V1.20.51",
 		"min_engine_version": [
 			1,
 			19,
@@ -32,7 +32,7 @@
 	"dependencies": [
 		{
 			"module_name": "@minecraft/server",
-			"version": "1.4.0-beta"
+			"version": "1.8.0-beta"
 		},
 		{
 			"module_name": "@minecraft/server-gametest",

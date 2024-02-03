@@ -4,6 +4,7 @@ import { worldlog } from "../lib/function"
 import { cmd, log, logfor } from "../lib/GametestFunctions"
 import { tpaSetting } from "../games/tpa/defind"
 import { playerDB } from "../config"
+import Event from "./eventBuild"
 
 mc.system.runInterval(() => {
     for (let player of mc.world.getAllPlayers()) {
